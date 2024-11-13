@@ -1,4 +1,4 @@
-package hiidy.ticketbookingsystem;
+package com.seatwise;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
