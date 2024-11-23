@@ -1,11 +1,13 @@
-package com.seatwise.show;
+package com.seatwise.show.service;
 
 import com.seatwise.event.entity.Event;
 import com.seatwise.event.exception.EventException;
 import com.seatwise.event.repository.EventRepository;
 import com.seatwise.global.exception.ErrorCode;
+import com.seatwise.show.Show;
 import com.seatwise.show.dto.request.ShowCreateRequest;
 import com.seatwise.show.dto.response.ShowCreateResponse;
+import com.seatwise.show.exception.DuplicateShowException;
 import com.seatwise.show.repository.ShowRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +47,7 @@ public class ShowService {
             .anyMatch(existingShow -> isTimeOverlapping(existingShow, newShow));
 
     if (hasOverlap) {
-      throw new DuplicateShowException("test");
+      throw new DuplicateShowException(ErrorCode.DUPLICATE_SHOW);
     }
   }
 

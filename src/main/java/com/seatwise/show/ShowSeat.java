@@ -2,7 +2,7 @@ package com.seatwise.show;
 
 import com.seatwise.booking.Booking;
 import com.seatwise.common.BaseEntity;
-import com.seatwise.seat.Seat;
+import com.seatwise.seat.entity.Seat;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
