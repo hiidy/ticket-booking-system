@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
+import com.seatwise.seat.domain.Seat;
+import com.seatwise.seat.domain.SeatType;
 import com.seatwise.seat.dto.SeatsCreateRequest;
 import com.seatwise.seat.dto.SeatsCreateResponse;
-import com.seatwise.seat.entity.Seat;
-import com.seatwise.seat.entity.SeatType;
 import com.seatwise.seat.repository.SeatRepository;
 import com.seatwise.seat.service.SeatService;
 import java.util.List;

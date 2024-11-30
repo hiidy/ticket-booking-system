@@ -1,6 +1,6 @@
 package com.seatwise.seat.dto;
 
-import com.seatwise.seat.entity.Seat;
+import com.seatwise.seat.domain.Seat;
 
 public record SeatCreateResponse(Long seatId) {
 

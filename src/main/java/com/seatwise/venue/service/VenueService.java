@@ -1,6 +1,6 @@
 package com.seatwise.venue.service;
 
-import com.seatwise.venue.entity.Venue;
+import com.seatwise.venue.domain.Venue;
 import com.seatwise.venue.repository.VenueRepository;
 import com.seatwise.venue.service.dto.VenueCreateDto;
 import lombok.RequiredArgsConstructor;

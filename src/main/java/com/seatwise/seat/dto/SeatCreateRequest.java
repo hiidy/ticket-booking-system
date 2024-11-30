@@ -1,7 +1,7 @@
 package com.seatwise.seat.dto;
 
-import com.seatwise.seat.entity.Seat;
-import com.seatwise.seat.entity.SeatType;
+import com.seatwise.seat.domain.Seat;
+import com.seatwise.seat.domain.SeatType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

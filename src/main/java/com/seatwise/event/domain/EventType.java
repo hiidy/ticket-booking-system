@@ -1,4 +1,4 @@
-package com.seatwise.event.entity;
+package com.seatwise.event.domain;
 
 public enum EventType {
   CONCERT("콘서트"),

@@ -1,10 +1,10 @@
 package com.seatwise.show.service;
 
-import com.seatwise.event.entity.Event;
+import com.seatwise.event.domain.Event;
 import com.seatwise.event.exception.EventException;
 import com.seatwise.event.repository.EventRepository;
 import com.seatwise.global.exception.ErrorCode;
-import com.seatwise.show.Show;
+import com.seatwise.show.domain.Show;
 import com.seatwise.show.dto.request.ShowCreateRequest;
 import com.seatwise.show.dto.response.ShowCreateResponse;
 import com.seatwise.show.exception.DuplicateShowException;

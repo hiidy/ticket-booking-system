@@ -1,4 +1,4 @@
-package com.seatwise.show;
+package com.seatwise.show.controller;
 
 import com.seatwise.show.dto.request.ShowCreateRequest;
 import com.seatwise.show.dto.response.ShowCreateResponse;

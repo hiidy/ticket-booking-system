@@ -1,4 +1,4 @@
-package com.seatwise.seat.entity;
+package com.seatwise.seat.domain;
 
 public enum SeatType {
   VIP,

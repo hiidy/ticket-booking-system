@@ -1,9 +1,9 @@
 package com.seatwise.event.service;
 
+import com.seatwise.event.domain.Event;
 import com.seatwise.event.dto.request.EventRequest;
 import com.seatwise.event.dto.response.EventCreateResponse;
 import com.seatwise.event.dto.response.EventResponse;
-import com.seatwise.event.entity.Event;
 import com.seatwise.event.exception.EventException;
 import com.seatwise.event.repository.EventRepository;
 import com.seatwise.global.exception.ErrorCode;

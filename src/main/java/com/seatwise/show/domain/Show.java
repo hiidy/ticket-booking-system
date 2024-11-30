@@ -1,7 +1,7 @@
-package com.seatwise.show;
+package com.seatwise.show.domain;
 
 import com.seatwise.common.BaseEntity;
-import com.seatwise.event.entity.Event;
+import com.seatwise.event.domain.Event;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;

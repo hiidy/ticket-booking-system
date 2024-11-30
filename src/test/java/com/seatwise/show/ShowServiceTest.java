@@ -3,8 +3,9 @@ package com.seatwise.show;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-import com.seatwise.event.entity.Event;
-import com.seatwise.event.entity.EventType;
+import com.seatwise.event.domain.Event;
+import com.seatwise.event.domain.EventType;
+import com.seatwise.show.domain.Show;
 import com.seatwise.show.dto.request.ShowCreateRequest;
 import com.seatwise.show.exception.DuplicateShowException;
 import com.seatwise.show.repository.ShowRepository;
