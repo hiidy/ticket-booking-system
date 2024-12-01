@@ -7,6 +7,7 @@ CREATE TABLE seat
     id          INT AUTO_INCREMENT PRIMARY KEY,
     seat_number INT          NOT NULL,
     type        VARCHAR(255) NOT NULL,
+    venue_id    INT          NOT NULL,
     created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

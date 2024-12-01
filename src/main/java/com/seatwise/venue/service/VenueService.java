@@ -1,5 +1,7 @@
 package com.seatwise.venue.service;
 
+import com.seatwise.global.exception.ErrorCode;
+import com.seatwise.global.exception.NotFoundException;
 import com.seatwise.venue.domain.Venue;
 import com.seatwise.venue.repository.VenueRepository;
 import com.seatwise.venue.service.dto.VenueCreateDto;
@@ -11,6 +13,12 @@ import org.springframework.stereotype.Service;
 public class VenueService {
 
   private final VenueRepository venueRepository;
+
+  public Venue findById(Long id) {
+    return venueRepository
+        .findById(id)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.VENUE_NOT_FOUND));
+  }
 
   public Long createVenue(VenueCreateDto createDto) {
     Venue venue =

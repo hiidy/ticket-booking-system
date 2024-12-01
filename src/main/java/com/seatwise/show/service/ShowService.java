@@ -4,6 +4,7 @@ import com.seatwise.event.domain.Event;
 import com.seatwise.event.exception.EventException;
 import com.seatwise.event.repository.EventRepository;
 import com.seatwise.global.exception.ErrorCode;
+import com.seatwise.global.exception.NotFoundException;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.dto.request.ShowCreateRequest;
 import com.seatwise.show.dto.response.ShowCreateResponse;
@@ -19,6 +20,12 @@ public class ShowService {
 
   private final ShowRepository showRepository;
   private final EventRepository eventRepository;
+
+  public Show findById(Long id) {
+    return showRepository
+        .findById(id)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.SHOW_NOT_FOUND));
+  }
 
   public ShowCreateResponse createShow(ShowCreateRequest createRequest) {
     List<Show> existingShows = showRepository.findByEventId(createRequest.eventId());

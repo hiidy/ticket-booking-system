@@ -1,8 +1,8 @@
 package com.seatwise.seat.controller;
 
+import com.seatwise.seat.controller.request.SeatsCreateRequest;
 import com.seatwise.seat.dto.SeatCreateRequest;
 import com.seatwise.seat.dto.SeatCreateResponse;
-import com.seatwise.seat.dto.SeatsCreateRequest;
 import com.seatwise.seat.dto.SeatsCreateResponse;
 import com.seatwise.seat.service.SeatService;
 import jakarta.validation.Valid;
@@ -26,6 +26,6 @@ public class SeatController {
 
   @PostMapping
   public SeatsCreateResponse createSeats(@RequestBody SeatsCreateRequest request) {
-    return seatService.createSeats(request);
+    return seatService.createSeats(request.toCreateDto());
   }
 }

@@ -1,14 +1,16 @@
 package com.seatwise.seat.service;
 
 import com.seatwise.seat.domain.Seat;
-import com.seatwise.seat.domain.SeatType;
+import com.seatwise.seat.dto.SeatCreateDto;
 import com.seatwise.seat.dto.SeatCreateRequest;
 import com.seatwise.seat.dto.SeatCreateResponse;
-import com.seatwise.seat.dto.SeatsCreateRequest;
 import com.seatwise.seat.dto.SeatsCreateResponse;
 import com.seatwise.seat.repository.SeatRepository;
-import java.util.ArrayList;
+import com.seatwise.venue.domain.Venue;
+import com.seatwise.venue.service.VenueService;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,18 +19,30 @@ import org.springframework.stereotype.Service;
 public class SeatService {
 
   private final SeatRepository seatRepository;
+  private final VenueService venueService;
 
   public SeatCreateResponse createSeat(SeatCreateRequest seatCreateRequest) {
     Seat saveSeat = seatRepository.save(seatCreateRequest.toEntity());
     return SeatCreateResponse.from(saveSeat);
   }
 
-  public SeatsCreateResponse createSeats(SeatsCreateRequest createRequest) {
-    List<Seat> seats = new ArrayList<>();
-    for (int i = 1; i <= createRequest.maxSeatNumber(); i++) {
-      seats.add(
-          Seat.builder().seatNumber(i).type(SeatType.valueOf(createRequest.seatType())).build());
-    }
+  public SeatsCreateResponse createSeats(SeatCreateDto createDto) {
+    Venue venue = venueService.findById(createDto.venueId());
+
+    List<Seat> seats =
+        createDto.seatTypeRanges().stream()
+            .flatMap(
+                range ->
+                    IntStream.rangeClosed(range.startNumber(), range.endNumber())
+                        .mapToObj(
+                            seatNumber ->
+                                Seat.builder()
+                                    .venue(venue)
+                                    .seatNumber(seatNumber)
+                                    .type(range.seatType())
+                                    .build()))
+            .collect(Collectors.toList());
+
     List<Seat> savedSeats = seatRepository.saveAll(seats);
     return SeatsCreateResponse.from(savedSeats);
   }
