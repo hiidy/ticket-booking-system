@@ -6,9 +6,10 @@ import static org.mockito.Mockito.when;
 import com.seatwise.event.domain.Event;
 import com.seatwise.event.domain.EventType;
 import com.seatwise.event.repository.EventRepository;
+import com.seatwise.global.exception.ConflictException;
+import com.seatwise.global.exception.ErrorCode;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.dto.request.ShowCreateRequest;
-import com.seatwise.show.exception.DuplicateShowException;
 import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.show.service.ShowService;
 import java.time.LocalDate;
@@ -64,6 +65,7 @@ class ShowServiceTest {
 
     // Then
     assertThatThrownBy(() -> showService.createShow(showCreateRequest))
-        .isInstanceOf(DuplicateShowException.class);
+        .isInstanceOf(ConflictException.class)
+        .hasMessage(ErrorCode.DUPLICATE_SHOW.getMessage());
   }
 }

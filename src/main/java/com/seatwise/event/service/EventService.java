@@ -4,9 +4,9 @@ import com.seatwise.event.domain.Event;
 import com.seatwise.event.dto.request.EventRequest;
 import com.seatwise.event.dto.response.EventCreateResponse;
 import com.seatwise.event.dto.response.EventResponse;
-import com.seatwise.event.exception.EventException;
 import com.seatwise.event.repository.EventRepository;
 import com.seatwise.global.exception.ErrorCode;
+import com.seatwise.global.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +25,6 @@ public class EventService {
     return eventRepository
         .findById(eventId)
         .map(EventResponse::from)
-        .orElseThrow(() -> new EventException(ErrorCode.EVENT_NOT_FOUND));
+        .orElseThrow(() -> new NotFoundException(ErrorCode.EVENT_NOT_FOUND));
   }
 }
