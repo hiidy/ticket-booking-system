@@ -4,6 +4,7 @@ import com.seatwise.seat.service.SeatService;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.domain.ShowSeat;
 import com.seatwise.show.dto.ShowSeatCreateDto;
+import com.seatwise.show.dto.response.ShowSeatCreateResponse;
 import com.seatwise.show.repository.ShowSeatRepository;
 import java.util.Collection;
 import java.util.List;
@@ -19,7 +20,7 @@ public class ShowSeatService {
   private final ShowService showService;
   private final SeatService seatService;
 
-  public void createShowSeat(ShowSeatCreateDto createDto) {
+  public ShowSeatCreateResponse createShowSeat(ShowSeatCreateDto createDto) {
 
     Show show = showService.findById(createDto.showId());
 
@@ -41,6 +42,7 @@ public class ShowSeatService {
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
 
-    showSeatRepository.saveAll(showSeats);
+    List<ShowSeat> savedShowSeats = showSeatRepository.saveAll(showSeats);
+    return ShowSeatCreateResponse.from(savedShowSeats);
   }
 }
