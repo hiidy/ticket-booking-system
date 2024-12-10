@@ -2,6 +2,8 @@ package com.seatwise.show.domain;
 
 import com.seatwise.common.BaseEntity;
 import com.seatwise.event.domain.Event;
+import com.seatwise.global.exception.BadRequestException;
+import com.seatwise.global.exception.ErrorCode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -45,10 +47,17 @@ public class Show extends BaseEntity {
 
   @Builder
   public Show(Event event, LocalDate date, LocalTime startTime, LocalTime endTime) {
+    validateTimes(startTime, endTime);
     this.event = event;
     this.date = date;
     this.startTime = startTime;
     this.endTime = endTime;
+  }
+
+  public void validateTimes(LocalTime startTime, LocalTime endTime) {
+    if (startTime.isAfter(endTime)) {
+      throw new BadRequestException(ErrorCode.INVALID_SHOW_TIME);
+    }
   }
 
   public boolean isOverlapping(Show other) {

@@ -2,6 +2,8 @@ package com.seatwise.show;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.seatwise.global.exception.BadRequestException;
+import com.seatwise.global.exception.ErrorCode;
 import com.seatwise.show.domain.Show;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -77,5 +79,19 @@ class ShowTest {
 
     // When & Then
     assertThat(show1.isOverlapping(show2)).isFalse();
+  }
+
+  @Test
+  @DisplayName("show의 종료 시간이 시작 시간 이후인지 확인")
+  void validateStartTimeIsBeforeEndTime() {
+
+    // Given
+    LocalTime startTime = LocalTime.of(16, 0);
+    LocalTime endTime = LocalTime.of(14, 0);
+
+    // When & Then
+    assertThatThrownBy(() -> Show.builder().startTime(startTime).endTime(endTime).build())
+        .isInstanceOf(BadRequestException.class)
+        .hasMessage(ErrorCode.INVALID_SHOW_TIME.getMessage());
   }
 }
