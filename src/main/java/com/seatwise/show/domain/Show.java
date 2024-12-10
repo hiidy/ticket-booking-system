@@ -1,9 +1,9 @@
 package com.seatwise.show.domain;
 
-import com.seatwise.common.BaseEntity;
+import com.seatwise.common.domain.BaseEntity;
+import com.seatwise.common.exception.BadRequestException;
+import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.event.domain.Event;
-import com.seatwise.global.exception.BadRequestException;
-import com.seatwise.global.exception.ErrorCode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;

@@ -1,6 +1,6 @@
 package com.seatwise.booking;
 
-import com.seatwise.common.BaseEntity;
+import com.seatwise.common.domain.BaseEntity;
 import com.seatwise.show.domain.ShowSeat;
 import com.seatwise.user.User;
 import jakarta.persistence.Entity;

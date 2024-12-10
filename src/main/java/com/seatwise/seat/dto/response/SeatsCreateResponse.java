@@ -1,4 +1,4 @@
-package com.seatwise.seat.dto;
+package com.seatwise.seat.dto.response;
 
 import com.seatwise.seat.domain.Seat;
 import java.util.List;

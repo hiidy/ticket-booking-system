@@ -1,4 +1,4 @@
-package com.seatwise.venue.controller.request;
+package com.seatwise.venue.dto.request;
 
 import com.seatwise.venue.service.dto.VenueCreateDto;
 import jakarta.validation.constraints.NotBlank;

@@ -1,12 +1,12 @@
 package com.seatwise.event.service;
 
+import com.seatwise.common.exception.ErrorCode;
+import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.event.domain.Event;
 import com.seatwise.event.dto.request.EventRequest;
 import com.seatwise.event.dto.response.EventCreateResponse;
 import com.seatwise.event.dto.response.EventResponse;
 import com.seatwise.event.repository.EventRepository;
-import com.seatwise.global.exception.ErrorCode;
-import com.seatwise.global.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

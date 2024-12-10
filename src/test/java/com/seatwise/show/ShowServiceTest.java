@@ -3,11 +3,11 @@ package com.seatwise.show;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+import com.seatwise.common.exception.ConflictException;
+import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.event.domain.Event;
 import com.seatwise.event.domain.EventType;
 import com.seatwise.event.repository.EventRepository;
-import com.seatwise.global.exception.ConflictException;
-import com.seatwise.global.exception.ErrorCode;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.dto.request.ShowCreateRequest;
 import com.seatwise.show.repository.ShowRepository;

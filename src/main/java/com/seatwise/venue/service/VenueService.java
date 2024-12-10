@@ -1,7 +1,7 @@
 package com.seatwise.venue.service;
 
-import com.seatwise.global.exception.ErrorCode;
-import com.seatwise.global.exception.NotFoundException;
+import com.seatwise.common.exception.ErrorCode;
+import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.venue.domain.Venue;
 import com.seatwise.venue.repository.VenueRepository;
 import com.seatwise.venue.service.dto.VenueCreateDto;

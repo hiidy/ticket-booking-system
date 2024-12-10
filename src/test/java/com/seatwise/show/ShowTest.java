@@ -2,8 +2,8 @@ package com.seatwise.show;
 
 import static org.assertj.core.api.Assertions.*;
 
-import com.seatwise.global.exception.BadRequestException;
-import com.seatwise.global.exception.ErrorCode;
+import com.seatwise.common.exception.BadRequestException;
+import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.show.domain.Show;
 import java.time.LocalDate;
 import java.time.LocalTime;

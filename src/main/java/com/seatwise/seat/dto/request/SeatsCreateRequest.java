@@ -1,4 +1,4 @@
-package com.seatwise.seat.controller.request;
+package com.seatwise.seat.dto.request;
 
 import com.seatwise.seat.dto.SeatCreateDto;
 import jakarta.validation.constraints.NotNull;

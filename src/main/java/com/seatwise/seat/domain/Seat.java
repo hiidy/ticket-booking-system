@@ -1,6 +1,6 @@
 package com.seatwise.seat.domain;
 
-import com.seatwise.common.BaseEntity;
+import com.seatwise.common.domain.BaseEntity;
 import com.seatwise.show.domain.ShowSeat;
 import com.seatwise.venue.domain.Venue;
 import jakarta.persistence.Entity;

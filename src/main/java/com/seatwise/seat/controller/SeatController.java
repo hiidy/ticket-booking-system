@@ -1,9 +1,9 @@
 package com.seatwise.seat.controller;
 
-import com.seatwise.seat.controller.request.SeatsCreateRequest;
-import com.seatwise.seat.dto.SeatCreateRequest;
-import com.seatwise.seat.dto.SeatCreateResponse;
-import com.seatwise.seat.dto.SeatsCreateResponse;
+import com.seatwise.seat.dto.request.SeatCreateRequest;
+import com.seatwise.seat.dto.request.SeatsCreateRequest;
+import com.seatwise.seat.dto.response.SeatCreateResponse;
+import com.seatwise.seat.dto.response.SeatsCreateResponse;
 import com.seatwise.seat.service.SeatService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

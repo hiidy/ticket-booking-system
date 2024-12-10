@@ -1,4 +1,4 @@
-package com.seatwise.global.exception;
+package com.seatwise.common.exception;
 
 public class NotFoundException extends BusinessException {
   public NotFoundException(ErrorCode errorCode) {

@@ -1,6 +1,6 @@
 package com.seatwise.event.domain;
 
-import com.seatwise.common.BaseEntity;
+import com.seatwise.common.domain.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

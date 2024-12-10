@@ -1,4 +1,4 @@
-package com.seatwise.seat.dto;
+package com.seatwise.seat.dto.request;
 
 import com.seatwise.seat.domain.Seat;
 import com.seatwise.seat.domain.SeatType;

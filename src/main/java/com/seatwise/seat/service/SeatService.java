@@ -2,9 +2,9 @@ package com.seatwise.seat.service;
 
 import com.seatwise.seat.domain.Seat;
 import com.seatwise.seat.dto.SeatCreateDto;
-import com.seatwise.seat.dto.SeatCreateRequest;
-import com.seatwise.seat.dto.SeatCreateResponse;
-import com.seatwise.seat.dto.SeatsCreateResponse;
+import com.seatwise.seat.dto.request.SeatCreateRequest;
+import com.seatwise.seat.dto.response.SeatCreateResponse;
+import com.seatwise.seat.dto.response.SeatsCreateResponse;
 import com.seatwise.seat.repository.SeatRepository;
 import com.seatwise.venue.domain.Venue;
 import com.seatwise.venue.service.VenueService;

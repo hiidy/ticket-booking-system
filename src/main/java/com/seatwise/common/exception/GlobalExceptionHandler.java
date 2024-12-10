@@ -1,4 +1,4 @@
-package com.seatwise.global.exception;
+package com.seatwise.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

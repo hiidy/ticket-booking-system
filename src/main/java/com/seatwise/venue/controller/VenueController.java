@@ -1,6 +1,6 @@
 package com.seatwise.venue.controller;
 
-import com.seatwise.venue.controller.request.VenueCreateRequest;
+import com.seatwise.venue.dto.request.VenueCreateRequest;
 import com.seatwise.venue.service.VenueService;
 import jakarta.validation.Valid;
 import java.net.URI;

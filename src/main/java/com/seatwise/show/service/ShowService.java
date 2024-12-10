@@ -1,10 +1,10 @@
 package com.seatwise.show.service;
 
+import com.seatwise.common.exception.ConflictException;
+import com.seatwise.common.exception.ErrorCode;
+import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.event.domain.Event;
 import com.seatwise.event.repository.EventRepository;
-import com.seatwise.global.exception.ConflictException;
-import com.seatwise.global.exception.ErrorCode;
-import com.seatwise.global.exception.NotFoundException;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.dto.request.ShowCreateRequest;
 import com.seatwise.show.dto.response.ShowCreateResponse;
