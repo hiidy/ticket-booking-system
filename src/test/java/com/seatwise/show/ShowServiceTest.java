@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import com.seatwise.event.domain.Event;
 import com.seatwise.event.domain.EventType;
+import com.seatwise.event.repository.EventRepository;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.dto.request.ShowCreateRequest;
 import com.seatwise.show.exception.DuplicateShowException;
@@ -13,7 +14,9 @@ import com.seatwise.show.service.ShowService;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,6 +28,7 @@ class ShowServiceTest {
 
   @InjectMocks private ShowService showService;
   @Mock private ShowRepository showRepository;
+  @Mock private EventRepository eventRepository;
 
   private Event event;
 
@@ -39,6 +43,7 @@ class ShowServiceTest {
   }
 
   @Test
+  @DisplayName("show를 만들때 시간이 겹치면 예외 반환")
   void createShow_WithOverlappingTime_ThrowsException() {
     // Given
     Show existingShow =
@@ -55,6 +60,7 @@ class ShowServiceTest {
 
     // When & Then
     when(showRepository.findByEventId(1L)).thenReturn(List.of(existingShow));
+    when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
 
     // Then
     assertThatThrownBy(() -> showService.createShow(showCreateRequest))

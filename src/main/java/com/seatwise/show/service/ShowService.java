@@ -30,40 +30,29 @@ public class ShowService {
   public ShowCreateResponse createShow(ShowCreateRequest createRequest) {
     List<Show> existingShows = showRepository.findByEventId(createRequest.eventId());
 
-    validateOverlappingShow(existingShows, createRequest);
-
     Event event =
         eventRepository
             .findById(createRequest.eventId())
             .orElseThrow(() -> new EventException(ErrorCode.EVENT_NOT_FOUND));
 
-    Show show =
+    Show newShow =
         Show.builder()
             .event(event)
             .date(createRequest.date())
             .startTime(createRequest.startTime())
             .endTime(createRequest.endTime())
             .build();
-    return ShowCreateResponse.from(showRepository.save(show));
+
+    validateOverlappingShow(existingShows, newShow);
+    return ShowCreateResponse.from(showRepository.save(newShow));
   }
 
-  private void validateOverlappingShow(List<Show> existingShows, ShowCreateRequest newShow) {
+  private void validateOverlappingShow(List<Show> existingShows, Show newShow) {
     boolean hasOverlap =
-        existingShows.stream()
-            .filter(existingShow -> isSameDate(existingShow, newShow))
-            .anyMatch(existingShow -> isTimeOverlapping(existingShow, newShow));
+        existingShows.stream().anyMatch(existingShow -> existingShow.isOverlapping(newShow));
 
     if (hasOverlap) {
       throw new DuplicateShowException(ErrorCode.DUPLICATE_SHOW);
     }
-  }
-
-  private boolean isSameDate(Show existingShow, ShowCreateRequest newShow) {
-    return existingShow.getDate().equals(newShow.date());
-  }
-
-  private boolean isTimeOverlapping(Show existingShow, ShowCreateRequest newShow) {
-    return !(newShow.endTime().isBefore(existingShow.getStartTime())
-        || newShow.startTime().isAfter(existingShow.getEndTime()));
   }
 }

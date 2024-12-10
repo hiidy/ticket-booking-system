@@ -50,4 +50,16 @@ public class Show extends BaseEntity {
     this.startTime = startTime;
     this.endTime = endTime;
   }
+
+  public boolean isOverlapping(Show other) {
+    return isSameDate(other) && isTimeOverlapping(other);
+  }
+
+  private boolean isSameDate(Show other) {
+    return this.date.equals(other.getDate());
+  }
+
+  private boolean isTimeOverlapping(Show other) {
+    return !(this.endTime.isBefore(other.startTime) || this.startTime.isAfter(other.endTime));
+  }
 }
