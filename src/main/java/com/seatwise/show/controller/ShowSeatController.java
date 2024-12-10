@@ -1,0 +1,23 @@
+package com.seatwise.show.controller;
+
+import com.seatwise.show.dto.request.ShowSeatCreateRequest;
+import com.seatwise.show.service.ShowSeatService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/showseats")
+@RequiredArgsConstructor
+public class ShowSeatController {
+
+  private final ShowSeatService showSeatService;
+
+  @PostMapping
+  public void createShowSeat(@Valid @RequestBody ShowSeatCreateRequest createRequest) {
+    showSeatService.createShowSeat(createRequest.toCreateDto());
+  }
+}

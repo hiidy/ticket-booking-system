@@ -46,4 +46,8 @@ public class SeatService {
     List<Seat> savedSeats = seatRepository.saveAll(seats);
     return SeatsCreateResponse.from(savedSeats);
   }
+
+  public List<Seat> findSeatsInRange(Long startId, Long endId) {
+    return seatRepository.findByIdBetween(startId, endId);
+  }
 }

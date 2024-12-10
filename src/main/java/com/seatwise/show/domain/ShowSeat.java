@@ -11,8 +11,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.math.BigDecimal;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -38,5 +38,12 @@ public class ShowSeat extends BaseEntity {
   @JoinColumn(name = "booking_id")
   private Booking booking;
 
-  private BigDecimal price;
+  private Integer price;
+
+  @Builder
+  public ShowSeat(Show show, Seat seat, Integer price) {
+    this.show = show;
+    this.seat = seat;
+    this.price = price;
+  }
 }
