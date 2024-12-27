@@ -9,6 +9,7 @@ import com.seatwise.show.domain.Show;
 import com.seatwise.show.dto.request.ShowCreateRequest;
 import com.seatwise.show.dto.response.ShowCreateResponse;
 import com.seatwise.show.repository.ShowRepository;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -53,5 +54,11 @@ public class ShowService {
     if (hasOverlap) {
       throw new ConflictException(ErrorCode.DUPLICATE_SHOW);
     }
+  }
+
+  public List<LocalDate> getAvailableDates(Long eventId, int year, int month) {
+    LocalDate startDate = LocalDate.of(year, month, 1);
+    LocalDate endDate = startDate.plusMonths(1);
+    return showRepository.findShowDatesByEventIdAndDateBetween(eventId, startDate, endDate);
   }
 }
