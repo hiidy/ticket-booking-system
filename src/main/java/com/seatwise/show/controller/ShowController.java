@@ -2,6 +2,7 @@ package com.seatwise.show.controller;
 
 import com.seatwise.show.dto.request.ShowCreateRequest;
 import com.seatwise.show.dto.response.ShowCreateResponse;
+import com.seatwise.show.dto.response.ShowResponse;
 import com.seatwise.show.service.ShowService;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -30,9 +31,15 @@ public class ShowController {
   }
 
   @GetMapping("/{eventId}/dates")
-  public ResponseEntity<List<LocalDate>> getAvailableDates(
+  public ResponseEntity<List<LocalDate>> getShowDatesByMonth(
       @PathVariable Long eventId, @RequestParam int year, @RequestParam int month) {
     List<LocalDate> dates = showService.getAvailableDates(eventId, year, month);
     return ResponseEntity.ok(dates);
+  }
+
+  @GetMapping("/{eventId}/daily/{date}")
+  public ResponseEntity<List<ShowResponse>> getShowsByDate(
+      @PathVariable Long eventId, @PathVariable LocalDate date) {
+    return ResponseEntity.ok(showService.getShowsByDate(eventId, date));
   }
 }

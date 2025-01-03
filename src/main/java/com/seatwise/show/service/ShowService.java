@@ -8,6 +8,7 @@ import com.seatwise.event.repository.EventRepository;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.dto.request.ShowCreateRequest;
 import com.seatwise.show.dto.response.ShowCreateResponse;
+import com.seatwise.show.dto.response.ShowResponse;
 import com.seatwise.show.repository.ShowRepository;
 import java.time.LocalDate;
 import java.util.List;
@@ -60,5 +61,11 @@ public class ShowService {
     LocalDate startDate = LocalDate.of(year, month, 1);
     LocalDate endDate = startDate.plusMonths(1);
     return showRepository.findShowDatesByEventIdAndDateBetween(eventId, startDate, endDate);
+  }
+
+  public List<ShowResponse> getShowsByDate(Long eventId, LocalDate date) {
+    return showRepository.findShowsByEventIdAndDate(eventId, date).stream()
+        .map(ShowResponse::from)
+        .toList();
   }
 }

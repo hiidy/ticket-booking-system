@@ -19,4 +19,6 @@ public interface ShowRepository extends JpaRepository<Show, Long> {
       @Param("eventId") Long eventId,
       @Param("startDate") LocalDate startDate,
       @Param("endDate") LocalDate endDate);
+
+  List<Show> findShowsByEventIdAndDate(Long eventId, LocalDate date);
 }
