@@ -1,12 +1,10 @@
 package com.seatwise.seat.controller;
 
 import com.seatwise.seat.dto.request.SeatCreateRequest;
-import com.seatwise.seat.dto.request.SeatsCreateRequest;
 import com.seatwise.seat.dto.response.SeatCreateResponse;
-import com.seatwise.seat.dto.response.SeatsCreateResponse;
 import com.seatwise.seat.service.SeatService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,13 +17,9 @@ public class SeatController {
 
   private final SeatService seatService;
 
-  @PostMapping("/single")
-  public SeatCreateResponse createSeat(@Valid @RequestBody SeatCreateRequest createRequest) {
-    return seatService.createSeat(createRequest);
-  }
-
   @PostMapping
-  public SeatsCreateResponse createSeats(@RequestBody SeatsCreateRequest request) {
-    return seatService.createSeats(request.toCreateDto());
+  public ResponseEntity<SeatCreateResponse> createSeat(@RequestBody SeatCreateRequest request) {
+    SeatCreateResponse response = seatService.createSeat(request);
+    return ResponseEntity.ok(response);
   }
 }

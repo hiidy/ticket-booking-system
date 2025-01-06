@@ -1,10 +1,9 @@
 package com.seatwise.seat.service;
 
 import com.seatwise.seat.domain.Seat;
-import com.seatwise.seat.dto.SeatCreateDto;
+import com.seatwise.seat.domain.SeatType;
 import com.seatwise.seat.dto.request.SeatCreateRequest;
 import com.seatwise.seat.dto.response.SeatCreateResponse;
-import com.seatwise.seat.dto.response.SeatsCreateResponse;
 import com.seatwise.seat.repository.SeatRepository;
 import com.seatwise.venue.domain.Venue;
 import com.seatwise.venue.service.VenueService;
@@ -21,16 +20,11 @@ public class SeatService {
   private final SeatRepository seatRepository;
   private final VenueService venueService;
 
-  public SeatCreateResponse createSeat(SeatCreateRequest seatCreateRequest) {
-    Seat saveSeat = seatRepository.save(seatCreateRequest.toEntity());
-    return SeatCreateResponse.from(saveSeat);
-  }
-
-  public SeatsCreateResponse createSeats(SeatCreateDto createDto) {
-    Venue venue = venueService.findById(createDto.venueId());
+  public SeatCreateResponse createSeat(SeatCreateRequest request) {
+    Venue venue = venueService.findById(request.venueId());
 
     List<Seat> seats =
-        createDto.seatTypeRanges().stream()
+        request.seatTypeRanges().stream()
             .flatMap(
                 range ->
                     IntStream.rangeClosed(range.startNumber(), range.endNumber())
@@ -39,12 +33,12 @@ public class SeatService {
                                 Seat.builder()
                                     .venue(venue)
                                     .seatNumber(seatNumber)
-                                    .type(range.seatType())
+                                    .type(SeatType.valueOf(range.seatType()))
                                     .build()))
             .collect(Collectors.toList());
 
     List<Seat> savedSeats = seatRepository.saveAll(seats);
-    return SeatsCreateResponse.from(savedSeats);
+    return SeatCreateResponse.from(savedSeats);
   }
 
   public List<Seat> findSeatsInRange(Long startId, Long endId) {

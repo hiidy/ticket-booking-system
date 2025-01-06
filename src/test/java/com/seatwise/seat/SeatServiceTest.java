@@ -1,42 +1,53 @@
 package com.seatwise.seat;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import com.seatwise.seat.domain.Seat;
-import com.seatwise.seat.domain.SeatType;
-import com.seatwise.seat.dto.SeatsCreateRequest;
-import com.seatwise.seat.dto.SeatsCreateResponse;
-import com.seatwise.seat.repository.SeatRepository;
+import com.seatwise.seat.dto.request.SeatCreateRequest;
+import com.seatwise.seat.dto.request.SeatTypeRangeRequest;
+import com.seatwise.seat.dto.response.SeatCreateResponse;
 import com.seatwise.seat.service.SeatService;
+import com.seatwise.venue.domain.Venue;
+import com.seatwise.venue.repository.VenueRepository;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(webEnvironment = WebEnvironment.NONE)
 class SeatServiceTest {
 
-  @InjectMocks private SeatService seatService;
-  @Mock private SeatRepository seatRepository;
+  @Autowired private SeatService seatService;
+
+  @Autowired private VenueRepository venueRepository;
+
+  @BeforeEach
+  void setUp() {
+    Venue venue = Venue.builder().name("예술의 전당").totalSeats(200).build();
+    venueRepository.save(venue);
+  }
 
   @Test
-  @DisplayName("여러개의 좌석 생성")
-  public void testCreateMultipleSeat() {
-    SeatsCreateRequest request = new SeatsCreateRequest(1L, 3, "A");
-    List<Seat> expectedSeats =
-        List.of(
-            Seat.builder().seatNumber(1).type(SeatType.A).build(),
-            Seat.builder().seatNumber(2).type(SeatType.A).build(),
-            Seat.builder().seatNumber(3).type(SeatType.A).build());
-    when(seatRepository.saveAll(anyList())).thenReturn(expectedSeats);
+  @DisplayName("단일 좌석 생성 테스트")
+  public void createSeat_WithValidRequest_Success() {
+    SeatTypeRangeRequest seatTypeRangeRequest = new SeatTypeRangeRequest(1, 1, "S");
+    SeatCreateRequest seatCreateRequest = new SeatCreateRequest(1L, List.of(seatTypeRangeRequest));
 
-    SeatsCreateResponse response = seatService.createSeats(request);
+    SeatCreateResponse seats = seatService.createSeat(seatCreateRequest);
+    assertThat(seats.seatsId()).hasSize(1);
+  }
 
-    assertThat(response.seatsId().size()).isEqualTo(3);
+  @Test
+  @DisplayName("다중 좌석 생성 테스트")
+  public void createSeats_WithValidRequest_Success() {
+    SeatTypeRangeRequest sSeatRequest = new SeatTypeRangeRequest(1, 10, "S");
+    SeatTypeRangeRequest vipSeatRequest = new SeatTypeRangeRequest(11, 15, "VIP");
+    SeatCreateRequest seatCreateRequest =
+        new SeatCreateRequest(1L, List.of(sSeatRequest, vipSeatRequest));
+
+    SeatCreateResponse seats = seatService.createSeat(seatCreateRequest);
+    assertThat(seats.seatsId()).hasSize(15);
   }
 }
