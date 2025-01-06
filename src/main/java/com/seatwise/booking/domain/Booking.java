@@ -1,8 +1,8 @@
 package com.seatwise.booking.domain;
 
 import com.seatwise.common.domain.BaseEntity;
+import com.seatwise.member.Member;
 import com.seatwise.show.domain.ShowSeat;
-import com.seatwise.user.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -31,14 +31,14 @@ public class Booking extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
-  private User user;
+  private Member member;
 
   @OneToMany(mappedBy = "booking")
   private List<ShowSeat> showSeats = new ArrayList<>();
 
   @Builder
-  public Booking(User user, List<ShowSeat> showSeats) {
-    this.user = user;
+  public Booking(Member member, List<ShowSeat> showSeats) {
+    this.member = member;
     this.showSeats = showSeats;
   }
 }

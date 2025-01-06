@@ -1,4 +1,4 @@
-package com.seatwise.user;
+package com.seatwise.member;
 
 import com.seatwise.common.domain.BaseEntity;
 import jakarta.persistence.Entity;
@@ -11,10 +11,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "user")
+@Table(name = "member")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends BaseEntity {
+public class Member extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
