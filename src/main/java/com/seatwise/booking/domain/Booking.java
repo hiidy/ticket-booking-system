@@ -1,4 +1,4 @@
-package com.seatwise.booking;
+package com.seatwise.booking.domain;
 
 import com.seatwise.common.domain.BaseEntity;
 import com.seatwise.show.domain.ShowSeat;
@@ -10,9 +10,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,9 +33,12 @@ public class Booking extends BaseEntity {
   @JoinColumn(name = "user_id")
   private User user;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "show_seat_id")
-  private ShowSeat showSeat;
+  @OneToMany(mappedBy = "booking")
+  private List<ShowSeat> showSeats = new ArrayList<>();
 
-  private LocalDateTime timeStamp;
+  @Builder
+  public Booking(User user, List<ShowSeat> showSeats) {
+    this.user = user;
+    this.showSeats = showSeats;
+  }
 }

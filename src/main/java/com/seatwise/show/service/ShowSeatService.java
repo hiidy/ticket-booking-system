@@ -3,6 +3,7 @@ package com.seatwise.show.service;
 import com.seatwise.seat.service.SeatService;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.domain.ShowSeat;
+import com.seatwise.show.domain.Status;
 import com.seatwise.show.dto.ShowSeatCreateDto;
 import com.seatwise.show.dto.response.ShowSeatCreateResponse;
 import com.seatwise.show.repository.ShowSeatRepository;
@@ -37,6 +38,7 @@ public class ShowSeatService {
                                     .show(show)
                                     .seat(seat)
                                     .price(seatPrice.price())
+                                    .status(Status.AVAILABLE)
                                     .build())
                         .collect(Collectors.toList()))
             .flatMap(Collection::stream)
