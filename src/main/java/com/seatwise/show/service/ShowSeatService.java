@@ -1,6 +1,6 @@
 package com.seatwise.show.service;
 
-import com.seatwise.seat.service.SeatService;
+import com.seatwise.seat.repository.SeatRepository;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.domain.ShowSeat;
 import com.seatwise.show.domain.Status;
@@ -9,7 +9,6 @@ import com.seatwise.show.dto.response.ShowSeatCreateResponse;
 import com.seatwise.show.repository.ShowSeatRepository;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +18,7 @@ public class ShowSeatService {
 
   private final ShowSeatRepository showSeatRepository;
   private final ShowService showService;
-  private final SeatService seatService;
+  private final SeatRepository seatRepository;
 
   public ShowSeatCreateResponse createShowSeat(ShowSeatCreateDto createDto) {
 
@@ -29,8 +28,8 @@ public class ShowSeatService {
         createDto.showSeatPrices().stream()
             .map(
                 seatPrice ->
-                    seatService
-                        .findSeatsInRange(seatPrice.startSeatId(), seatPrice.endSeatId())
+                    seatRepository
+                        .findByIdBetween(seatPrice.startSeatId(), seatPrice.endSeatId())
                         .stream()
                         .map(
                             seat ->
@@ -40,9 +39,9 @@ public class ShowSeatService {
                                     .price(seatPrice.price())
                                     .status(Status.AVAILABLE)
                                     .build())
-                        .collect(Collectors.toList()))
+                        .toList())
             .flatMap(Collection::stream)
-            .collect(Collectors.toList());
+            .toList();
 
     List<ShowSeat> savedShowSeats = showSeatRepository.saveAll(showSeats);
     return ShowSeatCreateResponse.from(savedShowSeats);

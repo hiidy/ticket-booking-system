@@ -1,27 +1,35 @@
 package com.seatwise.seat.service;
 
+import com.seatwise.common.exception.ErrorCode;
+import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.seat.domain.Seat;
 import com.seatwise.seat.domain.SeatType;
 import com.seatwise.seat.dto.request.SeatCreateRequest;
 import com.seatwise.seat.dto.response.SeatCreateResponse;
 import com.seatwise.seat.repository.SeatRepository;
 import com.seatwise.venue.domain.Venue;
-import com.seatwise.venue.service.VenueService;
+import com.seatwise.venue.repository.VenueRepository;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class SeatService {
 
   private final SeatRepository seatRepository;
-  private final VenueService venueService;
+  private final VenueRepository venueRepository;
 
   public SeatCreateResponse createSeat(SeatCreateRequest request) {
-    Venue venue = venueService.findById(request.venueId());
+    Venue venue =
+        venueRepository
+            .findById(request.venueId())
+            .orElseThrow(() -> new NotFoundException(ErrorCode.VENUE_NOT_FOUND));
+
+    venue.validateNewSeatNumbers(request.seatTypeRanges());
 
     List<Seat> seats =
         request.seatTypeRanges().stream()
@@ -35,13 +43,9 @@ public class SeatService {
                                     .seatNumber(seatNumber)
                                     .type(SeatType.valueOf(range.seatType()))
                                     .build()))
-            .collect(Collectors.toList());
+            .toList();
 
     List<Seat> savedSeats = seatRepository.saveAll(seats);
     return SeatCreateResponse.from(savedSeats);
-  }
-
-  public List<Seat> findSeatsInRange(Long startId, Long endId) {
-    return seatRepository.findByIdBetween(startId, endId);
   }
 }
