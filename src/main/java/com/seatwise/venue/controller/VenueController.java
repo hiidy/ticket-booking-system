@@ -20,7 +20,7 @@ public class VenueController {
 
   @PostMapping
   public ResponseEntity<Void> createVenue(@Valid @RequestBody VenueCreateRequest request) {
-    Long venueId = venueService.createVenue(request.toCreateDto());
+    Long venueId = venueService.createVenue(request);
     return ResponseEntity.created(URI.create("/api/venues/" + venueId)).build();
   }
 }
