@@ -49,13 +49,13 @@ class BookingServiceTest {
     Seat seat = Seat.builder().seatNumber(1).type(SeatType.A).build();
     seatRepository.save(seat);
 
-    ShowSeat showSeat = ShowSeat.builder().show(show).seat(seat).build();
+    ShowSeat showSeat = ShowSeat.createAvailable(show, seat, 40000);
     showSeatRepository.save(showSeat);
   }
 
   @Test
   @DisplayName("좌석 예약 성공")
-  public void testCreateBookingSuccessfully() {
+  void testCreateBookingSuccessfully() {
     // Given
     Long showId = 1L;
     List<Long> seatIds = List.of(1L);
@@ -71,7 +71,7 @@ class BookingServiceTest {
 
   @Test
   @DisplayName("존재하지 않는 좌석으로 예약을 할 수 없다.")
-  public void testCreateBookingWhenInvalidShowSeat() {
+  void testCreateBookingWhenInvalidShowSeat() {
     // Given
     Long showId = 1L;
     List<Long> seatIds = List.of(999L, 1000L);

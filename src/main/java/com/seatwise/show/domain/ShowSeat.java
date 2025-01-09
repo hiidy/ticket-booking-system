@@ -2,6 +2,8 @@ package com.seatwise.show.domain;
 
 import com.seatwise.booking.domain.Booking;
 import com.seatwise.common.domain.BaseEntity;
+import com.seatwise.common.exception.BadRequestException;
+import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.seat.domain.Seat;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -49,12 +51,27 @@ public class ShowSeat extends BaseEntity {
   public ShowSeat(Show show, Seat seat, Integer price, Status status) {
     this.show = show;
     this.seat = seat;
+    this.booking = null;
     this.price = price;
     this.status = status;
   }
 
+  public static ShowSeat createAvailable(Show show, Seat seat, Integer price) {
+    return new ShowSeat(show, seat, price, Status.AVAILABLE);
+  }
+
   public void assignBooking(Booking booking) {
+    validateBeforeAssignBooking();
     this.booking = booking;
     this.status = Status.RESERVED;
+  }
+
+  private void validateBeforeAssignBooking() {
+    if (this.booking != null) {
+      throw new BadRequestException(ErrorCode.SEAT_ALREADY_BOOKED);
+    }
+    if (this.status != Status.AVAILABLE) {
+      throw new BadRequestException(ErrorCode.SEAT_NOT_AVAILABLE);
+    }
   }
 }
