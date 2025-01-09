@@ -5,7 +5,6 @@ import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.seat.repository.SeatRepository;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.domain.ShowSeat;
-import com.seatwise.show.domain.Status;
 import com.seatwise.show.dto.request.ShowSeatCreateRequest;
 import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.show.repository.ShowSeatRepository;
@@ -13,9 +12,11 @@ import java.util.Collection;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ShowSeatService {
 
   private final ShowSeatRepository showSeatRepository;
@@ -36,14 +37,7 @@ public class ShowSeatService {
                     seatRepository
                         .findByIdBetween(seatPrice.startSeatId(), seatPrice.endSeatId())
                         .stream()
-                        .map(
-                            seat ->
-                                ShowSeat.builder()
-                                    .show(show)
-                                    .seat(seat)
-                                    .price(seatPrice.price())
-                                    .status(Status.AVAILABLE)
-                                    .build())
+                        .map(seat -> ShowSeat.createAvailable(show, seat, seatPrice.price()))
                         .toList())
             .flatMap(Collection::stream)
             .toList();

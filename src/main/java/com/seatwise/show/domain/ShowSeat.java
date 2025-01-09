@@ -16,7 +16,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -47,8 +46,7 @@ public class ShowSeat extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private Status status;
 
-  @Builder
-  public ShowSeat(Show show, Seat seat, Integer price, Status status) {
+  private ShowSeat(Show show, Seat seat, Integer price, Status status) {
     this.show = show;
     this.seat = seat;
     this.booking = null;
