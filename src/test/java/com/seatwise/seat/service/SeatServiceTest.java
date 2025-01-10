@@ -1,4 +1,4 @@
-package com.seatwise.seat;
+package com.seatwise.seat.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -11,7 +11,6 @@ import com.seatwise.seat.dto.request.SeatCreateRequest;
 import com.seatwise.seat.dto.request.SeatTypeRangeRequest;
 import com.seatwise.seat.dto.response.SeatCreateResponse;
 import com.seatwise.seat.repository.SeatRepository;
-import com.seatwise.seat.service.SeatService;
 import com.seatwise.venue.domain.Venue;
 import com.seatwise.venue.repository.VenueRepository;
 import java.util.List;

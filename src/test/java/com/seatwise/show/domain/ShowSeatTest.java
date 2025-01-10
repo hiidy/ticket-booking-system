@@ -1,4 +1,4 @@
-package com.seatwise.show;
+package com.seatwise.show.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -6,8 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.seatwise.booking.domain.Booking;
 import com.seatwise.common.exception.BadRequestException;
 import com.seatwise.common.exception.ErrorCode;
-import com.seatwise.show.domain.ShowSeat;
-import com.seatwise.show.domain.Status;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

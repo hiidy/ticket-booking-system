@@ -1,4 +1,4 @@
-package com.seatwise.show;
+package com.seatwise.show.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -13,7 +13,6 @@ import com.seatwise.show.dto.ShowSeatPrice;
 import com.seatwise.show.dto.request.ShowSeatCreateRequest;
 import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.show.repository.ShowSeatRepository;
-import com.seatwise.show.service.ShowSeatService;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.seatwise.show;
+package com.seatwise.show.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -11,7 +11,6 @@ import com.seatwise.event.repository.EventRepository;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.dto.request.ShowCreateRequest;
 import com.seatwise.show.repository.ShowRepository;
-import com.seatwise.show.service.ShowService;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;

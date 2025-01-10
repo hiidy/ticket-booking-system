@@ -1,9 +1,8 @@
-package com.seatwise.booking;
+package com.seatwise.booking.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.seatwise.booking.service.BookingService;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.seat.domain.Seat;

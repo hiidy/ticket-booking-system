@@ -1,10 +1,9 @@
-package com.seatwise.show;
+package com.seatwise.show.domain;
 
 import static org.assertj.core.api.Assertions.*;
 
 import com.seatwise.RepositoryTest;
 import com.seatwise.event.domain.Event;
-import com.seatwise.show.domain.Show;
 import com.seatwise.show.repository.ShowRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;

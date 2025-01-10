@@ -1,18 +1,14 @@
-package com.seatwise.show;
+package com.seatwise.show.domain;
 
 import static org.assertj.core.api.Assertions.*;
 
 import com.seatwise.common.exception.BadRequestException;
 import com.seatwise.common.exception.ErrorCode;
-import com.seatwise.show.domain.Show;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
 class ShowTest {
 
   @Test
