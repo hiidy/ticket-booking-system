@@ -37,7 +37,7 @@ class SeatServiceTest {
 
   @BeforeEach
   void setUp() {
-    venue = Venue.builder().name("예술의 전당").totalSeats(200).build();
+    venue = new Venue("에술의 전당", 200);
     venueRepository.save(venue);
   }
 

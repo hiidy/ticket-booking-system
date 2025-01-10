@@ -21,9 +21,7 @@ public class VenueService {
   }
 
   public Long createVenue(VenueCreateRequest request) {
-    Venue venue =
-        venueRepository.save(
-            Venue.builder().name(request.name()).totalSeats(request.totalSeats()).build());
-    return venue.getId();
+    Venue venue = new Venue(request.name(), request.totalSeats());
+    return venueRepository.save(venue).getId();
   }
 }

@@ -4,6 +4,7 @@ import com.seatwise.common.domain.BaseEntity;
 import com.seatwise.common.exception.BadRequestException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.seat.domain.Seat;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,10 +33,12 @@ public class Venue extends BaseEntity {
 
   private int totalSeats;
 
-  @OneToMany(mappedBy = "venue")
+  @OneToMany(
+      mappedBy = "venue",
+      cascade = {CascadeType.REMOVE},
+      orphanRemoval = true)
   private List<Seat> seats = new ArrayList<>();
 
-  @Builder
   public Venue(String name, int totalSeats) {
     this.name = name;
     this.totalSeats = totalSeats;
