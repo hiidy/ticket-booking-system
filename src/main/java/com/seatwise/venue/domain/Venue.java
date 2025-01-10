@@ -1,10 +1,9 @@
 package com.seatwise.venue.domain;
 
 import com.seatwise.common.domain.BaseEntity;
-import com.seatwise.common.exception.ConflictException;
+import com.seatwise.common.exception.BadRequestException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.seat.domain.Seat;
-import com.seatwise.seat.dto.request.SeatTypeRangeRequest;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,17 +42,18 @@ public class Venue extends BaseEntity {
     this.totalSeats = totalSeats;
   }
 
-  public void validateNewSeatNumbers(List<SeatTypeRangeRequest> ranges) {
+  public void validateNewSeatNumbers(List<Integer> seatNumbers) {
     Set<Integer> existingNumbers =
         seats.stream().map(Seat::getSeatNumber).collect(Collectors.toSet());
 
-    boolean hasDuplicate =
-        ranges.stream()
-            .flatMap(range -> IntStream.rangeClosed(range.startNumber(), range.endNumber()).boxed())
-            .anyMatch(existingNumbers::contains);
+    boolean hasDuplicate = seatNumbers.stream().anyMatch(existingNumbers::contains);
 
     if (hasDuplicate) {
-      throw new ConflictException(ErrorCode.DUPLICATE_SEAT_NUMBER);
+      throw new BadRequestException(ErrorCode.DUPLICATE_SEAT_NUMBER);
     }
+  }
+
+  public void addSeat(Seat seat) {
+    seats.add(seat);
   }
 }

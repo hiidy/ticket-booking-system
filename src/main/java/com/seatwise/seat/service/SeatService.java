@@ -5,6 +5,7 @@ import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.seat.domain.Seat;
 import com.seatwise.seat.domain.SeatType;
 import com.seatwise.seat.dto.request.SeatCreateRequest;
+import com.seatwise.seat.dto.request.SeatTypeRangeRequest;
 import com.seatwise.seat.dto.response.SeatCreateResponse;
 import com.seatwise.seat.repository.SeatRepository;
 import com.seatwise.venue.domain.Venue;
@@ -29,7 +30,8 @@ public class SeatService {
             .findById(request.venueId())
             .orElseThrow(() -> new NotFoundException(ErrorCode.VENUE_NOT_FOUND));
 
-    venue.validateNewSeatNumbers(request.seatTypeRanges());
+    List<Integer> seatNumbers = extractSeatNumbers(request.seatTypeRanges());
+    venue.validateNewSeatNumbers(seatNumbers);
 
     List<Seat> seats =
         request.seatTypeRanges().stream()
@@ -47,5 +49,11 @@ public class SeatService {
 
     List<Seat> savedSeats = seatRepository.saveAll(seats);
     return SeatCreateResponse.from(savedSeats);
+  }
+
+  public List<Integer> extractSeatNumbers(List<SeatTypeRangeRequest> request) {
+    return request.stream()
+        .flatMap(range -> IntStream.rangeClosed(range.startNumber(), range.endNumber()).boxed())
+        .toList();
   }
 }

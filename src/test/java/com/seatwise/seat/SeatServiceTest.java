@@ -3,7 +3,7 @@ package com.seatwise.seat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.seatwise.common.exception.ConflictException;
+import com.seatwise.common.exception.BadRequestException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.seat.domain.Seat;
 import com.seatwise.seat.domain.SeatType;
@@ -85,7 +85,7 @@ class SeatServiceTest {
 
     // when & then
     assertThatThrownBy(() -> seatService.createSeat(request))
-        .isInstanceOf(ConflictException.class)
+        .isInstanceOf(BadRequestException.class)
         .hasMessage(ErrorCode.DUPLICATE_SEAT_NUMBER.getMessage());
   }
 }
