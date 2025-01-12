@@ -28,21 +28,14 @@ public class ShowService {
         .orElseThrow(() -> new NotFoundException(ErrorCode.SHOW_NOT_FOUND));
   }
 
-  public ShowCreateResponse createShow(ShowCreateRequest createRequest) {
-    List<Show> existingShows = showRepository.findByEventId(createRequest.eventId());
+  public ShowCreateResponse createShow(ShowCreateRequest request) {
+    List<Show> existingShows = showRepository.findByEventId(request.eventId());
 
     Event event =
         eventRepository
-            .findById(createRequest.eventId())
+            .findById(request.eventId())
             .orElseThrow(() -> new NotFoundException(ErrorCode.EVENT_NOT_FOUND));
-
-    Show newShow =
-        Show.builder()
-            .event(event)
-            .date(createRequest.date())
-            .startTime(createRequest.startTime())
-            .endTime(createRequest.endTime())
-            .build();
+    Show newShow = new Show(event, request.date(), request.startTime(), request.endTime());
 
     validateOverlappingShow(existingShows, newShow);
     return ShowCreateResponse.from(showRepository.save(newShow));

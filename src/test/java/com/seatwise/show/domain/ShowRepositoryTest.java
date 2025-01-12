@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import com.seatwise.RepositoryTest;
 import com.seatwise.event.domain.Event;
+import com.seatwise.event.domain.EventType;
 import com.seatwise.show.repository.ShowRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -20,34 +21,18 @@ class ShowRepositoryTest extends RepositoryTest {
   @DisplayName("특정 기간의 공연 날짜를 조회 할 수 있다.")
   void testFindShowDatesByEventIdAndDateBetween() {
     // Given
-    Event event = Event.builder().title("공연1").build();
+    Event event = new Event("지킬 앤 하이드", "테스트 공연", EventType.MUSICAL);
     em.persist(event);
 
-    Show show1 =
-        Show.builder()
-            .date(LocalDate.now())
-            .startTime(LocalTime.now())
-            .endTime(LocalTime.now().plusHours(1))
-            .event(event)
-            .build();
+    Show show1 = new Show(event, LocalDate.now(), LocalTime.now(), LocalTime.now().plusHours(1));
     persistAndFlush(show1);
 
     Show show2 =
-        Show.builder()
-            .date(LocalDate.now().plusDays(3))
-            .startTime(LocalTime.now())
-            .endTime(LocalTime.now().plusHours(1))
-            .event(event)
-            .build();
+        new Show(event, LocalDate.now().plusDays(3), LocalTime.now(), LocalTime.now().plusHours(1));
     persistAndFlush(show2);
 
     Show show3 =
-        Show.builder()
-            .date(LocalDate.now().plusDays(4))
-            .startTime(LocalTime.now())
-            .endTime(LocalTime.now().plusHours(1))
-            .event(event)
-            .build();
+        new Show(event, LocalDate.now().plusDays(4), LocalTime.now(), LocalTime.now().plusHours(1));
     persistAndFlush(show3);
 
     // When
@@ -63,32 +48,19 @@ class ShowRepositoryTest extends RepositoryTest {
   @DisplayName("특정 이벤트의 특정 날짜에 예정된 공연 목록을 조회한다.")
   void testFindShowsByEventIdAndDate() {
     // Given
-    Event event = Event.builder().title("공연1").build();
+    Event event = new Event("지킬 앤 하이드", "테스트 공연", EventType.MUSICAL);
     em.persist(event);
 
     LocalDate date = LocalDate.of(2025, 1, 1);
     LocalTime time = LocalTime.of(13, 0);
 
-    Show show1 =
-        Show.builder().date(date).startTime(time).endTime(time.plusHours(1)).event(event).build();
+    Show show1 = new Show(event, date, time, time.plusHours(1));
     persistAndFlush(show1);
 
-    Show show2 =
-        Show.builder()
-            .date(date)
-            .startTime(time.plusHours(2))
-            .endTime(time.plusHours(3))
-            .event(event)
-            .build();
+    Show show2 = new Show(event, date, time.plusHours(2), time.plusHours(3));
     persistAndFlush(show2);
 
-    Show show3 =
-        Show.builder()
-            .date(date.plusMonths(1))
-            .startTime(time.plusHours(2))
-            .endTime(time.plusHours(3))
-            .event(event)
-            .build();
+    Show show3 = new Show(event, date.plusMonths(1), time.plusHours(2), time.plusHours(3));
     persistAndFlush(show3);
 
     // When

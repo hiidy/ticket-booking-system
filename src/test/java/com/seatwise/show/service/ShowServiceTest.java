@@ -47,12 +47,7 @@ class ShowServiceTest {
   void createShow_WithOverlappingTime_ThrowsException() {
     // Given
     Show existingShow =
-        Show.builder()
-            .event(event)
-            .date(LocalDate.of(2024, 1, 1))
-            .startTime(LocalTime.of(15, 0))
-            .endTime(LocalTime.of(17, 0))
-            .build();
+        new Show(event, LocalDate.of(2024, 1, 1), LocalTime.of(15, 0), LocalTime.of(17, 0));
 
     ShowCreateRequest showCreateRequest =
         new ShowCreateRequest(

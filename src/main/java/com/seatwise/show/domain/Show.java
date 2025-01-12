@@ -18,7 +18,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -45,7 +44,6 @@ public class Show extends BaseEntity {
   @OneToMany(mappedBy = "show")
   private List<ShowSeat> showSeats = new ArrayList<>();
 
-  @Builder
   public Show(Event event, LocalDate date, LocalTime startTime, LocalTime endTime) {
     validateTimes(startTime, endTime);
     this.event = event;

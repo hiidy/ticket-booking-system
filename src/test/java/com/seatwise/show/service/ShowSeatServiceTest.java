@@ -41,12 +41,7 @@ class ShowSeatServiceTest {
 
   @BeforeEach
   void setUp() {
-    show =
-        Show.builder()
-            .date(LocalDate.of(2024, 1, 1))
-            .startTime(LocalTime.of(12, 0))
-            .endTime(LocalTime.of(14, 0))
-            .build();
+    show = new Show(null, LocalDate.of(2024, 1, 1), LocalTime.of(12, 0), LocalTime.of(14, 0));
 
     showRepository.save(show);
 

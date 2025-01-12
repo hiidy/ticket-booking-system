@@ -36,12 +36,7 @@ class BookingServiceTest {
 
   @BeforeEach
   void setUp() {
-    Show show =
-        Show.builder()
-            .date(LocalDate.of(2025, 1, 1))
-            .startTime(LocalTime.of(18, 0))
-            .endTime(LocalTime.of(20, 0))
-            .build();
+    Show show = new Show(null, LocalDate.of(2025, 1, 1), LocalTime.of(18, 0), LocalTime.of(20, 0));
 
     showRepository.save(show);
 
