@@ -47,6 +47,7 @@ public class ShowSeat extends BaseEntity {
   private Status status;
 
   private ShowSeat(Show show, Seat seat, Integer price, Status status) {
+    validatePrice(price);
     this.show = show;
     this.seat = seat;
     this.booking = null;
@@ -70,6 +71,12 @@ public class ShowSeat extends BaseEntity {
     }
     if (this.status != Status.AVAILABLE) {
       throw new BadRequestException(ErrorCode.SEAT_NOT_AVAILABLE);
+    }
+  }
+
+  private void validatePrice(Integer price) {
+    if (price < 0) {
+      throw new BadRequestException(ErrorCode.INVALID_SEAT_PRICE);
     }
   }
 }

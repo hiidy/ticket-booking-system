@@ -50,4 +50,11 @@ class ShowSeatTest {
         .isInstanceOf(BadRequestException.class)
         .hasMessage(ErrorCode.SEAT_NOT_AVAILABLE.getMessage());
   }
+
+  @Test
+  @DisplayName("좌석의 가격이 0이하면 예외를 던진다")
+  void createShowSeat_WithNegativePrice_ThrowsException() {
+    assertThatThrownBy(() -> ShowSeat.createAvailable(null, null, -10000))
+        .isInstanceOf(BadRequestException.class);
+  }
 }
