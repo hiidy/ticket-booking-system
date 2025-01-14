@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.seat.domain.Seat;
-import com.seatwise.seat.domain.SeatType;
+import com.seatwise.seat.domain.SeatGrade;
 import com.seatwise.seat.repository.SeatRepository;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.domain.ShowSeat;
@@ -40,7 +40,7 @@ class BookingServiceTest {
 
     showRepository.save(show);
 
-    Seat seat = Seat.builder().seatNumber(1).type(SeatType.A).build();
+    Seat seat = Seat.builder().seatNumber(1).grade(SeatGrade.A).build();
     seatRepository.save(seat);
 
     ShowSeat showSeat = ShowSeat.createAvailable(show, seat, 40000);

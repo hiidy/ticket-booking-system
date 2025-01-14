@@ -3,9 +3,9 @@ package com.seatwise.seat.service;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.seat.domain.Seat;
-import com.seatwise.seat.domain.SeatType;
+import com.seatwise.seat.domain.SeatGrade;
 import com.seatwise.seat.dto.request.SeatCreateRequest;
-import com.seatwise.seat.dto.request.SeatTypeRangeRequest;
+import com.seatwise.seat.dto.request.SeatGradeRangeRequest;
 import com.seatwise.seat.dto.response.SeatCreateResponse;
 import com.seatwise.seat.repository.SeatRepository;
 import com.seatwise.venue.domain.Venue;
@@ -43,7 +43,7 @@ public class SeatService {
                                 Seat.builder()
                                     .venue(venue)
                                     .seatNumber(seatNumber)
-                                    .type(SeatType.valueOf(range.seatType()))
+                                    .grade(SeatGrade.valueOf(range.grade()))
                                     .build()))
             .toList();
 
@@ -51,7 +51,7 @@ public class SeatService {
     return SeatCreateResponse.from(savedSeats);
   }
 
-  public List<Integer> extractSeatNumbers(List<SeatTypeRangeRequest> request) {
+  public List<Integer> extractSeatNumbers(List<SeatGradeRangeRequest> request) {
     return request.stream()
         .flatMap(range -> IntStream.rangeClosed(range.startNumber(), range.endNumber()).boxed())
         .toList();

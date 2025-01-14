@@ -33,7 +33,7 @@ public class Seat extends BaseEntity {
   private int seatNumber;
 
   @Enumerated(EnumType.STRING)
-  private SeatType type;
+  private SeatGrade grade;
 
   @OneToMany(mappedBy = "seat")
   private List<ShowSeat> showSeats = new ArrayList<>();
@@ -42,9 +42,9 @@ public class Seat extends BaseEntity {
   private Venue venue;
 
   @Builder
-  public Seat(int seatNumber, SeatType type, Venue venue) {
+  public Seat(int seatNumber, SeatGrade grade, Venue venue) {
     this.seatNumber = seatNumber;
-    this.type = type;
+    this.grade = grade;
     this.venue = venue;
   }
 }
