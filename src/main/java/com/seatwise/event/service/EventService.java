@@ -9,9 +9,11 @@ import com.seatwise.event.dto.response.EventResponse;
 import com.seatwise.event.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class EventService {
 
   private final EventRepository eventRepository;

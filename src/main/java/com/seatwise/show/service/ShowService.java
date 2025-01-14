@@ -8,15 +8,18 @@ import com.seatwise.event.repository.EventRepository;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.dto.request.ShowCreateRequest;
 import com.seatwise.show.dto.response.ShowCreateResponse;
+import com.seatwise.show.dto.response.ShowDatesResponse;
 import com.seatwise.show.dto.response.ShowResponse;
 import com.seatwise.show.repository.ShowRepository;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ShowService {
 
   private final ShowRepository showRepository;
@@ -50,10 +53,12 @@ public class ShowService {
     }
   }
 
-  public List<LocalDate> getAvailableDates(Long eventId, int year, int month) {
+  @Transactional(readOnly = true)
+  public List<ShowDatesResponse> getAvailableDates(Long eventId, int year, int month) {
     LocalDate startDate = LocalDate.of(year, month, 1);
     LocalDate endDate = startDate.plusMonths(1);
-    return showRepository.findShowDatesByEventIdAndDateBetween(eventId, startDate, endDate);
+    List<Show> shows = showRepository.findByEventIdAndDateBetween(eventId, startDate, endDate);
+    return shows.stream().map(ShowDatesResponse::from).toList();
   }
 
   public List<ShowResponse> getShowsByDate(Long eventId, LocalDate date) {

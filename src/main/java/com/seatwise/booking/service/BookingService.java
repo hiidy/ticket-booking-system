@@ -13,12 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BookingService {
 
   private final BookingRepository bookingRepository;
   private final ShowSeatRepository showSeatRepository;
 
-  @Transactional
   public Long createBooking(Long showId, List<Long> seatIds) {
     List<ShowSeat> showSeats =
         seatIds.stream()
