@@ -9,7 +9,6 @@ import com.seatwise.show.service.ShowSeatService;
 import com.seatwise.show.service.ShowService;
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -43,10 +42,10 @@ public class ShowController {
     return ResponseEntity.ok(dates);
   }
 
-  @GetMapping("/{eventId}/daily/{date}")
-  public ResponseEntity<List<ShowResponse>> getShowsByDate(
-      @PathVariable Long eventId, @PathVariable LocalDate date) {
-    return ResponseEntity.ok(showService.getShowsByDate(eventId, date));
+  @GetMapping("/{showId}/daily/seats")
+  public ResponseEntity<ShowResponse> getShowsByDate(@PathVariable Long showId) {
+    ShowResponse response = showService.getShowDetails(showId);
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping("/{showId}/seats")
