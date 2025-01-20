@@ -5,6 +5,7 @@ import com.seatwise.show.dto.request.ShowSeatCreateRequest;
 import com.seatwise.show.dto.response.ShowCreateResponse;
 import com.seatwise.show.dto.response.ShowDatesResponse;
 import com.seatwise.show.dto.response.ShowResponse;
+import com.seatwise.show.dto.response.ShowSeatResponse;
 import com.seatwise.show.service.ShowSeatService;
 import com.seatwise.show.service.ShowService;
 import jakarta.validation.Valid;
@@ -42,12 +43,19 @@ public class ShowController {
     return ResponseEntity.ok(dates);
   }
 
-  @GetMapping("/{showId}/daily/seats")
-  public ResponseEntity<ShowResponse> getShowsByDate(@PathVariable Long showId) {
+  @GetMapping("/{showId}/details")
+  public ResponseEntity<ShowResponse> getShowsDetails(@PathVariable Long showId) {
     ShowResponse response = showService.getShowDetails(showId);
     return ResponseEntity.ok(response);
   }
 
+  @GetMapping("/{showId}/seats")
+  public ResponseEntity<List<ShowSeatResponse>> getShowSeats(@PathVariable Long showId) {
+    List<ShowSeatResponse> response = showSeatService.getShowSeats(showId);
+    return ResponseEntity.ok(response);
+  }
+
+  @GetMapping("/{showId}/")
   @PostMapping("/{showId}/seats")
   public ResponseEntity<List<Long>> createShowSeat(
       @PathVariable Long showId, @Valid @RequestBody ShowSeatCreateRequest request) {

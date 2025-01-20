@@ -6,6 +6,7 @@ import com.seatwise.seat.repository.SeatRepository;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.domain.ShowSeat;
 import com.seatwise.show.dto.request.ShowSeatCreateRequest;
+import com.seatwise.show.dto.response.ShowSeatResponse;
 import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.show.repository.ShowSeatRepository;
 import java.util.Collection;
@@ -44,5 +45,13 @@ public class ShowSeatService {
 
     List<ShowSeat> savedShowSeats = showSeatRepository.saveAll(showSeats);
     return savedShowSeats.stream().map(ShowSeat::getId).toList();
+  }
+
+  public List<ShowSeatResponse> getShowSeats(Long showId) {
+    List<ShowSeat> showSeats = showSeatRepository.findByShowId(showId);
+    if (showSeats.isEmpty()) {
+      throw new NotFoundException(ErrorCode.SHOW_SEAT_NOT_FOUND);
+    }
+    return showSeats.stream().map(ShowSeatResponse::from).toList();
   }
 }
