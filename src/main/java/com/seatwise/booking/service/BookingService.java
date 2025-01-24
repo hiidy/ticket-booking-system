@@ -13,21 +13,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class BookingService {
 
   private final BookingRepository bookingRepository;
   private final ShowSeatRepository showSeatRepository;
 
-  public Long createBooking(Long showId, List<Long> seatIds) {
-    List<ShowSeat> showSeats =
-        seatIds.stream()
-            .map(
-                seatId ->
-                    showSeatRepository
-                        .findByShowIdAndSeatId(showId, seatId)
-                        .orElseThrow(() -> new NotFoundException(ErrorCode.SHOW_SEAT_NOT_FOUND)))
-            .toList();
+  @Transactional
+  public Long createBooking(List<Long> showSeatIds) {
+
+    List<ShowSeat> showSeats = showSeatRepository.findAllByShowIdWithLock(showSeatIds);
+    if (showSeats.isEmpty() || showSeats.size() != showSeatIds.size()) {
+      throw new NotFoundException(ErrorCode.SHOW_SEAT_NOT_FOUND);
+    }
 
     Booking booking = Booking.builder().build();
     showSeats.forEach(showSeat -> showSeat.assignBooking(booking));

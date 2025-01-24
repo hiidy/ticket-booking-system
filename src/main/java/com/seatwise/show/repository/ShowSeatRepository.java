@@ -12,4 +12,10 @@ public interface ShowSeatRepository extends JpaRepository<ShowSeat, Long> {
 
   @Query("SELECT ss from ShowSeat ss " + "JOIN FETCH ss.seat st " + "WHERE ss.show.id = :showId")
   List<ShowSeat> findByShowId(Long showId);
+
+  @Query("SELECT s FROM ShowSeat s WHERE s.id IN :showIds")
+  List<ShowSeat> findAllByShowIdWithLock(List<Long> showIds);
+
+  @Query("SELECT ss FROM ShowSeat ss WHERE ss.show.id IN :showIds")
+  List<ShowSeat> findAllByShowId(List<Long> showIds);
 }

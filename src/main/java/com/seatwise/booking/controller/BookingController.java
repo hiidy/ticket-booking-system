@@ -19,8 +19,7 @@ public class BookingController {
 
   @PostMapping
   public ResponseEntity<Long> createBooking(@Valid @RequestBody BookingRequest bookingRequest) {
-    Long bookingId =
-        bookingService.createBooking(bookingRequest.showId(), bookingRequest.seatIds());
+    Long bookingId = bookingService.createBooking(bookingRequest.showSeatIds());
     return ResponseEntity.ok(bookingId);
   }
 }

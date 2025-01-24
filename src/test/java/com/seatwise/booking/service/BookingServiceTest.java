@@ -52,12 +52,8 @@ class BookingServiceTest {
   @Test
   @DisplayName("좌석 예약 성공")
   void testCreateBookingSuccessfully() {
-    // Given
-    Long showId = 1L;
-    List<Long> seatIds = List.of(1L);
-
     // When
-    Long bookingId = bookingService.createBooking(showId, seatIds);
+    Long bookingId = bookingService.createBooking(List.of(1L));
 
     // then
     assertThat(bookingId).isNotNull();
@@ -68,12 +64,8 @@ class BookingServiceTest {
   @Test
   @DisplayName("존재하지 않는 좌석으로 예약을 할 수 없다.")
   void testCreateBookingWhenInvalidShowSeat() {
-    // Given
-    Long showId = 1L;
-    List<Long> seatIds = List.of(999L, 1000L);
-
     // When & Then
-    assertThatThrownBy(() -> bookingService.createBooking(showId, seatIds))
+    assertThatThrownBy(() -> bookingService.createBooking(List.of(999L)))
         .isInstanceOf(NotFoundException.class)
         .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SHOW_SEAT_NOT_FOUND);
   }
