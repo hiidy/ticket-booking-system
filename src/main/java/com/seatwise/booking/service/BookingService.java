@@ -4,6 +4,8 @@ import com.seatwise.booking.domain.Booking;
 import com.seatwise.booking.repository.BookingRepository;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.common.exception.NotFoundException;
+import com.seatwise.member.domain.Member;
+import com.seatwise.member.repository.MemberRepository;
 import com.seatwise.show.domain.ShowSeat;
 import com.seatwise.show.repository.ShowSeatRepository;
 import java.util.List;
@@ -17,16 +19,22 @@ public class BookingService {
 
   private final BookingRepository bookingRepository;
   private final ShowSeatRepository showSeatRepository;
+  private final MemberRepository memberRepository;
 
   @Transactional
-  public Long createBooking(List<Long> showSeatIds) {
+  public Long createBooking(Long memberId, List<Long> showSeatIds) {
 
-    List<ShowSeat> showSeats = showSeatRepository.findAllByShowIdWithLock(showSeatIds);
+    Member member =
+        memberRepository
+            .findById(memberId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+    List<ShowSeat> showSeats = showSeatRepository.findAllById(showSeatIds);
     if (showSeats.isEmpty() || showSeats.size() != showSeatIds.size()) {
       throw new NotFoundException(ErrorCode.SHOW_SEAT_NOT_FOUND);
     }
 
-    Booking booking = Booking.builder().build();
+    Booking booking = new Booking(member);
     showSeats.forEach(showSeat -> showSeat.assignBooking(booking));
     Booking savedBooking = bookingRepository.save(booking);
 

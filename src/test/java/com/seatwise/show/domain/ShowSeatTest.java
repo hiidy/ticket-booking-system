@@ -16,7 +16,7 @@ class ShowSeatTest {
   void assignBooking_WithValidInputs_ChangedToReserved() {
     // given
     ShowSeat showSeat = ShowSeat.createAvailable(null, null, 40000);
-    Booking booking = new Booking(null, null);
+    Booking booking = new Booking(null);
 
     // when
     showSeat.assignBooking(booking);
@@ -30,7 +30,7 @@ class ShowSeatTest {
   void assignBooking_WithAlreadyBookedSeat_ThrowsException() {
     // given
     ShowSeat showSeat = ShowSeat.createAvailable(null, null, 40000);
-    Booking booking = new Booking(null, null);
+    Booking booking = new Booking(null);
     showSeat.assignBooking(booking);
 
     // when & then

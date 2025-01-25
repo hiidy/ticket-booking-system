@@ -13,9 +13,9 @@ public class BookingFacadeService {
 
   private final BookingService bookingService;
 
-  public Long createBookingFacade(List<Long> showSeatIds) {
+  public Long createBookingFacade(Long memberId, List<Long> showSeatIds) {
     try {
-      return bookingService.createBooking(showSeatIds);
+      return bookingService.createBooking(memberId, showSeatIds);
     } catch (OptimisticLockingFailureException e) {
       throw new BadRequestException(ErrorCode.SEAT_ALREADY_BOOKED);
     }

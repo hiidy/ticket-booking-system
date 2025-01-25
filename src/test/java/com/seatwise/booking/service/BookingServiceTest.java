@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.common.exception.NotFoundException;
+import com.seatwise.member.domain.Member;
+import com.seatwise.member.repository.MemberRepository;
 import com.seatwise.seat.domain.Seat;
 import com.seatwise.seat.domain.SeatGrade;
 import com.seatwise.seat.repository.SeatRepository;
@@ -29,12 +31,12 @@ import org.springframework.transaction.annotation.Transactional;
 class BookingServiceTest {
 
   @Autowired private BookingService bookingService;
-
   @Autowired private ShowSeatRepository showSeatRepository;
-
   @Autowired private ShowRepository showRepository;
-
   @Autowired private SeatRepository seatRepository;
+  @Autowired private MemberRepository memberRepository;
+
+  Member member;
 
   @BeforeEach
   void setUp() {
@@ -47,13 +49,16 @@ class BookingServiceTest {
 
     ShowSeat showSeat = ShowSeat.createAvailable(show, seat, 40000);
     showSeatRepository.save(showSeat);
+
+    member = new Member("테스트유저", "abcd@gmail.com", "1234");
+    memberRepository.save(member);
   }
 
   @Test
   @DisplayName("좌석 예약 성공")
   void testCreateBookingSuccessfully() {
     // When
-    Long bookingId = bookingService.createBooking(List.of(1L));
+    Long bookingId = bookingService.createBooking(member.getId(), List.of(1L));
 
     // then
     assertThat(bookingId).isNotNull();
@@ -65,7 +70,7 @@ class BookingServiceTest {
   @DisplayName("존재하지 않는 좌석으로 예약을 할 수 없다.")
   void testCreateBookingWhenInvalidShowSeat() {
     // When & Then
-    assertThatThrownBy(() -> bookingService.createBooking(List.of(999L)))
+    assertThatThrownBy(() -> bookingService.createBooking(member.getId(), List.of(999L)))
         .isInstanceOf(NotFoundException.class)
         .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SHOW_SEAT_NOT_FOUND);
   }

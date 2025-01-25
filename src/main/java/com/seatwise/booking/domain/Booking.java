@@ -1,7 +1,7 @@
 package com.seatwise.booking.domain;
 
 import com.seatwise.common.domain.BaseEntity;
-import com.seatwise.member.Member;
+import com.seatwise.member.domain.Member;
 import com.seatwise.show.domain.ShowSeat;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -15,7 +15,6 @@ import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -36,9 +35,7 @@ public class Booking extends BaseEntity {
   @OneToMany(mappedBy = "booking")
   private List<ShowSeat> showSeats = new ArrayList<>();
 
-  @Builder
-  public Booking(Member member, List<ShowSeat> showSeats) {
+  public Booking(Member member) {
     this.member = member;
-    this.showSeats = showSeats;
   }
 }

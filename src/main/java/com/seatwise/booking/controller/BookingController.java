@@ -18,8 +18,10 @@ public class BookingController {
   private final BookingFacadeService bookingFacadeService;
 
   @PostMapping
-  public ResponseEntity<Long> createBooking(@Valid @RequestBody BookingRequest bookingRequest) {
-    Long bookingId = bookingFacadeService.createBookingFacade(bookingRequest.showSeatIds());
+  public ResponseEntity<Long> createBooking(
+      Long memberId, @Valid @RequestBody BookingRequest bookingRequest) {
+    Long bookingId =
+        bookingFacadeService.createBookingFacade(memberId, bookingRequest.showSeatIds());
     return ResponseEntity.ok(bookingId);
   }
 }

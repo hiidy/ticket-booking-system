@@ -13,6 +13,7 @@ public enum ErrorCode {
   VENUE_NOT_FOUND("장소를 찾을 수 없습니다."),
   SHOW_NOT_FOUND("진행 시간을 찾을 수 없습니다."),
   SHOW_SEAT_NOT_FOUND("ShowSeat를 찾을 수 없습니다."),
+  MEMBER_NOT_FOUND("유저를 찾을 수 없습니다."),
 
   DUPLICATE_SEAT_NUMBER("중복된 좌석 번호입니다."),
   DUPLICATE_SHOW("이벤트 시간이 중복됐습니다.");

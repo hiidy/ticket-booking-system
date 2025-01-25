@@ -1,4 +1,4 @@
-package com.seatwise.member;
+package com.seatwise.member.domain;
 
 import com.seatwise.common.domain.BaseEntity;
 import jakarta.persistence.Entity;
@@ -25,4 +25,10 @@ public class Member extends BaseEntity {
   private String email;
 
   private String password;
+
+  public Member(String name, String email, String password) {
+    this.name = name;
+    this.email = email;
+    this.password = password;
+  }
 }
