@@ -60,7 +60,6 @@ CREATE TABLE show_seat
     booking_id INT,
     price      BIGINT       NOT NULL,
     status     VARCHAR(100) NOT NULL,
-    version    INT,
     created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

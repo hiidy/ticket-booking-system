@@ -15,7 +15,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,8 +45,6 @@ public class ShowSeat extends BaseEntity {
 
   @Enumerated(EnumType.STRING)
   private Status status;
-
-  @Version private Long version;
 
   private ShowSeat(Show show, Seat seat, Integer price, Status status) {
     validatePrice(price);

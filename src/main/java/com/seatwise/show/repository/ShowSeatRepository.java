@@ -1,9 +1,11 @@
 package com.seatwise.show.repository;
 
 import com.seatwise.show.domain.ShowSeat;
+import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 public interface ShowSeatRepository extends JpaRepository<ShowSeat, Long> {
@@ -15,4 +17,10 @@ public interface ShowSeatRepository extends JpaRepository<ShowSeat, Long> {
 
   @Query("SELECT ss FROM ShowSeat ss WHERE ss.show.id IN :showIds")
   List<ShowSeat> findAllByShowId(List<Long> showIds);
+
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("SELECT ss FROM ShowSeat ss WHERE ss.id IN :showSeatIds")
+  List<ShowSeat> findAllByIdWithLock(List<Long> showSeatIds);
+
+  boolean existsByShowIdAndSeatIdIn(Long showId, List<Long> seatIds);
 }

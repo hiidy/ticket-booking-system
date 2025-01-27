@@ -1,7 +1,7 @@
 package com.seatwise.booking.controller;
 
 import com.seatwise.booking.dto.BookingRequest;
-import com.seatwise.booking.service.BookingFacadeService;
+import com.seatwise.booking.service.BookingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class BookingController {
 
-  private final BookingFacadeService bookingFacadeService;
+  private final BookingService bookingService;
 
   @PostMapping
   public ResponseEntity<Long> createBooking(
       Long memberId, @Valid @RequestBody BookingRequest bookingRequest) {
-    Long bookingId =
-        bookingFacadeService.createBookingFacade(memberId, bookingRequest.showSeatIds());
+    Long bookingId = bookingService.createBooking(memberId, bookingRequest.showSeatIds());
     return ResponseEntity.ok(bookingId);
   }
 }
