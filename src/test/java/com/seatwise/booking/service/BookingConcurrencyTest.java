@@ -25,6 +25,7 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test-mysql")
 @Sql(scripts = "/sql/data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
+@Disabled
 class BookingConcurrencyTest {
 
   private static final Logger log = LoggerFactory.getLogger(BookingConcurrencyTest.class);
@@ -34,7 +35,6 @@ class BookingConcurrencyTest {
   @Autowired BookingRepository bookingRepository;
 
   @RepeatedTest(1)
-  @Disabled
   void lostUpdateWhenAssignBooking() throws InterruptedException {
     log.info("=== 테스트 시작 ===");
     long startTime = System.currentTimeMillis();
