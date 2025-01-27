@@ -11,6 +11,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.RepeatedTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,16 +29,17 @@ class BookingConcurrencyTest {
 
   private static final Logger log = LoggerFactory.getLogger(BookingConcurrencyTest.class);
 
-  @Autowired BookingFacadeService bookingService;
+  @Autowired BookingService bookingService;
   @Autowired ShowSeatRepository showSeatRepository;
   @Autowired BookingRepository bookingRepository;
 
   @RepeatedTest(1)
+  @Disabled
   void lostUpdateWhenAssignBooking() throws InterruptedException {
     log.info("=== 테스트 시작 ===");
     long startTime = System.currentTimeMillis();
 
-    int numberOfThreads = 5;
+    int numberOfThreads = 1000;
     ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
     CountDownLatch startLatch = new CountDownLatch(1);
     CountDownLatch endLatch = new CountDownLatch(numberOfThreads);
@@ -58,7 +60,7 @@ class BookingConcurrencyTest {
           () -> {
             try {
               startLatch.await();
-              bookingService.createBookingFacade((long) threadNum, seatIds);
+              bookingService.createBooking((long) threadNum, seatIds);
             } catch (Exception e) {
               log.error("Thread {} 예약 실패 - 좌석 {}", threadNum, seatIds, e);
             } finally {
@@ -86,5 +88,59 @@ class BookingConcurrencyTest {
             seat -> {
               log.info("좌석 {} - 예약 ID: {}", seat.getSeat().getId(), seat.getBooking().getId());
             });
+  }
+
+  @RepeatedTest(1)
+  void createBooking_WhenMultipleThreads_ShouldHandleConcurrency() throws InterruptedException {
+    log.info("=== 동시성 테스트 시작 ===");
+    long startTime = System.currentTimeMillis();
+
+    int numberOfThreads = 2000;
+    ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+    CountDownLatch startLatch = new CountDownLatch(1);
+    CountDownLatch endLatch = new CountDownLatch(numberOfThreads);
+
+    // 각 스레드가 동일한 좌석을 예약하도록 설정
+    for (int i = 0; i < numberOfThreads; i++) {
+      int threadNum = i + 1;
+      executorService.submit(
+          () -> {
+            try {
+              startLatch.await(); // 모든 스레드가 동시에 시작하도록 대기
+              bookingService.createBooking(
+                  (long) threadNum, // memberId
+                  List.of(1L) // showId
+                  );
+              log.info("Thread {} 예약 성공", threadNum);
+            } catch (Exception e) {
+              log.error("Thread {} 예약 실패", threadNum, e);
+            } finally {
+              endLatch.countDown();
+            }
+          });
+    }
+
+    startLatch.countDown(); // 모든 스레드 시작
+    endLatch.await(10, TimeUnit.SECONDS);
+    executorService.shutdown();
+
+    long endTime = System.currentTimeMillis();
+    log.info("테스트 소요 시간: {}ms", endTime - startTime);
+
+    // 검증
+    List<ShowSeat> showSeats = showSeatRepository.findAllByShowId(List.of(1L));
+
+    // 하나의 좌석은 한 번만 예약되어야 함
+    assertThat(showSeats.stream().filter(seat -> seat.getBooking() != null).count())
+        .isLessThanOrEqualTo(1);
+
+    showSeats.stream()
+        .filter(seat -> seat.getBooking() != null)
+        .forEach(
+            seat ->
+                log.info(
+                    "좌석 {} 최종 예약 상태: 예약자 ID {}",
+                    seat.getSeat().getId(),
+                    seat.getBooking().getMember().getId()));
   }
 }
