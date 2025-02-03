@@ -55,7 +55,6 @@ public class ShowController {
     return ResponseEntity.ok(response);
   }
 
-  @GetMapping("/{showId}/")
   @PostMapping("/{showId}/seats")
   public ResponseEntity<List<Long>> createShowSeat(
       @PathVariable Long showId, @Valid @RequestBody ShowSeatCreateRequest request) {
