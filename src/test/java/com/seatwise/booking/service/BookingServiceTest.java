@@ -63,7 +63,7 @@ class BookingServiceTest {
     // then
     assertThat(bookingId).isNotNull();
     ShowSeat showSeat = showSeatRepository.findByShowIdAndSeatId(1L, 1L).orElseThrow();
-    assertThat(showSeat.getStatus()).isEqualTo(Status.RESERVED);
+    assertThat(showSeat.getStatus()).isEqualTo(Status.PAYMENT_PENDING);
   }
 
   @Test
