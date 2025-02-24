@@ -8,6 +8,7 @@ import com.seatwise.member.domain.Member;
 import com.seatwise.member.repository.MemberRepository;
 import com.seatwise.show.domain.ShowSeat;
 import com.seatwise.show.repository.ShowSeatRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class BookingService {
     }
 
     Booking booking = new Booking(member);
-    showSeats.forEach(showSeat -> showSeat.assignBooking(booking));
+    showSeats.forEach(showSeat -> showSeat.assignBooking(booking, LocalDateTime.now()));
     Booking savedBooking = bookingRepository.save(booking);
 
     return savedBooking.getId();

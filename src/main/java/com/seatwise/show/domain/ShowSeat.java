@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,6 +47,8 @@ public class ShowSeat extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private Status status;
 
+  private LocalDateTime expirationTime;
+
   private ShowSeat(Show show, Seat seat, Integer price, Status status) {
     validatePrice(price);
     this.show = show;
@@ -59,17 +62,22 @@ public class ShowSeat extends BaseEntity {
     return new ShowSeat(show, seat, price, Status.AVAILABLE);
   }
 
-  public void assignBooking(Booking booking) {
-    validateBeforeAssignBooking();
+  public void assignBooking(Booking booking, LocalDateTime time) {
+    validateBookingStatus();
+    validatePendingBooking(time);
     this.booking = booking;
-    this.status = Status.RESERVED;
+    this.status = Status.PAYMENT_PENDING;
+    this.expirationTime = time.plusMinutes(10);
   }
 
-  private void validateBeforeAssignBooking() {
-    if (this.booking != null) {
+  private void validateBookingStatus() {
+    if (this.status == Status.BOOKED) {
       throw new BadRequestException(ErrorCode.SEAT_ALREADY_BOOKED);
     }
-    if (this.status != Status.AVAILABLE) {
+  }
+
+  private void validatePendingBooking(LocalDateTime time) {
+    if (this.status == Status.PAYMENT_PENDING && expirationTime.isAfter(time)) {
       throw new BadRequestException(ErrorCode.SEAT_NOT_AVAILABLE);
     }
   }
@@ -77,6 +85,14 @@ public class ShowSeat extends BaseEntity {
   private void validatePrice(Integer price) {
     if (price < 0) {
       throw new BadRequestException(ErrorCode.INVALID_SEAT_PRICE);
+    }
+  }
+
+  public void releaseExpiredSeat(LocalDateTime currentTime) {
+    if (this.status == Status.PAYMENT_PENDING && currentTime.isAfter(expirationTime)) {
+      this.status = Status.AVAILABLE;
+      this.booking = null;
+      this.expirationTime = null;
     }
   }
 }
