@@ -1,5 +1,8 @@
 package com.seatwise.booking.repository;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -13,13 +16,21 @@ public class RedisBookingRepository {
   private static final String LOCK_PREFIX = "lock:showSeat:";
   private static final long LOCK_DURATION = 10;
 
-  public boolean lockSeat(Long memberId, Long seatId) {
-    String key = LOCK_PREFIX + seatId;
+  public boolean lockSeat(Long memberId, List<Long> seatIds) {
 
-    Boolean isLocked =
-        redisTemplate
-            .opsForValue()
-            .setIfAbsent(key, memberId.toString(), LOCK_DURATION, TimeUnit.MINUTES);
+    Map<String, String> lockMap = new HashMap<>();
+    for (Long seatId : seatIds) {
+      String key = LOCK_PREFIX + seatId;
+      lockMap.put(key, memberId.toString());
+    }
+
+    Boolean isLocked = redisTemplate.opsForValue().multiSetIfAbsent(lockMap);
+    if (Boolean.TRUE.equals(isLocked)) {
+      for (String key : lockMap.keySet()) {
+        redisTemplate.expire(key, LOCK_DURATION, TimeUnit.MINUTES);
+      }
+    }
+
     return Boolean.TRUE.equals(isLocked);
   }
 }

@@ -29,8 +29,7 @@ public class BookingService {
 
   @Transactional
   public Long createBooking(Long memberId, List<Long> showSeatIds) {
-    boolean allLocked =
-        showSeatIds.stream().allMatch(seatId -> redisBookingRepository.lockSeat(memberId, seatId));
+    boolean allLocked = redisBookingRepository.lockSeat(memberId, showSeatIds);
 
     if (!allLocked) {
       throw new BadRequestException(ErrorCode.SEAT_NOT_AVAILABLE);
