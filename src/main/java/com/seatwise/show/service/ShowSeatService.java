@@ -5,17 +5,14 @@ import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.seat.repository.SeatRepository;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.domain.ShowSeat;
-import com.seatwise.show.domain.Status;
 import com.seatwise.show.dto.request.ShowSeatCreateRequest;
 import com.seatwise.show.dto.response.ShowSeatResponse;
 import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.show.repository.ShowSeatRepository;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,18 +55,5 @@ public class ShowSeatService {
       throw new NotFoundException(ErrorCode.SHOW_SEAT_NOT_FOUND);
     }
     return showSeats.stream().map(ShowSeatResponse::from).toList();
-  }
-
-  @Scheduled(cron = "0 */1 * * * *")
-  public void resetSeatExpirationTime() {
-    List<ShowSeat> expiredSeats =
-        showSeatRepository.findAllByStatusIsAndExpirationTimeBefore(
-            Status.PAYMENT_PENDING, LocalDateTime.now());
-
-    if (!expiredSeats.isEmpty()) {
-      expiredSeats.forEach(seat -> seat.releaseExpiredSeat(LocalDateTime.now()));
-      showSeatRepository.saveAll(expiredSeats);
-      log.info("{}개의 좌석이 만료됐습니다.", expiredSeats.size());
-    }
   }
 }
