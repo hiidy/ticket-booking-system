@@ -54,15 +54,15 @@ CREATE TABLE booking
 
 CREATE TABLE show_seat
 (
-    id         INT AUTO_INCREMENT PRIMARY KEY,
-    show_id    INT          NOT NULL,
-    seat_id    INT          NOT NULL,
-    booking_id INT,
-    price      BIGINT       NOT NULL,
-    status     VARCHAR(100) NOT NULL,
-    version    INT,
-    created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    show_id         INT          NOT NULL,
+    seat_id         INT          NOT NULL,
+    booking_id      INT,
+    price           BIGINT       NOT NULL,
+    status          VARCHAR(100) NOT NULL,
+    expiration_time TIMESTAMP,
+    created_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE venue

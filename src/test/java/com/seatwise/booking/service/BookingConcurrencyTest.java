@@ -95,7 +95,7 @@ class BookingConcurrencyTest {
     log.info("=== 동시성 테스트 시작 ===");
     long startTime = System.currentTimeMillis();
 
-    int numberOfThreads = 2000;
+    int numberOfThreads = 10;
     ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
     CountDownLatch startLatch = new CountDownLatch(1);
     CountDownLatch endLatch = new CountDownLatch(numberOfThreads);

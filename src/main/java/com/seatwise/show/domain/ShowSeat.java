@@ -87,12 +87,4 @@ public class ShowSeat extends BaseEntity {
       throw new BadRequestException(ErrorCode.INVALID_SEAT_PRICE);
     }
   }
-
-  public void releaseExpiredSeat(LocalDateTime currentTime) {
-    if (this.status == Status.PAYMENT_PENDING && currentTime.isAfter(expirationTime)) {
-      this.status = Status.AVAILABLE;
-      this.booking = null;
-      this.expirationTime = null;
-    }
-  }
 }

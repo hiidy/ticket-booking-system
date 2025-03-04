@@ -28,17 +28,17 @@ VALUES (1, 'VIP', 1, 1),
        (9, 'VIP', 1, 9),
        (10, 'VIP', 1, 10);
 
-INSERT INTO show_seat (id, show_id, seat_id, price, version, status)
-VALUES (1, 1, 1, 60000, 0, 'AVAILABLE'),
-       (2, 1, 2, 60000, 0, 'AVAILABLE'),
-       (3, 1, 3, 60000, 0, 'AVAILABLE'),
-       (4, 1, 4, 60000, 0, 'AVAILABLE'),
-       (5, 1, 5, 60000, 0, 'AVAILABLE'),
-       (6, 1, 6, 60000, 0, 'AVAILABLE'),
-       (7, 1, 7, 60000, 0, 'AVAILABLE'),
-       (8, 1, 8, 60000, 0, 'AVAILABLE'),
-       (9, 1, 9, 60000, 0, 'AVAILABLE'),
-       (10, 1, 10, 60000, 0, 'AVAILABLE');
+INSERT INTO show_seat (id, show_id, seat_id, price, status)
+VALUES (1, 1, 1, 60000, 'AVAILABLE'),
+       (2, 1, 2, 60000, 'AVAILABLE'),
+       (3, 1, 3, 60000, 'AVAILABLE'),
+       (4, 1, 4, 60000, 'AVAILABLE'),
+       (5, 1, 5, 60000, 'AVAILABLE'),
+       (6, 1, 6, 60000, 'AVAILABLE'),
+       (7, 1, 7, 60000, 'AVAILABLE'),
+       (8, 1, 8, 60000, 'AVAILABLE'),
+       (9, 1, 9, 60000, 'AVAILABLE'),
+       (10, 1, 10, 60000, 'AVAILABLE');
 
 INSERT INTO member (id, name, email, password)
 VALUES (1, '김철수', 'kim@gmail.com', '1234'),
