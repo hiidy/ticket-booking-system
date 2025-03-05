@@ -40,7 +40,7 @@ public class BookingService {
             .findById(memberId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
-    List<ShowSeat> showSeats = showSeatRepository.findAllByIdWithLock(showSeatIds);
+    List<ShowSeat> showSeats = showSeatRepository.findAllByIds(showSeatIds);
     if (showSeats.isEmpty() || showSeats.size() != showSeatIds.size()) {
       throw new NotFoundException(ErrorCode.SHOW_SEAT_NOT_FOUND);
     }

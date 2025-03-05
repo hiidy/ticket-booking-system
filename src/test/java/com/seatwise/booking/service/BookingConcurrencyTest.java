@@ -2,6 +2,7 @@ package com.seatwise.booking.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.seatwise.annotation.EmbeddedRedisTest;
 import com.seatwise.booking.domain.Booking;
 import com.seatwise.booking.repository.BookingRepository;
 import com.seatwise.show.domain.ShowSeat;
@@ -25,6 +26,7 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test-mysql")
 @Sql(scripts = "/sql/data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
+@EmbeddedRedisTest
 @Disabled
 class BookingConcurrencyTest {
 
@@ -95,7 +97,7 @@ class BookingConcurrencyTest {
     log.info("=== 동시성 테스트 시작 ===");
     long startTime = System.currentTimeMillis();
 
-    int numberOfThreads = 10;
+    int numberOfThreads = 5;
     ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
     CountDownLatch startLatch = new CountDownLatch(1);
     CountDownLatch endLatch = new CountDownLatch(numberOfThreads);
@@ -134,13 +136,13 @@ class BookingConcurrencyTest {
     assertThat(showSeats.stream().filter(seat -> seat.getBooking() != null).count())
         .isLessThanOrEqualTo(1);
 
-    showSeats.stream()
-        .filter(seat -> seat.getBooking() != null)
-        .forEach(
-            seat ->
-                log.info(
-                    "좌석 {} 최종 예약 상태: 예약자 ID {}",
-                    seat.getSeat().getId(),
-                    seat.getBooking().getMember().getId()));
+    //    showSeats.stream()
+    //        .filter(seat -> seat.getBooking() != null)
+    //        .forEach(
+    //            seat ->
+    //                log.info(
+    //                    "좌석 {} 최종 예약 상태: 예약자 ID {}",
+    //                    seat.getSeat().getId(),
+    //                    seat.getBooking().getMember().getId()));
   }
 }

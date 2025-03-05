@@ -1,9 +1,8 @@
-package com.seatwise.booking;
+package com.seatwise.booking.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.seatwise.annotation.EmbeddedRedisTest;
-import com.seatwise.booking.repository.RedisBookingRepository;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;

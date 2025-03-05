@@ -44,7 +44,7 @@ public class RedisTestConfig {
   }
 
   @Bean
-  public RedisConnectionFactory redisConnectionFactory() {
+  public RedisConnectionFactory redisTestConnectionFactory() {
     RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
     configuration.setHostName("localhost");
     configuration.setPort(redisPort);
@@ -54,7 +54,7 @@ public class RedisTestConfig {
   @Bean
   public StringRedisTemplate stringRedisTemplate() {
     StringRedisTemplate template = new StringRedisTemplate();
-    template.setConnectionFactory(redisConnectionFactory());
+    template.setConnectionFactory(redisTestConnectionFactory());
     return template;
   }
 }
