@@ -1,6 +1,10 @@
 server:
   port: 8080
 spring:
+  data:
+    redis:
+      port: 6379
+      host: localhost
   application:
     name: ticket-booking-system
   datasource:
