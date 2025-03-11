@@ -2,7 +2,7 @@ package com.seatwise.booking.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.seatwise.annotation.EmbeddedRedisTest;
+import com.seatwise.annotation.ServiceTest;
 import com.seatwise.booking.domain.Booking;
 import com.seatwise.booking.repository.BookingRepository;
 import com.seatwise.show.domain.ShowSeat;
@@ -17,16 +17,13 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test-mysql")
 @Sql(scripts = "/sql/data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
-@EmbeddedRedisTest
+@ServiceTest
 @Disabled
 class BookingConcurrencyTest {
 

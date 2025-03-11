@@ -3,6 +3,7 @@ package com.seatwise.show.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.seatwise.annotation.ServiceTest;
 import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.seat.domain.Seat;
 import com.seatwise.seat.repository.SeatRepository;
@@ -20,12 +21,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@Transactional
+@ServiceTest
 class ShowSeatServiceTest {
 
   @Autowired private ShowSeatService showSeatService;

@@ -3,7 +3,7 @@ package com.seatwise.booking.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.seatwise.annotation.EmbeddedRedisTest;
+import com.seatwise.annotation.ServiceTest;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.member.domain.Member;
@@ -23,13 +23,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
-@EmbeddedRedisTest
-@Transactional
+@ServiceTest
 class BookingServiceTest {
 
   @Autowired private BookingService bookingService;
