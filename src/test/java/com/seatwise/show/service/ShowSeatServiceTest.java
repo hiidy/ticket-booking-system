@@ -66,7 +66,7 @@ class ShowSeatServiceTest {
 
     // then
     assertThat(showSeatIds).hasSize(5);
-    List<ShowSeat> showSeats = showSeatRepository.findAllByIds(showSeatIds);
+    List<ShowSeat> showSeats = showSeatRepository.findAllById(showSeatIds);
     assertThat(showSeats)
         .hasSize(5)
         .allSatisfy(

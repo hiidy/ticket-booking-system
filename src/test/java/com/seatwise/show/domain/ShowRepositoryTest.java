@@ -2,7 +2,6 @@ package com.seatwise.show.domain;
 
 import static org.assertj.core.api.Assertions.*;
 
-import com.seatwise.RepositoryTest;
 import com.seatwise.event.domain.Event;
 import com.seatwise.event.domain.EventType;
 import com.seatwise.event.repository.EventRepository;
@@ -13,8 +12,10 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-class ShowRepositoryTest extends RepositoryTest {
+@DataJpaTest
+class ShowRepositoryTest {
 
   @Autowired ShowRepository showRepository;
   @Autowired EventRepository eventRepository;

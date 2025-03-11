@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.seatwise.annotation.ServiceTest;
+import com.seatwise.common.exception.BadRequestException;
 import com.seatwise.common.exception.ErrorCode;
-import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.member.domain.Member;
 import com.seatwise.member.repository.MemberRepository;
 import com.seatwise.seat.domain.Seat;
@@ -68,7 +68,7 @@ class BookingServiceTest {
   void testCreateBookingWhenInvalidShowSeat() {
     // When & Then
     assertThatThrownBy(() -> bookingService.createBooking(member.getId(), List.of(999L)))
-        .isInstanceOf(NotFoundException.class)
-        .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SHOW_SEAT_NOT_FOUND);
+        .isInstanceOf(BadRequestException.class)
+        .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SEAT_NOT_AVAILABLE);
   }
 }

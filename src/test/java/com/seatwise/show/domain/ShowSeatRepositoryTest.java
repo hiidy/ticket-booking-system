@@ -1,6 +1,7 @@
 package com.seatwise.show.domain;
 
-import com.seatwise.RepositoryTest;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.seatwise.seat.domain.Seat;
 import com.seatwise.seat.domain.SeatGrade;
 import com.seatwise.seat.repository.SeatRepository;
@@ -9,12 +10,13 @@ import com.seatwise.show.repository.ShowSeatRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-class ShowSeatRepositoryTest extends RepositoryTest {
+@DataJpaTest
+class ShowSeatRepositoryTest {
 
   @Autowired ShowSeatRepository showSeatRepository;
   @Autowired SeatRepository seatRepository;
@@ -38,8 +40,8 @@ class ShowSeatRepositoryTest extends RepositoryTest {
     List<ShowSeat> showSeats = showSeatRepository.findByShowId(show.getId());
 
     // then
-    Assertions.assertThat(showSeats).hasSize(2);
-    Assertions.assertThat(showSeats.get(0).getSeat().getSeatNumber()).isEqualTo(1);
-    Assertions.assertThat(showSeats.get(1).getSeat().getSeatNumber()).isEqualTo(2);
+    assertThat(showSeats).hasSize(2);
+    assertThat(showSeats.get(0).getSeat().getSeatNumber()).isEqualTo(1);
+    assertThat(showSeats.get(1).getSeat().getSeatNumber()).isEqualTo(2);
   }
 }
