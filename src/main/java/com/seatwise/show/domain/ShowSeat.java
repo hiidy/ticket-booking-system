@@ -62,23 +62,23 @@ public class ShowSeat extends BaseEntity {
     return new ShowSeat(show, seat, price, Status.AVAILABLE);
   }
 
-  public void assignBooking(Booking booking, LocalDateTime time) {
+  public void assignBooking(Booking booking, LocalDateTime requestTime) {
     validateBookingStatus();
-    validatePendingBooking(time);
+    if (isLocked(requestTime)) {
+      throw new BadRequestException(ErrorCode.SEAT_NOT_AVAILABLE);
+    }
     this.booking = booking;
     this.status = Status.PAYMENT_PENDING;
-    this.expirationTime = time.plusMinutes(10);
+    this.expirationTime = requestTime.plusMinutes(10);
+  }
+
+  public boolean isLocked(LocalDateTime currentTime) {
+    return status == Status.PAYMENT_PENDING && expirationTime.isAfter(currentTime);
   }
 
   private void validateBookingStatus() {
     if (this.status == Status.BOOKED) {
       throw new BadRequestException(ErrorCode.SEAT_ALREADY_BOOKED);
-    }
-  }
-
-  private void validatePendingBooking(LocalDateTime time) {
-    if (this.status == Status.PAYMENT_PENDING && expirationTime.isAfter(time)) {
-      throw new BadRequestException(ErrorCode.SEAT_NOT_AVAILABLE);
     }
   }
 
