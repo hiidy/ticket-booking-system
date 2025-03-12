@@ -27,5 +27,5 @@ public interface ShowSeatRepository extends JpaRepository<ShowSeat, Long> {
   @Query(
       "SELECT ss FROM ShowSeat ss WHERE ss.id IN :showSeatIds AND (ss.expirationTime IS NULL OR ss.expirationTime > :currentTime)")
   @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "0")})
-  List<ShowSeat> findAllAvailableSeats(List<Long> showSeatIds, LocalDateTime currentTime);
+  List<ShowSeat> findAllAvailableSeatsWithLock(List<Long> showSeatIds, LocalDateTime currentTime);
 }

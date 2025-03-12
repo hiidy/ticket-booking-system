@@ -12,13 +12,11 @@ import com.seatwise.show.repository.ShowSeatRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class BookingService {
 
   private final BookingRepository bookingRepository;
@@ -29,7 +27,7 @@ public class BookingService {
   public Long createBooking(Long memberId, List<Long> showSeatIds) {
     LocalDateTime bookingRequestTime = LocalDateTime.now();
     List<ShowSeat> showSeats =
-        showSeatRepository.findAllAvailableSeats(showSeatIds, bookingRequestTime);
+        showSeatRepository.findAllAvailableSeatsWithLock(showSeatIds, bookingRequestTime);
 
     if (showSeats.size() != showSeatIds.size()) {
       throw new BadRequestException(ErrorCode.SEAT_NOT_AVAILABLE);
