@@ -72,4 +72,6 @@ CREATE TABLE venue
     total_seats INT       NOT NULL,
     created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-)
+);
+
+CREATE INDEX idx_show_seat_show_id ON show_seat (show_id);
