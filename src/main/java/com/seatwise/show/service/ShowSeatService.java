@@ -9,6 +9,7 @@ import com.seatwise.show.dto.request.ShowSeatCreateRequest;
 import com.seatwise.show.dto.response.ShowSeatResponse;
 import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.show.repository.ShowSeatRepository;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -47,9 +48,12 @@ public class ShowSeatService {
 
   public List<ShowSeatResponse> getShowSeats(Long showId) {
     List<ShowSeat> showSeats = showSeatRepository.findByShowId(showId);
+    LocalDateTime requestTime = LocalDateTime.now();
     if (showSeats.isEmpty()) {
       throw new NotFoundException(ErrorCode.SHOW_SEAT_NOT_FOUND);
     }
-    return showSeats.stream().map(ShowSeatResponse::from).toList();
+    return showSeats.stream()
+        .map(showSeat -> ShowSeatResponse.from(showSeat, requestTime))
+        .toList();
   }
 }
