@@ -21,11 +21,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ShowService {
 
   private final ShowRepository showRepository;
@@ -82,7 +80,6 @@ public class ShowService {
     }
   }
 
-  @Transactional(readOnly = true)
   public List<ShowDatesResponse> getAvailableDates(Long eventId, int year, int month) {
     LocalDate startDate = LocalDate.of(year, month, 1);
     LocalDate endDate = startDate.plusMonths(1);
