@@ -16,7 +16,9 @@ public enum ErrorCode {
   MEMBER_NOT_FOUND("유저를 찾을 수 없습니다."),
 
   DUPLICATE_SEAT_NUMBER("중복된 좌석 번호입니다."),
-  DUPLICATE_SHOW("이벤트 시간이 중복됐습니다.");
+  DUPLICATE_SHOW("이벤트 시간이 중복됐습니다."),
+
+  SEAT_ALREADY_LOCKED("좌석이 이미 선점되었습니다. 다른 좌석을 이용해주세요");
 
   private final String message;
 
