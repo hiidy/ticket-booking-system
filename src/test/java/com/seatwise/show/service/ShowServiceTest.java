@@ -63,7 +63,7 @@ class ShowServiceTest {
 
   @Test
   @DisplayName("공연 시간별로 상세한 정보를 조회한다.")
-  void getShowDetails() {
+  void getShowSeatAvailability() {
     // given
     LocalTime startTime = LocalTime.of(15, 0);
     Show show = new Show(event, LocalDate.of(2024, 1, 1), startTime, startTime.plusHours(2));
@@ -80,7 +80,7 @@ class ShowServiceTest {
     showSeatRepository.saveAll(List.of(showSeat1, showSeat2, showSeat3));
 
     // when
-    ShowResponse response = showService.getShowDetails(show.getId());
+    ShowResponse response = showService.getShowSeatAvailability(show.getId());
 
     // then
     assertThat(response.startTime()).isEqualTo(startTime);
@@ -99,13 +99,13 @@ class ShowServiceTest {
     showRepository.save(show);
     Long showId = 999L;
 
-    assertThatThrownBy(() -> showService.getShowDetails(showId))
+    assertThatThrownBy(() -> showService.getShowSeatAvailability(showId))
         .isInstanceOf(NotFoundException.class);
   }
 
   @Test
   @DisplayName("공연 시간별로 상세한 정보를 불러올 때 이용 가능한 좌석이 없으면 예외를 던진다.")
-  void getShowDetailsWithUnavailableSeats() {
+  void getShowSeatAvailabilityWithUnavailableSeats() {
     // given
     LocalTime startTime = LocalTime.of(15, 0);
     Show show = new Show(event, LocalDate.of(2024, 1, 1), startTime, startTime.plusHours(2));
@@ -119,7 +119,7 @@ class ShowServiceTest {
     Long showId = show.getId();
 
     // when & then
-    assertThatThrownBy(() -> showService.getShowDetails(showId))
+    assertThatThrownBy(() -> showService.getShowSeatAvailability(showId))
         .isInstanceOf(NotFoundException.class);
   }
 }

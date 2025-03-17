@@ -76,7 +76,7 @@ class BookingConcurrencyTest {
     log.info("총 소요 시간: {}ms", endTime - startTime);
 
     // then
-    List<ShowSeat> savedShowSeats = showSeatRepository.findAllByShowId(List.of(1L));
+    List<ShowSeat> savedShowSeats = showSeatRepository.findAllByShowIds(List.of(1L));
     List<Booking> bookings = bookingRepository.findAll();
 
     assertThat(bookings).hasSizeLessThanOrEqualTo(3);
@@ -127,7 +127,7 @@ class BookingConcurrencyTest {
     log.info("테스트 소요 시간: {}ms", endTime - startTime);
 
     // 검증
-    List<ShowSeat> showSeats = showSeatRepository.findAllByShowId(List.of(1L));
+    List<ShowSeat> showSeats = showSeatRepository.findAllByShowIds(List.of(1L));
 
     // 하나의 좌석은 한 번만 예약되어야 함
     assertThat(showSeats.stream().filter(seat -> seat.getBooking() != null).count())

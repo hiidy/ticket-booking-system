@@ -7,6 +7,7 @@ import lombok.Getter;
 @Getter
 public enum SeatGrade {
   VIP("VIP석"),
+  PREMIUM("프리미엄석"),
   R("R석"),
   S("S석"),
   A("A석"),

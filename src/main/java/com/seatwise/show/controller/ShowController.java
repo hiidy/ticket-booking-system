@@ -2,9 +2,9 @@ package com.seatwise.show.controller;
 
 import com.seatwise.show.dto.request.ShowCreateRequest;
 import com.seatwise.show.dto.request.ShowSeatCreateRequest;
+import com.seatwise.show.dto.response.SeatAvailabilityResponse;
 import com.seatwise.show.dto.response.ShowCreateResponse;
 import com.seatwise.show.dto.response.ShowDatesResponse;
-import com.seatwise.show.dto.response.ShowResponse;
 import com.seatwise.show.dto.response.ShowSeatResponse;
 import com.seatwise.show.service.ShowSeatService;
 import com.seatwise.show.service.ShowService;
@@ -44,8 +44,9 @@ public class ShowController {
   }
 
   @GetMapping("/{showId}/details")
-  public ResponseEntity<ShowResponse> getShowsDetails(@PathVariable Long showId) {
-    ShowResponse response = showService.getShowDetails(showId);
+  public ResponseEntity<List<SeatAvailabilityResponse>> getShowSeatAvailability(
+      @PathVariable Long showId) {
+    List<SeatAvailabilityResponse> response = showSeatService.getRemainingShowSeats(showId);
     return ResponseEntity.ok(response);
   }
 

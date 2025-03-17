@@ -16,16 +16,16 @@ public interface ShowSeatRepository extends JpaRepository<ShowSeat, Long> {
   Optional<ShowSeat> findByShowIdAndSeatId(Long showId, Long seatId);
 
   @Query("SELECT ss from ShowSeat ss " + "JOIN FETCH ss.seat st " + "WHERE ss.show.id = :showId")
-  List<ShowSeat> findByShowId(Long showId);
+  List<ShowSeat> findAllByShowId(Long showId);
 
   @Query("SELECT ss FROM ShowSeat ss WHERE ss.show.id IN :showIds")
-  List<ShowSeat> findAllByShowId(List<Long> showIds);
+  List<ShowSeat> findAllByShowIds(List<Long> showIds);
 
   List<ShowSeat> findAllById(Iterable<Long> showSeatIds);
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query(
-      "SELECT ss FROM ShowSeat ss WHERE ss.id IN :showSeatIds AND (ss.expirationTime IS NULL OR ss.expirationTime > :currentTime)")
+      "SELECT ss FROM ShowSeat ss WHERE ss.id IN :showSeatIds AND (ss.expirationTime IS NULL OR ss.expirationTime > :currentTime) AND ss.status != 'BOOKED'")
   @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "0")})
   List<ShowSeat> findAllAvailableSeatsWithLock(List<Long> showSeatIds, LocalDateTime currentTime);
 }

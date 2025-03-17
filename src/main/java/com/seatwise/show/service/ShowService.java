@@ -30,7 +30,7 @@ public class ShowService {
   private final EventRepository eventRepository;
   private final SeatRepository seatRepository;
 
-  public ShowResponse getShowDetails(Long showId) {
+  public ShowResponse getShowSeatAvailability(Long showId) {
     LocalTime startTime =
         showRepository
             .findById(showId)
