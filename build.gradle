@@ -49,6 +49,7 @@ dependencies {
 test {
     useJUnitPlatform()
     finalizedBy jacocoTestReport
+    systemProperty 'user.timezone', 'UTC'
 }
 
 jacoco {
