@@ -58,7 +58,7 @@ public class ShowSeatService {
         .toList();
   }
 
-  public List<SeatAvailabilityResponse> getRemainingShowSeats(Long showId) {
+  public List<SeatAvailabilityResponse> getAvailableSeatsForShow(Long showId) {
     return showSeatRepository.findSeatAvailabilityByShowId(showId);
   }
 }

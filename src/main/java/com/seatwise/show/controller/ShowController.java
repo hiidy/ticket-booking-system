@@ -43,10 +43,10 @@ public class ShowController {
     return ResponseEntity.ok(dates);
   }
 
-  @GetMapping("/{showId}/details")
-  public ResponseEntity<List<SeatAvailabilityResponse>> getShowSeatAvailability(
+  @GetMapping("/{showId}/available-seats")
+  public ResponseEntity<List<SeatAvailabilityResponse>> getAvailableSeatsForShow(
       @PathVariable Long showId) {
-    List<SeatAvailabilityResponse> response = showSeatService.getRemainingShowSeats(showId);
+    List<SeatAvailabilityResponse> response = showSeatService.getAvailableSeatsForShow(showId);
     return ResponseEntity.ok(response);
   }
 
