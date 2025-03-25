@@ -2,11 +2,9 @@ package com.seatwise.show.service;
 
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.common.exception.NotFoundException;
-import com.seatwise.seat.domain.SeatGrade;
 import com.seatwise.seat.repository.SeatRepository;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.domain.ShowSeat;
-import com.seatwise.show.domain.Status;
 import com.seatwise.show.dto.request.ShowSeatCreateRequest;
 import com.seatwise.show.dto.response.SeatAvailabilityResponse;
 import com.seatwise.show.dto.response.ShowSeatResponse;
@@ -15,7 +13,6 @@ import com.seatwise.show.repository.ShowSeatRepository;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -62,27 +59,6 @@ public class ShowSeatService {
   }
 
   public List<SeatAvailabilityResponse> getRemainingShowSeats(Long showId) {
-    List<ShowSeat> showSeats = showSeatRepository.findAllByShowId(showId);
-    return showSeats.stream()
-        .collect(Collectors.groupingBy(showSeat -> showSeat.getSeat().getGrade()))
-        .entrySet()
-        .stream()
-        .map(
-            entry -> {
-              SeatGrade grade = entry.getKey();
-              List<ShowSeat> seats = entry.getValue();
-              int totalSeats = seats.size();
-              int availableSeats =
-                  (int)
-                      seats.stream()
-                          .filter(
-                              s ->
-                                  s.getStatus().equals(Status.AVAILABLE)
-                                      || s.getStatus().equals(Status.PAYMENT_PENDING))
-                          .count();
-
-              return new SeatAvailabilityResponse(grade, totalSeats, availableSeats);
-            })
-        .toList();
+    return showSeatRepository.findSeatAvailabilityByShowId(showId);
   }
 }
