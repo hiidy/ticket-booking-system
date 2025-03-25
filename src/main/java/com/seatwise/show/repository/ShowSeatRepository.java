@@ -36,8 +36,6 @@ public interface ShowSeatRepository extends JpaRepository<ShowSeat, Long> {
   @Query("SELECT ss FROM ShowSeat ss WHERE ss.show.id IN :showIds")
   List<ShowSeat> findAllByShowIds(List<Long> showIds);
 
-  List<ShowSeat> findAllById(Iterable<Long> showSeatIds);
-
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query(
       "SELECT ss FROM ShowSeat ss WHERE ss.id IN :showSeatIds AND (ss.expirationTime IS NULL OR ss.expirationTime > :currentTime) AND ss.status != 'BOOKED'")
