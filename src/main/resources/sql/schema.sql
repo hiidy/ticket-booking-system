@@ -1,6 +1,6 @@
-drop database booking_system;
-create database booking_system;
-use booking_system;
+DROP DATABASE booking_system;
+CREATE DATABASE booking_system;
+USE booking_system;
 
 CREATE TABLE seat
 (
@@ -74,4 +74,4 @@ CREATE TABLE venue
     updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_show_seat_show_id ON show_seat (show_id);
+CREATE INDEX idx_show_seat_show_seat_id ON show_seat (show_id, seat_id, status);
