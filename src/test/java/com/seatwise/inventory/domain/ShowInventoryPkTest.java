@@ -1,8 +1,7 @@
-package com.seatwise.inventory;
+package com.seatwise.inventory.domain;
 
 import static org.assertj.core.api.Assertions.*;
 
-import com.seatwise.inventory.domain.ShowInventoryPk;
 import com.seatwise.seat.domain.SeatGrade;
 import org.junit.jupiter.api.Test;
 
