@@ -1,6 +1,6 @@
-drop database ticket_test;
-create database ticket_test;
-use ticket_test;
+DROP DATABASE ticket_test;
+CREATE DATABASE ticket_test;
+USE ticket_test;
 
 CREATE TABLE seat
 (
@@ -45,11 +45,12 @@ CREATE TABLE `show`
 
 CREATE TABLE booking
 (
-    id         INT AUTO_INCREMENT PRIMARY KEY,
-    member_id  INT,
-    timestamp  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    id           INT AUTO_INCREMENT PRIMARY KEY,
+    member_id    INT       NOT NULL,
+    total_amount BIGINT    NOT NULL,
+    timestamp    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE show_seat
@@ -72,4 +73,15 @@ CREATE TABLE venue
     total_seats INT       NOT NULL,
     created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-)
+);
+
+CREATE TABLE inventory
+(
+    show_id         INT         NOT NULL,
+    grade           VARCHAR(50) NOT NULL,
+    total_count     INT         NOT NULL,
+    available_count INT         NOT NULL,
+    PRIMARY KEY (show_id, grade)
+);
+
+CREATE INDEX idx_show_seat_show_seat_id ON show_seat (show_id, seat_id, status);
