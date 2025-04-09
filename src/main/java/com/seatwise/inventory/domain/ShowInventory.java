@@ -1,5 +1,7 @@
 package com.seatwise.inventory.domain;
 
+import com.seatwise.common.exception.BadRequestException;
+import com.seatwise.common.exception.ErrorCode;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -18,4 +20,17 @@ public class ShowInventory {
   private int totalCount;
 
   private int availableCount;
+
+  public ShowInventory(ShowInventoryPk id, int totalCount, int availableCount) {
+    this.id = id;
+    this.totalCount = totalCount;
+    this.availableCount = availableCount;
+  }
+
+  public void decreaseStock(int count) {
+    if (availableCount <= 0) {
+      throw new BadRequestException(ErrorCode.NO_AVAILABLE_STOCK);
+    }
+    this.availableCount -= count;
+  }
 }
