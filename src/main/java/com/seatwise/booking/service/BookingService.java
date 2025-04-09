@@ -27,6 +27,11 @@ public class BookingService {
 
   @Transactional
   public Long createBooking(Long memberId, List<Long> showSeatIds) {
+    Member member =
+        memberRepository
+            .findById(memberId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
     LocalDateTime bookingRequestTime = LocalDateTime.now();
     List<ShowSeat> showSeats;
     try {
@@ -39,12 +44,8 @@ public class BookingService {
       throw new BadRequestException(ErrorCode.SEAT_NOT_AVAILABLE);
     }
 
-    Member member =
-        memberRepository
-            .findById(memberId)
-            .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-
-    Booking booking = new Booking(member);
+    int totalAmount = showSeats.stream().map(ShowSeat::getPrice).reduce(0, Integer::sum);
+    Booking booking = new Booking(member, totalAmount);
     showSeats.forEach(showSeat -> showSeat.assignBooking(booking, bookingRequestTime));
     Booking savedBooking = bookingRepository.save(booking);
 

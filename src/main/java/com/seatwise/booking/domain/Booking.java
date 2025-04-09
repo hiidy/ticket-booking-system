@@ -35,7 +35,10 @@ public class Booking extends BaseEntity {
   @OneToMany(mappedBy = "booking")
   private List<ShowSeat> showSeats = new ArrayList<>();
 
-  public Booking(Member member) {
+  private int totalAmount;
+
+  public Booking(Member member, int totalAmount) {
     this.member = member;
+    this.totalAmount = totalAmount;
   }
 }

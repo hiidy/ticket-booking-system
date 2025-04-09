@@ -18,7 +18,7 @@ class ShowSeatTest {
   void assignBooking_WithValidInputs_ChangedToPaymentPending() {
     // given
     ShowSeat showSeat = ShowSeat.createAvailable(null, null, 40000);
-    Booking booking = new Booking(null);
+    Booking booking = new Booking(null, 0);
 
     // when
     showSeat.assignBooking(booking, LocalDateTime.now());
@@ -32,7 +32,7 @@ class ShowSeatTest {
   void assignBooking_BeforeExpirationTime_ThrowsException() {
     // given
     ShowSeat showSeat = ShowSeat.createAvailable(null, null, 40000);
-    Booking booking = new Booking(null);
+    Booking booking = new Booking(null, 0);
     showSeat.assignBooking(booking, LocalDateTime.now());
 
     // when & then
@@ -66,7 +66,7 @@ class ShowSeatTest {
     // given
     ShowSeat showSeat = ShowSeat.createAvailable(null, null, 40000);
     Member member = new Member("철수", "abcd@gamil.com", "1234");
-    Booking booking = new Booking(member);
+    Booking booking = new Booking(null, 0);
     showSeat.assignBooking(booking, LocalDateTime.of(2025, 1, 1, 12, 0));
 
     // when & then
@@ -82,8 +82,8 @@ class ShowSeatTest {
     ShowSeat showSeat = ShowSeat.createAvailable(null, null, 40000);
     Member member1 = new Member("철수", "abcd@gamil.com", "1234");
     Member member2 = new Member("맹구", "qwer@gamil.com", "1234");
-    Booking booking1 = new Booking(member1);
-    Booking booking2 = new Booking(member2);
+    Booking booking1 = new Booking(member1, 0);
+    Booking booking2 = new Booking(member2, 0);
 
     // when & then
     showSeat.assignBooking(booking1, LocalDateTime.of(2025, 1, 1, 12, 0));
