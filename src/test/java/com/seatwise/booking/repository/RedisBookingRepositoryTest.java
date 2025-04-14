@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +17,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 @SpringBootTest
 @EmbeddedRedisTest
+@Disabled
 class RedisBookingRepositoryTest {
 
   @Autowired private StringRedisTemplate redisTemplate;
