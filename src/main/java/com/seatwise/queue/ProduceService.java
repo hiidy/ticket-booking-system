@@ -15,7 +15,7 @@ public class ProduceService {
 
   public void sendMessage(ProduceRequest request) {
     String streamKey =
-        StreamKeyGenerator.forSectionShard(request.sectionId(), queueProperties.getTotalShard());
+        StreamKeyGenerator.forSectionShard(request.sectionId(), queueProperties.getShardCount());
 
     ObjectRecord<String, ProduceRequest> objectRecord =
         StreamRecords.newRecord().in(streamKey).ofObject(request);

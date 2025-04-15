@@ -28,7 +28,7 @@ class ProduceServiceTest {
     Long memberId = 1L;
     List<Long> showSeatIds = List.of(1L, 2L);
     ProduceRequest request = new ProduceRequest(memberId, showSeatIds, sectionId);
-    when(queueProperties.getTotalShard()).thenReturn(totalShard);
+    when(queueProperties.getShardCount()).thenReturn(totalShard);
 
     // when
     produceService.sendMessage(request);

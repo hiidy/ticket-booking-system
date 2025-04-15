@@ -8,10 +8,12 @@ import org.springframework.boot.context.properties.bind.ConstructorBinding;
 @Getter
 public class QueueProperties {
 
-  private final int totalShard;
+  private final int shardCount;
+  private final int instanceCount;
 
   @ConstructorBinding
-  public QueueProperties(int totalShard) {
-    this.totalShard = totalShard;
+  public QueueProperties(int shardCount, int instanceCount) {
+    this.shardCount = shardCount;
+    this.instanceCount = instanceCount;
   }
 }
