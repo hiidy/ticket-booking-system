@@ -10,10 +10,12 @@ public class QueueProperties {
 
   private final int shardCount;
   private final int instanceCount;
+  private final String consumerGroup;
 
   @ConstructorBinding
-  public QueueProperties(int shardCount, int instanceCount) {
+  public QueueProperties(int shardCount, int instanceCount, String consumerGroup) {
     this.shardCount = shardCount;
     this.instanceCount = instanceCount;
+    this.consumerGroup = consumerGroup;
   }
 }
