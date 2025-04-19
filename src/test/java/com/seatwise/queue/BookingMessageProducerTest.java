@@ -14,11 +14,11 @@ import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.core.StreamOperations;
 
 @ExtendWith(MockitoExtension.class)
-class ProduceServiceTest {
+class BookingMessageProducerTest {
 
   @Mock private StreamOperations<String, String, Object> streamOperations;
   @Mock private QueueProperties queueProperties;
-  @InjectMocks private ProduceService produceService;
+  @InjectMocks private BookingMessageProducer bookingMessageProducer;
 
   @Test
   void sendMessage() {
@@ -31,7 +31,7 @@ class ProduceServiceTest {
     when(queueProperties.getShardCount()).thenReturn(totalShard);
 
     // when
-    produceService.sendMessage(request);
+    bookingMessageProducer.sendMessage(request);
 
     // then
     verify(streamOperations).add(any(ObjectRecord.class));

@@ -1,5 +1,6 @@
 package com.seatwise.queue;
 
+import com.seatwise.booking.service.BookingService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ConsumeService
+public class BookingMessageConsumer
     implements StreamListener<String, ObjectRecord<String, ProduceRequest>> {
 
   @Value("${booking.instance-id:${random.uuid}}")
@@ -27,6 +28,7 @@ public class ConsumeService
       container;
   private final RedisTemplate<String, Object> redisTemplate;
   private final QueueProperties queueProperties;
+  private final BookingService bookingService;
 
   @PostConstruct
   public void init() {
@@ -64,10 +66,12 @@ public class ConsumeService
   @Override
   public void onMessage(ObjectRecord<String, ProduceRequest> message) {
     ProduceRequest request = message.getValue();
+    bookingService.createBooking(request.memberId(), request.showSeatIds());
     log.info(
         "멤버Id: {}, 좌석Id: {}, 섹션Id: {}에 대한 요청 처리중",
         request.memberId(),
         request.showSeatIds(),
         request.sectionId());
+    redisTemplate.opsForStream().acknowledge(queueProperties.getConsumerGroup(), message);
   }
 }
