@@ -82,6 +82,6 @@ sonar {
         property "sonar.projectKey", "hiidy_ticket-booking-system"
         property "sonar.organization", "hiidy"
         property "sonar.host.url", "https://sonarcloud.io"
-        property "sonar.coverage.jacoco.xmlReportPaths", "${layout.buildDirectory.get()}/reports/jacoco/test/jacocoTestReport.xml"
+        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
     }
 }
