@@ -4,12 +4,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import java.io.IOException;
 import java.net.ServerSocket;
-import org.redisson.Redisson;
-import org.redisson.api.RedissonClient;
-import org.redisson.config.Config;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import redis.embedded.RedisServer;
 
 @TestConfiguration
@@ -43,12 +38,4 @@ public class RedisTestConfig {
     }
   }
 
-  @Bean
-  @Primary
-  public RedissonClient redissonTestClient() {
-    Config config = new Config();
-    config.useSingleServer().setAddress("redis://localhost:" + redisPort);
-
-    return Redisson.create(config);
-  }
 }

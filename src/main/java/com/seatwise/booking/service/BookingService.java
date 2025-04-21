@@ -3,7 +3,6 @@ package com.seatwise.booking.service;
 import com.seatwise.booking.domain.Booking;
 import com.seatwise.booking.repository.BookingRepository;
 import com.seatwise.common.exception.BadRequestException;
-import com.seatwise.common.exception.ConflictException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.member.domain.Member;
@@ -13,7 +12,6 @@ import com.seatwise.show.repository.ShowSeatRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,12 +31,7 @@ public class BookingService {
             .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
     LocalDateTime bookingRequestTime = LocalDateTime.now();
-    List<ShowSeat> showSeats;
-    try {
-      showSeats = showSeatRepository.findAllAvailableSeatsWithLock(showSeatIds, bookingRequestTime);
-    } catch (PessimisticLockingFailureException ex) {
-      throw new ConflictException(ErrorCode.SEAT_ALREADY_LOCKED);
-    }
+    List<ShowSeat> showSeats = showSeatRepository.findAllAvailableSeats(showSeatIds, bookingRequestTime);
 
     if (showSeats.size() != showSeatIds.size()) {
       throw new BadRequestException(ErrorCode.SEAT_NOT_AVAILABLE);
