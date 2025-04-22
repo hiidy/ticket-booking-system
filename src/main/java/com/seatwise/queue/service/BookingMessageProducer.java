@@ -1,5 +1,8 @@
-package com.seatwise.queue;
+package com.seatwise.queue.service;
 
+import com.seatwise.queue.QueueProperties;
+import com.seatwise.queue.StreamKeyGenerator;
+import com.seatwise.queue.dto.BookingMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.StreamRecords;
@@ -13,12 +16,13 @@ public class BookingMessageProducer {
   private final QueueProperties queueProperties;
   private final StreamOperations<String, String, Object> streamOperations;
 
-  public void sendMessage(ProduceRequest request) {
+  public String sendMessage(BookingMessage message) {
     String streamKey =
-        StreamKeyGenerator.forSectionShard(request.sectionId(), queueProperties.getShardCount());
+        StreamKeyGenerator.forSectionShard(message.sectionId(), queueProperties.getShardCount());
 
-    ObjectRecord<String, ProduceRequest> objectRecord =
-        StreamRecords.newRecord().in(streamKey).ofObject(request);
+    ObjectRecord<String, BookingMessage> objectRecord =
+        StreamRecords.newRecord().in(streamKey).ofObject(message);
     streamOperations.add(objectRecord);
+    return message.requestId();
   }
 }

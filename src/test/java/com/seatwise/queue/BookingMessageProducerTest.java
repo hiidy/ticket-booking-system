@@ -4,6 +4,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.seatwise.queue.dto.BookingMessage;
+import com.seatwise.queue.service.BookingMessageProducer;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +29,7 @@ class BookingMessageProducerTest {
     Long sectionId = 1L;
     Long memberId = 1L;
     List<Long> showSeatIds = List.of(1L, 2L);
-    ProduceRequest request = new ProduceRequest(memberId, showSeatIds, sectionId);
+    BookingMessage request = new BookingMessage("test", memberId, showSeatIds, sectionId);
     when(queueProperties.getShardCount()).thenReturn(totalShard);
 
     // when
