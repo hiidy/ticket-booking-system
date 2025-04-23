@@ -1,12 +1,12 @@
 spring:
   profiles:
-    active: test
+    active: local
 
 ---
 spring:
   config:
     activate:
-      on-profile: test
+      on-profile: local
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
@@ -17,6 +17,9 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  data:
+    redis:
+      port: 6370
 
 ---
 spring:
@@ -39,3 +42,7 @@ spring:
     init:
       mode: always
       schema-locations: classpath:sql/test-schema.sql
+  queue:
+    shard-count: 1
+    consumer-group: 'bookingGroup'
+    instance-count: 1

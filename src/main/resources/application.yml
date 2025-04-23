@@ -7,6 +7,7 @@ spring:
       host: localhost
   application:
     name: ticket-booking-system
+    instance-id: ${INSTANCE_ID:${random.uuid}}
   datasource:
     url: jdbc:mysql://localhost:3306/booking_system?serverTimezone=UTC
     username: ${DB_USERNAME}
@@ -21,10 +22,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+    open-in-view: false
 
-logging:
-#  level:
-#    net.javacrumbs.shedlock: debug
-#    org.springframework.transaction: trace
-#    com.zaxxer.hikari: debug
+queue:
+  shard-count: 32
+  consumer-group: 'bookingGroup'
+  instance-count: 1
 

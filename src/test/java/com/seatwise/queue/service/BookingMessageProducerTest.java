@@ -1,11 +1,11 @@
-package com.seatwise.queue;
+package com.seatwise.queue.service;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.seatwise.queue.QueueProperties;
 import com.seatwise.queue.dto.BookingMessage;
-import com.seatwise.queue.service.BookingMessageProducer;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.seatwise.booking.dto.BookingResult;
 import com.seatwise.queue.dto.BookingMessage;
 import java.time.Duration;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -25,8 +26,8 @@ import org.springframework.data.redis.stream.StreamMessageListenerContainer.Stre
 public class RedisConfig {
 
   @Bean
-  public RedisConnectionFactory redisConnectionFactory() {
-    return new LettuceConnectionFactory();
+  public RedisConnectionFactory redisConnectionFactory(RedisProperties redisProperties) {
+    return new LettuceConnectionFactory(redisProperties.getHost(), redisProperties.getPort());
   }
 
   private ObjectMapper createObjectMapper() {

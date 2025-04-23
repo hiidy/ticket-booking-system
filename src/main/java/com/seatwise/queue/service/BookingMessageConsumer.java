@@ -35,7 +35,7 @@ public class BookingMessageConsumer
   private final BookingService bookingService;
 
   @PostConstruct
-  public void init() {
+  protected void init() {
     int instanceHash = instanceId.hashCode();
     int shardCount = queueProperties.getShardCount();
     int instanceCount = queueProperties.getInstanceCount();
@@ -61,7 +61,7 @@ public class BookingMessageConsumer
   }
 
   @PreDestroy
-  public void destroy() {
+  protected void destroy() {
     if (container != null) {
       container.stop();
     }
@@ -70,12 +70,12 @@ public class BookingMessageConsumer
   @Override
   public void onMessage(ObjectRecord<String, BookingMessage> message) {
     BookingMessage request = message.getValue();
+    log.info(
+        "멤버Id: {}, 좌석Id: {}, 섹션Id: {}에 대한 요청 처리중",
+        request.memberId(),
+        request.showSeatIds(),
+        request.sectionId());
     try {
-      log.info(
-          "멤버Id: {}, 좌석Id: {}, 섹션Id: {}에 대한 요청 처리중",
-          request.memberId(),
-          request.showSeatIds(),
-          request.sectionId());
       Long bookingId = bookingService.createBooking(request.memberId(), request.showSeatIds());
       BookingResult result = new BookingResult(true, bookingId, request.requestId());
       redisTemplate.opsForValue().set("booking:result:" + request.requestId(), result);
