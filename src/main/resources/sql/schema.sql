@@ -36,6 +36,7 @@ CREATE TABLE `show`
 (
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
     event_id   BIGINT    NOT NULL,
+    venue_id   BIGINT    NOT NULL,
     date       DATE      NOT NULL,
     start_time TIME      NOT NULL,
     end_time   TIME      NOT NULL,

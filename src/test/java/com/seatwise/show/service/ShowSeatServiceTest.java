@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.seatwise.annotation.ServiceTest;
+import com.seatwise.common.builder.ShowTestDataBuilder;
 import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.seat.domain.Seat;
 import com.seatwise.seat.repository.SeatRepository;
@@ -12,13 +13,11 @@ import com.seatwise.show.domain.ShowSeat;
 import com.seatwise.show.domain.Status;
 import com.seatwise.show.dto.ShowSeatPrice;
 import com.seatwise.show.dto.request.ShowSeatCreateRequest;
-import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.show.repository.ShowSeatRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,22 +25,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 class ShowSeatServiceTest {
 
   @Autowired private ShowSeatService showSeatService;
-
-  @Autowired private ShowRepository showRepository;
-
   @Autowired private SeatRepository seatRepository;
-
   @Autowired private ShowSeatRepository showSeatRepository;
+  @Autowired private ShowTestDataBuilder showData;
 
   private Show show;
   private List<Seat> seats;
 
   @BeforeEach
   void setUp() {
-    show = new Show(null, LocalDate.of(2024, 1, 1), LocalTime.of(12, 0), LocalTime.of(14, 0));
+    LocalDate date = LocalDate.of(2024, 1, 1);
+    LocalTime startTime = LocalTime.of(12, 0);
+    LocalTime endTime = LocalTime.of(14, 0);
 
-    showRepository.save(show);
-
+    show = showData.withTime(startTime, endTime).withDate(date).build();
     seats =
         seatRepository.saveAll(
             List.of(
@@ -53,8 +50,7 @@ class ShowSeatServiceTest {
   }
 
   @Test
-  @DisplayName("ShowSeat 성공적으로 생성")
-  void createShow_WithValidRequest_Success() {
+  void givenValidShowIdAndSeatRequest_whenCreateShowSeat_thenCreatedSuccessfully() {
     // given
     Long startSeatId = seats.get(0).getId();
     Long endSeatId = seats.get(4).getId();
@@ -77,8 +73,7 @@ class ShowSeatServiceTest {
   }
 
   @Test
-  @DisplayName("존재하지 않은 Show로 ShowSeat를 생성하면 예외 발생")
-  void createShow_WithInvalidShowId_ThrowsException() {
+  void givenInvalidShowId_whenCreateShowSeat_thenThrowsNotFoundException() {
     // given
     Long invalidId = 9999L;
     ShowSeatPrice showSeatPrice =

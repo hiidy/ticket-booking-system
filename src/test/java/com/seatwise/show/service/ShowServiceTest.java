@@ -18,6 +18,8 @@ import com.seatwise.show.dto.request.ShowCreateRequest;
 import com.seatwise.show.dto.response.ShowResponse;
 import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.show.repository.ShowSeatRepository;
+import com.seatwise.venue.domain.Venue;
+import com.seatwise.venue.repository.VenueRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -34,13 +36,17 @@ class ShowServiceTest {
   @Autowired private EventRepository eventRepository;
   @Autowired private SeatRepository seatRepository;
   @Autowired private ShowSeatRepository showSeatRepository;
+  @Autowired private VenueRepository venueRepository;
 
   private Event event;
+  private Venue venue;
 
   @BeforeEach
   void setUp() {
     event = new Event("지킬 앤 하이드", "테스트 공연", EventType.MUSICAL);
     eventRepository.save(event);
+    venue = new Venue("test", 100);
+    venueRepository.save(venue);
   }
 
   @Test
@@ -48,12 +54,16 @@ class ShowServiceTest {
   void createShow_WithOverlappingTime_ThrowsException() {
     // given
     Show existingShow =
-        new Show(event, LocalDate.of(2024, 1, 1), LocalTime.of(15, 0), LocalTime.of(17, 0));
+        new Show(event, venue, LocalDate.of(2024, 1, 1), LocalTime.of(15, 0), LocalTime.of(17, 0));
     showRepository.save(existingShow);
 
     ShowCreateRequest request =
         new ShowCreateRequest(
-            1L, LocalDate.of(2024, 1, 1), LocalTime.of(16, 0), LocalTime.of(17, 0));
+            event.getId(),
+            venue.getId(),
+            LocalDate.of(2024, 1, 1),
+            LocalTime.of(16, 0),
+            LocalTime.of(17, 0));
 
     // when & then
     assertThatThrownBy(() -> showService.createShow(request))
@@ -66,12 +76,12 @@ class ShowServiceTest {
   void getShowSeatAvailability() {
     // given
     LocalTime startTime = LocalTime.of(15, 0);
-    Show show = new Show(event, LocalDate.of(2024, 1, 1), startTime, startTime.plusHours(2));
+    Show show = new Show(event, venue, LocalDate.of(2024, 1, 1), startTime, startTime.plusHours(2));
     showRepository.save(show);
 
-    Seat vipSeat1 = new Seat(1, SeatGrade.VIP, null);
-    Seat vipSeat2 = new Seat(2, SeatGrade.VIP, null);
-    Seat rSeat = new Seat(3, SeatGrade.R, null);
+    Seat vipSeat1 = new Seat(1, SeatGrade.VIP, venue);
+    Seat vipSeat2 = new Seat(2, SeatGrade.VIP, venue);
+    Seat rSeat = new Seat(3, SeatGrade.R, venue);
     seatRepository.saveAll(List.of(vipSeat1, vipSeat2, rSeat));
 
     ShowSeat showSeat1 = ShowSeat.createAvailable(show, vipSeat1, 40000);
@@ -95,7 +105,7 @@ class ShowServiceTest {
   @DisplayName("공연 상세정보를 불러올 때 없는 공연이면 예외를 던진다")
   void getShowDetailsWithNotExistingShow() {
     LocalTime startTime = LocalTime.of(15, 0);
-    Show show = new Show(event, LocalDate.of(2024, 1, 1), startTime, startTime.plusHours(2));
+    Show show = new Show(event, venue, LocalDate.of(2024, 1, 1), startTime, startTime.plusHours(2));
     showRepository.save(show);
     Long showId = 999L;
 
@@ -108,12 +118,12 @@ class ShowServiceTest {
   void getShowSeatAvailabilityWithUnavailableSeats() {
     // given
     LocalTime startTime = LocalTime.of(15, 0);
-    Show show = new Show(event, LocalDate.of(2024, 1, 1), startTime, startTime.plusHours(2));
+    Show show = new Show(event, venue, LocalDate.of(2024, 1, 1), startTime, startTime.plusHours(2));
     showRepository.save(show);
 
-    Seat vipSeat1 = new Seat(1, SeatGrade.VIP, null);
-    Seat vipSeat2 = new Seat(2, SeatGrade.VIP, null);
-    Seat rSeat = new Seat(3, SeatGrade.R, null);
+    Seat vipSeat1 = new Seat(1, SeatGrade.VIP, venue);
+    Seat vipSeat2 = new Seat(2, SeatGrade.VIP, venue);
+    Seat rSeat = new Seat(3, SeatGrade.R, venue);
     seatRepository.saveAll(List.of(vipSeat1, vipSeat2, rSeat));
 
     Long showId = show.getId();

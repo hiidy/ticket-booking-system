@@ -26,7 +26,8 @@ class ShowSeatRepositoryTest {
   @DisplayName("공연 ID로 ShowSeat를 조회한다.")
   void findAllByShowId() {
     // given
-    Show show = new Show(null, LocalDate.of(2025, 1, 1), LocalTime.of(14, 0), LocalTime.of(15, 0));
+    Show show =
+        new Show(null, null, LocalDate.of(2025, 1, 1), LocalTime.of(14, 0), LocalTime.of(15, 0));
     showRepository.save(show);
     Seat seat1 = new Seat(1, SeatGrade.VIP, null);
     Seat seat2 = new Seat(2, SeatGrade.VIP, null);
@@ -48,7 +49,8 @@ class ShowSeatRepositoryTest {
   @Test
   void findAllShowSeatsByShowId() {
     // given
-    Show show = new Show(null, LocalDate.of(2025, 1, 1), LocalTime.of(14, 0), LocalTime.of(15, 0));
+    Show show =
+        new Show(null, null, LocalDate.of(2025, 1, 1), LocalTime.of(14, 0), LocalTime.of(15, 0));
     showRepository.save(show);
     Seat seat1 = new Seat(1, SeatGrade.VIP, null);
     Seat seat2 = new Seat(2, SeatGrade.VIP, null);

@@ -20,9 +20,9 @@ class ShowTest {
     void isOverlapping_WithEndTimeEqualToStartTime_ReturnsTrue() {
       // given
       Show existingShow =
-          new Show(null, LocalDate.of(2024, 1, 1), LocalTime.of(12, 0), LocalTime.of(14, 0));
+          new Show(null, null, LocalDate.of(2024, 1, 1), LocalTime.of(12, 0), LocalTime.of(14, 0));
       Show newShow =
-          new Show(null, LocalDate.of(2024, 1, 1), LocalTime.of(13, 50), LocalTime.of(15, 0));
+          new Show(null, null, LocalDate.of(2024, 1, 1), LocalTime.of(13, 50), LocalTime.of(15, 0));
 
       // when & then
       assertThat(existingShow.isOverlapping(newShow)).isTrue();
@@ -33,9 +33,9 @@ class ShowTest {
     void isOverlapping_WithStartTimeEqualToEndTime_ReturnsTrue() {
       // given
       Show existingShow =
-          new Show(null, LocalDate.of(2024, 1, 1), LocalTime.of(12, 0), LocalTime.of(14, 0));
+          new Show(null, null, LocalDate.of(2024, 1, 1), LocalTime.of(12, 0), LocalTime.of(14, 0));
       Show newShow =
-          new Show(null, LocalDate.of(2024, 1, 1), LocalTime.of(11, 0), LocalTime.of(12, 10));
+          new Show(null, null, LocalDate.of(2024, 1, 1), LocalTime.of(11, 0), LocalTime.of(12, 10));
 
       // when & then
       assertThat(existingShow.isOverlapping(newShow)).isTrue();
@@ -46,9 +46,10 @@ class ShowTest {
     void isOverlapping_WithinExistingSchedule_ReturnsTrue() {
       // given
       Show existingShow =
-          new Show(null, LocalDate.of(2024, 1, 1), LocalTime.of(12, 0), LocalTime.of(14, 0));
+          new Show(null, null, LocalDate.of(2024, 1, 1), LocalTime.of(12, 0), LocalTime.of(14, 0));
       Show newShow =
-          new Show(null, LocalDate.of(2024, 1, 1), LocalTime.of(12, 30), LocalTime.of(13, 50));
+          new Show(
+              null, null, LocalDate.of(2024, 1, 1), LocalTime.of(12, 30), LocalTime.of(13, 50));
 
       // when & then
       assertThat(existingShow.isOverlapping(newShow)).isTrue();
@@ -59,9 +60,9 @@ class ShowTest {
     void isOverlapping_WithExistingScheduleWithinNew_ReturnsTrue() {
       // given
       Show existingShow =
-          new Show(null, LocalDate.of(2024, 1, 1), LocalTime.of(12, 0), LocalTime.of(14, 0));
+          new Show(null, null, LocalDate.of(2024, 1, 1), LocalTime.of(12, 0), LocalTime.of(14, 0));
       Show newShow =
-          new Show(null, LocalDate.of(2024, 1, 1), LocalTime.of(11, 0), LocalTime.of(15, 0));
+          new Show(null, null, LocalDate.of(2024, 1, 1), LocalTime.of(11, 0), LocalTime.of(15, 0));
 
       // when & then
       assertThat(existingShow.isOverlapping(newShow)).isTrue();
@@ -76,9 +77,9 @@ class ShowTest {
     void isOverlapping_WithEndTimeBeforeStartTime_ReturnsFalse() {
       // given
       Show existingShow =
-          new Show(null, LocalDate.of(2024, 1, 1), LocalTime.of(12, 0), LocalTime.of(14, 0));
+          new Show(null, null, LocalDate.of(2024, 1, 1), LocalTime.of(12, 0), LocalTime.of(14, 0));
       Show newShow =
-          new Show(null, LocalDate.of(2024, 1, 1), LocalTime.of(14, 30), LocalTime.of(16, 0));
+          new Show(null, null, LocalDate.of(2024, 1, 1), LocalTime.of(14, 30), LocalTime.of(16, 0));
 
       // when & then
       assertThat(existingShow.isOverlapping(newShow)).isFalse();
@@ -89,9 +90,9 @@ class ShowTest {
     void isOverlapping_WithStartTimeAfterEndTime_ReturnsFalse() {
       // given
       Show existingShow =
-          new Show(null, LocalDate.of(2024, 1, 1), LocalTime.of(14, 0), LocalTime.of(16, 0));
+          new Show(null, null, LocalDate.of(2024, 1, 1), LocalTime.of(14, 0), LocalTime.of(16, 0));
       Show newShow =
-          new Show(null, LocalDate.of(2024, 1, 1), LocalTime.of(11, 0), LocalTime.of(13, 0));
+          new Show(null, null, LocalDate.of(2024, 1, 1), LocalTime.of(11, 0), LocalTime.of(13, 0));
 
       // when & then
       assertThat(existingShow.isOverlapping(newShow)).isFalse();
@@ -102,9 +103,10 @@ class ShowTest {
     void isOverlapping_WithTimeOverlappingButNotSameDate_ReturnsFalse() {
       // given
       Show existingShow =
-          new Show(null, LocalDate.of(2024, 1, 1), LocalTime.of(12, 0), LocalTime.of(14, 0));
+          new Show(null, null, LocalDate.of(2024, 1, 1), LocalTime.of(12, 0), LocalTime.of(14, 0));
       Show newShow =
-          new Show(null, LocalDate.of(2024, 1, 2), LocalTime.of(12, 30), LocalTime.of(13, 50));
+          new Show(
+              null, null, LocalDate.of(2024, 1, 2), LocalTime.of(12, 30), LocalTime.of(13, 50));
 
       // when & then
       assertThat(existingShow.isOverlapping(newShow)).isFalse();
@@ -115,9 +117,10 @@ class ShowTest {
     void isOverlapping_WithSameDateAndNotOverlappingTime_ReturnsFalse() {
       // given
       Show existingShow =
-          new Show(null, LocalDate.of(2024, 1, 1), LocalTime.of(12, 0), LocalTime.of(14, 0));
+          new Show(null, null, LocalDate.of(2024, 1, 1), LocalTime.of(12, 0), LocalTime.of(14, 0));
       Show newShow =
-          new Show(null, LocalDate.of(2024, 1, 1), LocalTime.of(15, 30), LocalTime.of(16, 50));
+          new Show(
+              null, null, LocalDate.of(2024, 1, 1), LocalTime.of(15, 30), LocalTime.of(16, 50));
 
       // when & then
       assertThat(existingShow.isOverlapping(newShow)).isFalse();
@@ -136,7 +139,7 @@ class ShowTest {
       LocalDate date = LocalDate.now();
 
       // when & then
-      assertThatThrownBy(() -> new Show(null, date, startTime, endTime))
+      assertThatThrownBy(() -> new Show(null, null, date, startTime, endTime))
           .isInstanceOf(BadRequestException.class)
           .hasMessage(ErrorCode.INVALID_SHOW_TIME.getMessage());
     }

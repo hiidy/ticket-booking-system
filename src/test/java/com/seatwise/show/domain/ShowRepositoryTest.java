@@ -31,9 +31,9 @@ class ShowRepositoryTest {
     LocalTime startTime = LocalTime.of(13, 0);
     LocalTime endTime = startTime.plusHours(1);
 
-    Show show1 = new Show(event, date, startTime, endTime);
-    Show show2 = new Show(event, date.plusDays(3), startTime, endTime);
-    Show show3 = new Show(event, date.plusDays(4), startTime, endTime);
+    Show show1 = new Show(event, null, date, startTime, endTime);
+    Show show2 = new Show(event, null, date.plusDays(3), startTime, endTime);
+    Show show3 = new Show(event, null, date.plusDays(4), startTime, endTime);
     showRepository.saveAll(List.of(show1, show2, show3));
 
     // when
@@ -54,9 +54,9 @@ class ShowRepositoryTest {
     LocalDate date = LocalDate.of(2025, 1, 1);
     LocalTime time = LocalTime.of(13, 0);
 
-    Show show1 = new Show(event, date, time, time.plusHours(1));
-    Show show2 = new Show(event, date, time.plusHours(2), time.plusHours(3));
-    Show show3 = new Show(event, date.plusMonths(1), time.plusHours(2), time.plusHours(3));
+    Show show1 = new Show(event, null, date, time, time.plusHours(1));
+    Show show2 = new Show(event, null, date, time.plusHours(2), time.plusHours(3));
+    Show show3 = new Show(event, null, date.plusMonths(1), time.plusHours(2), time.plusHours(3));
     showRepository.saveAll(List.of(show1, show2, show3));
 
     // when

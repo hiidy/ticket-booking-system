@@ -15,6 +15,8 @@ import com.seatwise.show.dto.response.ShowCreateResponse;
 import com.seatwise.show.dto.response.ShowDatesResponse;
 import com.seatwise.show.dto.response.ShowResponse;
 import com.seatwise.show.repository.ShowRepository;
+import com.seatwise.venue.domain.Venue;
+import com.seatwise.venue.repository.VenueRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -29,6 +31,7 @@ public class ShowService {
   private final ShowRepository showRepository;
   private final EventRepository eventRepository;
   private final SeatRepository seatRepository;
+  private final VenueRepository venueRepository;
 
   public ShowResponse getShowSeatAvailability(Long showId) {
     LocalTime startTime =
@@ -65,8 +68,13 @@ public class ShowService {
         eventRepository
             .findById(request.eventId())
             .orElseThrow(() -> new NotFoundException(ErrorCode.EVENT_NOT_FOUND));
-    Show newShow = new Show(event, request.date(), request.startTime(), request.endTime());
 
+    Venue venue =
+        venueRepository
+            .findById(request.venueId())
+            .orElseThrow(() -> new NotFoundException(ErrorCode.VENUE_NOT_FOUND));
+
+    Show newShow = new Show(event, venue, request.date(), request.startTime(), request.endTime());
     validateOverlappingShow(existingShows, newShow);
     return ShowCreateResponse.from(showRepository.save(newShow));
   }

@@ -4,4 +4,4 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public record ShowCreateRequest(
-    Long eventId, LocalDate date, LocalTime startTime, LocalTime endTime) {}
+    Long eventId, Long venueId, LocalDate date, LocalTime startTime, LocalTime endTime) {}

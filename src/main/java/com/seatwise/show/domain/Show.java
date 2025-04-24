@@ -4,6 +4,7 @@ import com.seatwise.common.domain.BaseEntity;
 import com.seatwise.common.exception.BadRequestException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.event.domain.Event;
+import com.seatwise.venue.domain.Venue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -35,6 +36,10 @@ public class Show extends BaseEntity {
   @JoinColumn(name = "event_id")
   private Event event;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "venue_id")
+  private Venue venue;
+
   private LocalDate date;
 
   private LocalTime startTime;
@@ -44,12 +49,13 @@ public class Show extends BaseEntity {
   @OneToMany(mappedBy = "show")
   private List<ShowSeat> showSeats = new ArrayList<>();
 
-  public Show(Event event, LocalDate date, LocalTime startTime, LocalTime endTime) {
+  public Show(Event event, Venue venue, LocalDate date, LocalTime startTime, LocalTime endTime) {
     validateTimes(startTime, endTime);
     this.event = event;
     this.date = date;
     this.startTime = startTime;
     this.endTime = endTime;
+    this.venue = venue;
   }
 
   public void validateTimes(LocalTime startTime, LocalTime endTime) {
