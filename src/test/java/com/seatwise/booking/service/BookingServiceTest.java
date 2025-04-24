@@ -88,6 +88,6 @@ class BookingServiceTest {
     String requestId = bookingService.enqueueBooking(request);
 
     // then
-
+    assertThat(requestId).isNotNull();
   }
 }
