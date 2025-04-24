@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface InventoryRepository extends JpaRepository<ShowInventory, ShowInventoryPk> {
 
-  List<ShowInventory> findById_ShowId(Long ShowId);
+  List<ShowInventory> findById_ShowId(Long showId);
 }

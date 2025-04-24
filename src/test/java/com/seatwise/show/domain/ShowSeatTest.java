@@ -33,10 +33,12 @@ class ShowSeatTest {
     // given
     ShowSeat showSeat = ShowSeat.createAvailable(null, null, 40000);
     Booking booking = new Booking(null, 0);
-    showSeat.assignBooking(booking, LocalDateTime.now());
+    LocalDateTime requestTime = LocalDateTime.of(2025, 1, 1, 12, 0);
+    LocalDateTime newRequestTime = requestTime.plusMinutes(1);
+    showSeat.assignBooking(booking, requestTime);
 
     // when & then
-    assertThatThrownBy(() -> showSeat.assignBooking(booking, LocalDateTime.now()))
+    assertThatThrownBy(() -> showSeat.assignBooking(booking, newRequestTime))
         .isInstanceOf(BadRequestException.class)
         .hasMessage(ErrorCode.SEAT_NOT_AVAILABLE.getMessage());
   }
@@ -45,10 +47,11 @@ class ShowSeatTest {
   @DisplayName("좌석을 예약하지 않았지만 이용 가능한 상태가 아니라 예매할 경우 예외를 던진다")
   void assignBooking_WithNotBookedAndUnavailable_ThrowsException() {
     // given
+    LocalDateTime requestTime = LocalDateTime.of(2025, 1, 1, 12, 0);
     ShowSeat showSeat = ShowSeat.createAvailable(null, null, 40000);
     showSeat.assignBooking(null, LocalDateTime.now());
     // when & then
-    assertThatThrownBy(() -> showSeat.assignBooking(null, LocalDateTime.now()))
+    assertThatThrownBy(() -> showSeat.assignBooking(null, requestTime))
         .isInstanceOf(BadRequestException.class)
         .hasMessage(ErrorCode.SEAT_NOT_AVAILABLE.getMessage());
   }
@@ -65,12 +68,13 @@ class ShowSeatTest {
   void assignBookingBeforeExpiration() {
     // given
     ShowSeat showSeat = ShowSeat.createAvailable(null, null, 40000);
-    Member member = new Member("철수", "abcd@gamil.com", "1234");
     Booking booking = new Booking(null, 0);
-    showSeat.assignBooking(booking, LocalDateTime.of(2025, 1, 1, 12, 0));
+    LocalDateTime requestTime = LocalDateTime.of(2025, 1, 1, 12, 0);
+    LocalDateTime newRequestTime = LocalDateTime.of(2025, 1, 1, 12, 5);
+    showSeat.assignBooking(booking, requestTime);
 
     // when & then
-    assertThatThrownBy(() -> showSeat.assignBooking(booking, LocalDateTime.of(2025, 1, 1, 12, 5)))
+    assertThatThrownBy(() -> showSeat.assignBooking(booking, newRequestTime))
         .isInstanceOf(BadRequestException.class)
         .hasMessage(ErrorCode.SEAT_NOT_AVAILABLE.getMessage());
   }

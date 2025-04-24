@@ -70,8 +70,12 @@ class BookingServiceTest {
   @Test
   @DisplayName("존재하지 않는 좌석으로 예약을 할 수 없다.")
   void testCreateBookingWhenInvalidShowSeat() {
+    // given
+    Long memberId = member.getId();
+    List<Long> showSeatIds = List.of(999L);
+
     // When & Then
-    assertThatThrownBy(() -> bookingService.createBooking(member.getId(), List.of(999L)))
+    assertThatThrownBy(() -> bookingService.createBooking(memberId, showSeatIds))
         .isInstanceOf(BadRequestException.class)
         .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SEAT_NOT_AVAILABLE);
   }
