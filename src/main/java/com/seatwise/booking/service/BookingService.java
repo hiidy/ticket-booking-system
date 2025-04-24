@@ -73,22 +73,16 @@ public class BookingService {
       result = bookingRedisRepository.getBookingResult(requestId);
 
       if (result != null) {
-        log.info("Booking result found: {}", result);
         return result;
       }
-
-      log.debug("Attempt {} - No result yet for requestId: {}", 30 - tries, requestId);
 
       try {
         Thread.sleep(delayMs);
       } catch (InterruptedException e) {
-        log.warn("Polling interrupted for requestId: {}", requestId, e);
         Thread.currentThread().interrupt();
         break;
       }
     }
-
-    log.warn("No booking result found after maximum attempts for requestId: {}", requestId);
     return null;
   }
 }
