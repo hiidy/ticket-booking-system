@@ -79,19 +79,4 @@ class BookingServiceTest {
         .isInstanceOf(BadRequestException.class)
         .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SEAT_NOT_AVAILABLE);
   }
-
-  @Test
-  void givenValidBookingRequest_whenEnqueueBooking_ReturnRequestId() {
-    // given
-    Long memberId = 1L;
-    List<Long> showSeats = List.of(1L, 2L);
-    Long sectionId = 1L;
-    BookingRequest request = new BookingRequest(memberId, showSeats, sectionId);
-
-    // when
-    //    String requestId = bookingService.enqueueBooking(request);
-
-    // then
-    //    assertThat(requestId).isNotNull();
-  }
 }
