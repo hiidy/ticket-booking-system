@@ -56,17 +56,16 @@ public class BookingService {
     return savedBooking.getId();
   }
 
-  public String enqueueBooking(BookingRequest request) {
-    String requestId = UUID.randomUUID().toString();
+  public void enqueueBooking(String requestId, BookingRequest request) {
     BookingMessage message =
         new BookingMessage(
             requestId, request.memberId(), request.showSeatIds(), request.sectionId());
-    return producer.sendMessage(message);
+    producer.sendMessage(message);
   }
 
   public BookingResult readBookingResult(String requestId) {
     int tries = 30;
-    int delayMs = 0;
+    int delayMs = 1;
     BookingResult result = null;
 
     while (tries-- > 0) {

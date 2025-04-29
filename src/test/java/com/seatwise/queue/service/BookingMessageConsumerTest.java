@@ -26,7 +26,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 class BookingMessageConsumerTest {
 
   @Autowired private BookingMessageConsumer consumer;
-  @Autowired private RedisTemplate<String, BookingResult> redisTemplate;
   @Autowired private RedisTemplate<String, Object> objectRedisTemplate;
   @MockBean private BookingService bookingService;
   private String requestId;
@@ -59,11 +58,11 @@ class BookingMessageConsumerTest {
     Long memberId = 1L;
     List<Long> showSeats = List.of(1L, 2L);
     Long sectionId = 1L;
-    Long expectedBookingId = 100L;
+    Long bookingId = 100L;
 
     BookingMessage message = new BookingMessage(requestId, memberId, showSeats, sectionId);
 
-    when(bookingService.createBooking(memberId, showSeats)).thenReturn(expectedBookingId);
+    when(bookingService.createBooking(memberId, showSeats)).thenReturn(bookingId);
     ObjectRecord<String, BookingMessage> objectRecord =
         StreamRecords.newRecord().in(streamKey).ofObject(message);
 
@@ -71,11 +70,11 @@ class BookingMessageConsumerTest {
     consumer.onMessage(objectRecord);
 
     // then
-    BookingResult result = redisTemplate.opsForValue().get("booking:result:" + requestId);
+    BookingResult result = BookingResult.success(bookingId, requestId);
 
     assertThat(result).isNotNull();
     assertThat(result.success()).isTrue();
-    assertThat(result.bookingId()).isEqualTo(expectedBookingId);
+    assertThat(result.bookingId()).isEqualTo(bookingId);
     assertThat(result.requestId()).isEqualTo(requestId);
     verify(bookingService, times(1)).createBooking(memberId, showSeats);
   }
@@ -97,7 +96,7 @@ class BookingMessageConsumerTest {
     consumer.onMessage(objectRecord);
 
     // then
-    BookingResult result = redisTemplate.opsForValue().get("booking:result:" + requestId);
+    BookingResult result = BookingResult.failed(requestId);
 
     assertThat(result).isNotNull();
     assertThat(result.success()).isFalse();

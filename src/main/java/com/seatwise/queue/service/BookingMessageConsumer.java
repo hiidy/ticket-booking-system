@@ -1,6 +1,7 @@
 package com.seatwise.queue.service;
 
 import com.seatwise.booking.dto.BookingResult;
+import com.seatwise.booking.service.BookingResultWaitService;
 import com.seatwise.booking.service.BookingService;
 import com.seatwise.queue.QueueProperties;
 import com.seatwise.queue.StreamKeyGenerator;
@@ -33,6 +34,7 @@ public class BookingMessageConsumer
   private final RedisTemplate<String, Object> redisTemplate;
   private final QueueProperties queueProperties;
   private final BookingService bookingService;
+  private final BookingResultWaitService waitService;
 
   @PostConstruct
   protected void init() {
@@ -77,11 +79,11 @@ public class BookingMessageConsumer
         request.sectionId());
     try {
       Long bookingId = bookingService.createBooking(request.memberId(), request.showSeatIds());
-      BookingResult result = new BookingResult(true, bookingId, request.requestId());
-      redisTemplate.opsForValue().set("booking:result:" + request.requestId(), result);
+      BookingResult result = BookingResult.success(bookingId, request.requestId());
+      waitService.completeResult(request.requestId(), result);
     } catch (Exception e) {
-      BookingResult result = new BookingResult(false, null, request.requestId());
-      redisTemplate.opsForValue().set("booking:result:" + request.requestId(), result);
+      BookingResult result = BookingResult.failed(request.requestId());
+      waitService.completeResult(request.requestId(), result);
     } finally {
       redisTemplate.opsForStream().acknowledge(queueProperties.getConsumerGroup(), message);
     }
