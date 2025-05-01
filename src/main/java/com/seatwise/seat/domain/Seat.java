@@ -1,7 +1,6 @@
 package com.seatwise.seat.domain;
 
 import com.seatwise.common.domain.BaseEntity;
-import com.seatwise.show.domain.ShowSeat;
 import com.seatwise.venue.domain.Venue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,10 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,9 +30,6 @@ public class Seat extends BaseEntity {
 
   @Enumerated(EnumType.STRING)
   private SeatGrade grade;
-
-  @OneToMany(mappedBy = "seat")
-  private List<ShowSeat> showSeats = new ArrayList<>();
 
   @ManyToOne(fetch = FetchType.LAZY)
   private Venue venue;
