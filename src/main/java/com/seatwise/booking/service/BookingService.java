@@ -47,13 +47,6 @@ public class BookingService {
     LocalDateTime bookingRequestTime = LocalDateTime.now();
     List<ShowSeat> showSeats =
         showSeatRepository.findAllAvailableSeats(showSeatIds, bookingRequestTime);
-    //    List<ShowSeat> showSeats;
-    //    try {
-    //      showSeats = showSeatRepository.findAllAvailableSeatsWithLock(showSeatIds,
-    // bookingRequestTime);
-    //    } catch (PessimisticLockingFailureException e) {
-    //      throw new BadRequestException(ErrorCode.SEAT_ALREADY_LOCKED);
-    //    }
 
     if (showSeats.size() != showSeatIds.size()) {
       throw new BadRequestException(ErrorCode.SEAT_NOT_AVAILABLE);
