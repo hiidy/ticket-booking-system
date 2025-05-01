@@ -5,7 +5,6 @@ import com.seatwise.booking.dto.BookingResult;
 import com.seatwise.booking.service.BookingResultWaitService;
 import com.seatwise.booking.service.BookingService;
 import jakarta.validation.Valid;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

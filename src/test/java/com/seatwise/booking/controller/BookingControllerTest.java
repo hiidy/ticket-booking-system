@@ -1,7 +1,5 @@
 package com.seatwise.booking.controller;
 
-import static java.util.List.*;
-import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
