@@ -2,7 +2,7 @@ package com.seatwise.venue.domain;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.seatwise.common.exception.BadRequestException;
+import com.seatwise.common.exception.ConflictException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.seat.domain.Seat;
 import com.seatwise.seat.domain.SeatGrade;
@@ -25,7 +25,7 @@ class VenueTest {
 
     // when & then
     assertThatThrownBy(() -> venue.validateNewSeatNumbers(seatNumbers))
-        .isInstanceOf(BadRequestException.class)
+        .isInstanceOf(ConflictException.class)
         .hasMessage(ErrorCode.DUPLICATE_SEAT_NUMBER.getMessage());
   }
 }
