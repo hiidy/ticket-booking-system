@@ -6,6 +6,7 @@ import com.seatwise.booking.dto.BookingResult;
 import com.seatwise.booking.repository.BookingRedisRepository;
 import com.seatwise.booking.repository.BookingRepository;
 import com.seatwise.common.exception.BadRequestException;
+import com.seatwise.common.exception.ConflictException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.member.domain.Member;
@@ -16,7 +17,6 @@ import com.seatwise.show.domain.ShowSeat;
 import com.seatwise.show.repository.ShowSeatRepository;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,6 +35,10 @@ public class BookingService {
 
   @Transactional
   public Long createBooking(String requestId, Long memberId, List<Long> showSeatIds) {
+    if (bookingRepository.existsByRequestId(requestId)) {
+      throw new ConflictException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY);
+    }
+
     Member member =
         memberRepository
             .findById(memberId)
@@ -43,6 +47,13 @@ public class BookingService {
     LocalDateTime bookingRequestTime = LocalDateTime.now();
     List<ShowSeat> showSeats =
         showSeatRepository.findAllAvailableSeats(showSeatIds, bookingRequestTime);
+    //    List<ShowSeat> showSeats;
+    //    try {
+    //      showSeats = showSeatRepository.findAllAvailableSeatsWithLock(showSeatIds,
+    // bookingRequestTime);
+    //    } catch (PessimisticLockingFailureException e) {
+    //      throw new BadRequestException(ErrorCode.SEAT_ALREADY_LOCKED);
+    //    }
 
     if (showSeats.size() != showSeatIds.size()) {
       throw new BadRequestException(ErrorCode.SEAT_NOT_AVAILABLE);
