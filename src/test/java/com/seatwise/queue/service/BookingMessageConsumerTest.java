@@ -62,7 +62,7 @@ class BookingMessageConsumerTest {
 
     BookingMessage message = new BookingMessage(requestId, memberId, showSeats, sectionId);
 
-    when(bookingService.createBooking(memberId, showSeats)).thenReturn(bookingId);
+    when(bookingService.createBooking(requestId, memberId, showSeats)).thenReturn(bookingId);
     ObjectRecord<String, BookingMessage> objectRecord =
         StreamRecords.newRecord().in(streamKey).ofObject(message);
 
@@ -76,7 +76,7 @@ class BookingMessageConsumerTest {
     assertThat(result.success()).isTrue();
     assertThat(result.bookingId()).isEqualTo(bookingId);
     assertThat(result.requestId()).isEqualTo(requestId);
-    verify(bookingService, times(1)).createBooking(memberId, showSeats);
+    verify(bookingService, times(1)).createBooking(requestId, memberId, showSeats);
   }
 
   @Test
@@ -88,7 +88,8 @@ class BookingMessageConsumerTest {
 
     BookingMessage message = new BookingMessage(requestId, memberId, showSeats, sectionId);
 
-    when(bookingService.createBooking(memberId, showSeats)).thenThrow(new RuntimeException());
+    when(bookingService.createBooking(requestId, memberId, showSeats))
+        .thenThrow(new RuntimeException());
     ObjectRecord<String, BookingMessage> objectRecord =
         StreamRecords.newRecord().in(streamKey).ofObject(message);
 
@@ -102,6 +103,6 @@ class BookingMessageConsumerTest {
     assertThat(result.success()).isFalse();
     assertThat(result.bookingId()).isNull();
     assertThat(result.requestId()).isEqualTo(requestId);
-    verify(bookingService, times(1)).createBooking(memberId, showSeats);
+    verify(bookingService, times(1)).createBooking(requestId, memberId, showSeats);
   }
 }

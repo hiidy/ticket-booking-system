@@ -78,7 +78,9 @@ public class BookingMessageConsumer
         request.showSeatIds(),
         request.sectionId());
     try {
-      Long bookingId = bookingService.createBooking(request.memberId(), request.showSeatIds());
+      Long bookingId =
+          bookingService.createBooking(
+              request.requestId(), request.memberId(), request.showSeatIds());
       BookingResult result = BookingResult.success(bookingId, request.requestId());
       waitService.completeResult(request.requestId(), result);
     } catch (Exception e) {

@@ -16,13 +16,12 @@ public class BookingMessageProducer {
   private final QueueProperties queueProperties;
   private final StreamOperations<String, String, Object> streamOperations;
 
-  public String sendMessage(BookingMessage message) {
+  public void sendMessage(BookingMessage message) {
     String streamKey =
         StreamKeyGenerator.forSectionShard(message.sectionId(), queueProperties.getShardCount());
 
     ObjectRecord<String, BookingMessage> objectRecord =
         StreamRecords.newRecord().in(streamKey).ofObject(message);
     streamOperations.add(objectRecord);
-    return message.requestId();
   }
 }

@@ -26,10 +26,9 @@ public class BookingController {
 
   @PostMapping
   public DeferredResult<BookingResult> createBookingRequest(
-      @Valid @RequestBody BookingRequest request) {
-    String requestId = UUID.randomUUID().toString();
-    DeferredResult<BookingResult> result = waitService.waitForResult(requestId);
-    bookingService.enqueueBooking(requestId, request);
+      @RequestHeader("Idempotency-Key") String key, @Valid @RequestBody BookingRequest request) {
+    DeferredResult<BookingResult> result = waitService.waitForResult(key);
+    bookingService.enqueueBooking(key, request);
     return result;
   }
 

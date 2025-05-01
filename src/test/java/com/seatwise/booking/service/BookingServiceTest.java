@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.seatwise.annotation.ServiceTest;
-import com.seatwise.booking.dto.BookingRequest;
 import com.seatwise.common.builder.ShowTestDataBuilder;
 import com.seatwise.common.exception.BadRequestException;
 import com.seatwise.common.exception.ErrorCode;
@@ -35,6 +34,7 @@ class BookingServiceTest {
   @Autowired private ShowTestDataBuilder showTestDataBuilder;
 
   Member member;
+  String requestId = "test-request-id";
 
   @BeforeEach
   void setUp() {
@@ -59,7 +59,7 @@ class BookingServiceTest {
     // When
     ShowSeat showSeat = showSeatRepository.findAll().get(0); // 또는 ID로 조회
     Long showSeatId = showSeat.getId();
-    Long bookingId = bookingService.createBooking(member.getId(), List.of(showSeatId));
+    Long bookingId = bookingService.createBooking(requestId, member.getId(), List.of(showSeatId));
 
     // then
     assertThat(bookingId).isNotNull();
@@ -75,7 +75,7 @@ class BookingServiceTest {
     List<Long> showSeatIds = List.of(999L);
 
     // When & Then
-    assertThatThrownBy(() -> bookingService.createBooking(memberId, showSeatIds))
+    assertThatThrownBy(() -> bookingService.createBooking(requestId, memberId, showSeatIds))
         .isInstanceOf(BadRequestException.class)
         .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SEAT_NOT_AVAILABLE);
   }

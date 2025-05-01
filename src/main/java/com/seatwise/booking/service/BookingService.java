@@ -34,7 +34,7 @@ public class BookingService {
   private final BookingMessageProducer producer;
 
   @Transactional
-  public Long createBooking(Long memberId, List<Long> showSeatIds) {
+  public Long createBooking(String requestId, Long memberId, List<Long> showSeatIds) {
     Member member =
         memberRepository
             .findById(memberId)
@@ -49,7 +49,7 @@ public class BookingService {
     }
 
     int totalAmount = showSeats.stream().map(ShowSeat::getPrice).reduce(0, Integer::sum);
-    Booking booking = new Booking(member, totalAmount);
+    Booking booking = new Booking(requestId, member, totalAmount);
     showSeats.forEach(showSeat -> showSeat.assignBooking(booking, bookingRequestTime));
     Booking savedBooking = bookingRepository.save(booking);
 

@@ -28,6 +28,8 @@ public class Booking extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  private String requestId;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "member_id")
   private Member member;
@@ -37,7 +39,8 @@ public class Booking extends BaseEntity {
 
   private int totalAmount;
 
-  public Booking(Member member, int totalAmount) {
+  public Booking(String requestId, Member member, int totalAmount) {
+    this.requestId = requestId;
     this.member = member;
     this.totalAmount = totalAmount;
   }
