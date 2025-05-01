@@ -1,0 +1,55 @@
+package com.seatwise.booking.controller;
+
+import static java.util.List.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.seatwise.booking.dto.BookingRequest;
+import com.seatwise.booking.dto.BookingResult;
+import com.seatwise.booking.service.BookingResultWaitService;
+import com.seatwise.booking.service.BookingService;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.request.async.DeferredResult;
+
+@WebMvcTest(BookingController.class)
+class BookingControllerTest {
+
+  @Autowired MockMvc mockMvc;
+  @Autowired private ObjectMapper objectMapper;
+  @MockBean private BookingService bookingService;
+  @MockBean private BookingResultWaitService waitService;
+
+  private static final String IDEMPOTENCY_KEY = "test-key-123";
+
+  @Test
+  void givenRequestWithIdempotencyKey_whenCreateBooking_thenReturnsOk() throws Exception {
+    // given
+    BookingRequest bookingRequest = new BookingRequest(1L, List.of(1001L), 200L);
+    BookingResult result = BookingResult.success(999L, IDEMPOTENCY_KEY);
+
+    DeferredResult<BookingResult> deferredResult = new DeferredResult<>();
+    deferredResult.setResult(result);
+
+    given(waitService.waitForResult(IDEMPOTENCY_KEY)).willReturn(deferredResult);
+
+    // when & then
+    mockMvc
+        .perform(
+            post("/api/bookings")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Idempotency-Key", IDEMPOTENCY_KEY)
+                .content(objectMapper.writeValueAsString(bookingRequest)))
+        .andExpect(status().isOk());
+    verify(waitService).waitForResult("test-key-123");
+  }
+}
