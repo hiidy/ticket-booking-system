@@ -25,6 +25,7 @@ import com.seatwise.venue.domain.Venue;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,14 +50,7 @@ class ShowSeatServiceTest {
     LocalTime endTime = LocalTime.of(14, 0);
 
     show = showData.withTime(startTime, endTime).withDate(date).build();
-    seats =
-        seatRepository.saveAll(
-            List.of(
-                Seat.builder().seatNumber(1).build(),
-                Seat.builder().seatNumber(2).build(),
-                Seat.builder().seatNumber(3).build(),
-                Seat.builder().seatNumber(4).build(),
-                Seat.builder().seatNumber(5).build()));
+    seats = createSeats(5);
   }
 
   @Test
@@ -107,7 +101,7 @@ class ShowSeatServiceTest {
             .withDescription("test-desc")
             .withType(EventType.MUSICAL)
             .build();
-    Show show =
+    show =
         showData
             .withEvent(event)
             .withVenue(venue)
@@ -137,5 +131,12 @@ class ShowSeatServiceTest {
             tuple(1, SeatGrade.VIP, "예매 가능", false),
             tuple(2, SeatGrade.VIP, "예매 가능", false),
             tuple(3, SeatGrade.R, "예매 가능", false));
+  }
+
+  private List<Seat> createSeats(int count) {
+    return seatRepository.saveAll(
+        IntStream.rangeClosed(1, count)
+            .mapToObj(i -> Seat.builder().seatNumber(i).build())
+            .toList());
   }
 }
