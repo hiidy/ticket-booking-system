@@ -24,6 +24,11 @@ public class ShowTestDataBuilder {
     return this;
   }
 
+  public ShowTestDataBuilder withVenue(Venue venue) {
+    this.venue = venue;
+    return this;
+  }
+
   public ShowTestDataBuilder withDate(LocalDate date) {
     this.date = date;
     return this;

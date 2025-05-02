@@ -5,24 +5,16 @@ import static org.assertj.core.api.Assertions.*;
 import com.seatwise.annotation.ServiceTest;
 import com.seatwise.common.exception.ConflictException;
 import com.seatwise.common.exception.ErrorCode;
-import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.event.domain.Event;
 import com.seatwise.event.domain.EventType;
 import com.seatwise.event.repository.EventRepository;
-import com.seatwise.seat.domain.Seat;
-import com.seatwise.seat.domain.SeatGrade;
-import com.seatwise.seat.repository.SeatRepository;
 import com.seatwise.show.domain.Show;
-import com.seatwise.show.domain.ShowSeat;
 import com.seatwise.show.dto.request.ShowCreateRequest;
-import com.seatwise.show.dto.response.ShowResponse;
 import com.seatwise.show.repository.ShowRepository;
-import com.seatwise.show.repository.ShowSeatRepository;
 import com.seatwise.venue.domain.Venue;
 import com.seatwise.venue.repository.VenueRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,8 +26,6 @@ class ShowServiceTest {
   @Autowired private ShowService showService;
   @Autowired private ShowRepository showRepository;
   @Autowired private EventRepository eventRepository;
-  @Autowired private SeatRepository seatRepository;
-  @Autowired private ShowSeatRepository showSeatRepository;
   @Autowired private VenueRepository venueRepository;
 
   private Event event;
@@ -69,67 +59,5 @@ class ShowServiceTest {
     assertThatThrownBy(() -> showService.createShow(request))
         .isInstanceOf(ConflictException.class)
         .hasMessage(ErrorCode.DUPLICATE_SHOW.getMessage());
-  }
-
-  @Test
-  @DisplayName("공연 시간별로 상세한 정보를 조회한다.")
-  void getShowSeatAvailability() {
-    // given
-    LocalTime startTime = LocalTime.of(15, 0);
-    Show show = new Show(event, venue, LocalDate.of(2024, 1, 1), startTime, startTime.plusHours(2));
-    showRepository.save(show);
-
-    Seat vipSeat1 = new Seat(1, SeatGrade.VIP, venue);
-    Seat vipSeat2 = new Seat(2, SeatGrade.VIP, venue);
-    Seat rSeat = new Seat(3, SeatGrade.R, venue);
-    seatRepository.saveAll(List.of(vipSeat1, vipSeat2, rSeat));
-
-    ShowSeat showSeat1 = ShowSeat.createAvailable(show, vipSeat1, 40000);
-    ShowSeat showSeat2 = ShowSeat.createAvailable(show, vipSeat2, 40000);
-    ShowSeat showSeat3 = ShowSeat.createAvailable(show, rSeat, 20000);
-    showSeatRepository.saveAll(List.of(showSeat1, showSeat2, showSeat3));
-
-    // when
-    ShowResponse response = showService.getShowSeatAvailability(show.getId());
-
-    // then
-    assertThat(response.startTime()).isEqualTo(startTime);
-    assertThat(response.remainingSeats())
-        .hasSize(2)
-        .extracting("grade", "remainingCount")
-        .containsExactlyInAnyOrder(
-            tuple(SeatGrade.VIP.getDescription(), 2), tuple(SeatGrade.R.getDescription(), 1));
-  }
-
-  @Test
-  @DisplayName("공연 상세정보를 불러올 때 없는 공연이면 예외를 던진다")
-  void getShowDetailsWithNotExistingShow() {
-    LocalTime startTime = LocalTime.of(15, 0);
-    Show show = new Show(event, venue, LocalDate.of(2024, 1, 1), startTime, startTime.plusHours(2));
-    showRepository.save(show);
-    Long showId = 999L;
-
-    assertThatThrownBy(() -> showService.getShowSeatAvailability(showId))
-        .isInstanceOf(NotFoundException.class);
-  }
-
-  @Test
-  @DisplayName("공연 시간별로 상세한 정보를 불러올 때 이용 가능한 좌석이 없으면 예외를 던진다.")
-  void getShowSeatAvailabilityWithUnavailableSeats() {
-    // given
-    LocalTime startTime = LocalTime.of(15, 0);
-    Show show = new Show(event, venue, LocalDate.of(2024, 1, 1), startTime, startTime.plusHours(2));
-    showRepository.save(show);
-
-    Seat vipSeat1 = new Seat(1, SeatGrade.VIP, venue);
-    Seat vipSeat2 = new Seat(2, SeatGrade.VIP, venue);
-    Seat rSeat = new Seat(3, SeatGrade.R, venue);
-    seatRepository.saveAll(List.of(vipSeat1, vipSeat2, rSeat));
-
-    Long showId = show.getId();
-
-    // when & then
-    assertThatThrownBy(() -> showService.getShowSeatAvailability(showId))
-        .isInstanceOf(NotFoundException.class);
   }
 }
