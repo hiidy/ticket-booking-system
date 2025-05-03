@@ -47,6 +47,7 @@ CREATE TABLE `show`
 CREATE TABLE booking
 (
     id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    request_id   CHAR(36) UNIQUE,
     member_id    BIGINT    NOT NULL,
     total_amount BIGINT    NOT NULL,
     timestamp    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
