@@ -2,7 +2,7 @@ package com.seatwise.show.domain;
 
 import static org.assertj.core.api.Assertions.*;
 
-import com.seatwise.common.exception.BadRequestException;
+import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -132,7 +132,7 @@ class ShowTest {
   class ValidationTests {
     @Test
     @DisplayName("공연 종료 시각이 시작 시각보다 이르면 예외가 발생한다")
-    void validateTimes_WithEndTimeBeforeStartTime_ThrowsBadRequestException() {
+    void validateTimes_WithEndTimeBeforeStartTime_ThrowsestException() {
       // given
       LocalTime startTime = LocalTime.of(16, 0);
       LocalTime endTime = LocalTime.of(14, 0);
@@ -140,7 +140,7 @@ class ShowTest {
 
       // when & then
       assertThatThrownBy(() -> new Show(null, null, date, startTime, endTime))
-          .isInstanceOf(BadRequestException.class)
+          .isInstanceOf(BusinessException.class)
           .hasMessage(ErrorCode.INVALID_SHOW_TIME.getMessage());
     }
   }

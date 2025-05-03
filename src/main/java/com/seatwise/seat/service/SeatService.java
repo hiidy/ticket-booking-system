@@ -1,7 +1,7 @@
 package com.seatwise.seat.service;
 
+import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
-import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.seat.domain.Seat;
 import com.seatwise.seat.domain.SeatGrade;
 import com.seatwise.seat.dto.request.SeatCreateRequest;
@@ -28,7 +28,7 @@ public class SeatService {
     Venue venue =
         venueRepository
             .findById(request.venueId())
-            .orElseThrow(() -> new NotFoundException(ErrorCode.VENUE_NOT_FOUND));
+            .orElseThrow(() -> new BusinessException(ErrorCode.VENUE_NOT_FOUND));
 
     List<Integer> seatNumbers = extractSeatNumbers(request.seatTypeRanges());
     venue.validateNewSeatNumbers(seatNumbers);

@@ -1,6 +1,6 @@
 package com.seatwise.inventory.service;
 
-import com.seatwise.common.exception.BadRequestException;
+import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.inventory.domain.ShowInventory;
 import com.seatwise.inventory.domain.ShowInventoryPk;
@@ -33,7 +33,7 @@ public class InventoryService {
     ShowInventory showInventory =
         inventoryRepository
             .findById(pk)
-            .orElseThrow(() -> new BadRequestException(ErrorCode.NO_AVAILABLE_STOCK));
+            .orElseThrow(() -> new BusinessException(ErrorCode.NO_AVAILABLE_STOCK));
 
     showInventory.decreaseStock(decreaseCount);
   }

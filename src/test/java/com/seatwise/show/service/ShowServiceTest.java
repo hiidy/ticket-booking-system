@@ -3,7 +3,7 @@ package com.seatwise.show.service;
 import static org.assertj.core.api.Assertions.*;
 
 import com.seatwise.annotation.ServiceTest;
-import com.seatwise.common.exception.ConflictException;
+import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.event.domain.Event;
 import com.seatwise.event.domain.EventType;
@@ -57,7 +57,7 @@ class ShowServiceTest {
 
     // when & then
     assertThatThrownBy(() -> showService.createShow(request))
-        .isInstanceOf(ConflictException.class)
+        .isInstanceOf(BusinessException.class)
         .hasMessage(ErrorCode.DUPLICATE_SHOW.getMessage());
   }
 }

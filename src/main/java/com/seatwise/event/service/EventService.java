@@ -1,7 +1,7 @@
 package com.seatwise.event.service;
 
+import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
-import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.event.domain.Event;
 import com.seatwise.event.dto.request.EventRequest;
 import com.seatwise.event.dto.response.EventCreateResponse;
@@ -27,6 +27,6 @@ public class EventService {
     return eventRepository
         .findById(eventId)
         .map(EventResponse::from)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.EVENT_NOT_FOUND));
+        .orElseThrow(() -> new BusinessException(ErrorCode.EVENT_NOT_FOUND));
   }
 }

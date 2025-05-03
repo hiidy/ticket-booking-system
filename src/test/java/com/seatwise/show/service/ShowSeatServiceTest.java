@@ -8,7 +8,7 @@ import com.seatwise.annotation.ServiceTest;
 import com.seatwise.common.builder.EventTestDataBuilder;
 import com.seatwise.common.builder.ShowTestDataBuilder;
 import com.seatwise.common.builder.VenueTestDataBuilder;
-import com.seatwise.common.exception.NotFoundException;
+import com.seatwise.common.exception.BusinessException;
 import com.seatwise.event.domain.Event;
 import com.seatwise.event.domain.EventType;
 import com.seatwise.seat.domain.Seat;
@@ -77,7 +77,7 @@ class ShowSeatServiceTest {
   }
 
   @Test
-  void givenInvalidShowId_whenCreateShowSeat_thenThrowsNotFoundException() {
+  void givenInvalidShowId_whenCreateShowSeat_thenThrowsException() {
     // given
     Long invalidId = 9999L;
     ShowSeatPrice showSeatPrice =
@@ -86,7 +86,7 @@ class ShowSeatServiceTest {
 
     // when & then
     assertThatThrownBy(() -> showSeatService.createShowSeat(invalidId, request))
-        .isInstanceOf(NotFoundException.class);
+        .isInstanceOf(BusinessException.class);
   }
 
   @Test

@@ -3,7 +3,7 @@ package com.seatwise.inventory.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.seatwise.common.exception.BadRequestException;
+import com.seatwise.common.exception.BusinessException;
 import com.seatwise.seat.domain.SeatGrade;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +35,6 @@ class ShowInventoryTest {
 
     // when & then
     assertThatThrownBy(() -> showInventory.decreaseStock(decreaseCount))
-        .isInstanceOf(BadRequestException.class);
+        .isInstanceOf(BusinessException.class);
   }
 }

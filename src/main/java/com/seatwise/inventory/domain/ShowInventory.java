@@ -1,6 +1,6 @@
 package com.seatwise.inventory.domain;
 
-import com.seatwise.common.exception.BadRequestException;
+import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -29,7 +29,7 @@ public class ShowInventory {
 
   public void decreaseStock(int count) {
     if (availableCount <= 0) {
-      throw new BadRequestException(ErrorCode.NO_AVAILABLE_STOCK);
+      throw new BusinessException(ErrorCode.NO_AVAILABLE_STOCK);
     }
     this.availableCount -= count;
   }

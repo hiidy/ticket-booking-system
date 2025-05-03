@@ -1,7 +1,7 @@
 package com.seatwise.venue.domain;
 
 import com.seatwise.common.domain.BaseEntity;
-import com.seatwise.common.exception.ConflictException;
+import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.seat.domain.Seat;
 import jakarta.persistence.CascadeType;
@@ -51,7 +51,7 @@ public class Venue extends BaseEntity {
     boolean hasDuplicate = seatNumbers.stream().anyMatch(existingNumbers::contains);
 
     if (hasDuplicate) {
-      throw new ConflictException(ErrorCode.DUPLICATE_SEAT_NUMBER);
+      throw new BusinessException(ErrorCode.DUPLICATE_SEAT_NUMBER);
     }
   }
 

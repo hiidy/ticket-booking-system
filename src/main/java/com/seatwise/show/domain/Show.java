@@ -1,7 +1,7 @@
 package com.seatwise.show.domain;
 
 import com.seatwise.common.domain.BaseEntity;
-import com.seatwise.common.exception.BadRequestException;
+import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.event.domain.Event;
 import com.seatwise.venue.domain.Venue;
@@ -60,7 +60,7 @@ public class Show extends BaseEntity {
 
   public void validateTimes(LocalTime startTime, LocalTime endTime) {
     if (startTime.isAfter(endTime)) {
-      throw new BadRequestException(ErrorCode.INVALID_SHOW_TIME);
+      throw new BusinessException(ErrorCode.INVALID_SHOW_TIME);
     }
   }
 

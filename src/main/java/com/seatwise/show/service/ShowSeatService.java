@@ -1,7 +1,7 @@
 package com.seatwise.show.service;
 
+import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
-import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.seat.repository.SeatRepository;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.domain.ShowSeat;
@@ -29,7 +29,7 @@ public class ShowSeatService {
     Show show =
         showRepository
             .findById(showId)
-            .orElseThrow(() -> new NotFoundException(ErrorCode.SHOW_NOT_FOUND));
+            .orElseThrow(() -> new BusinessException(ErrorCode.SHOW_NOT_FOUND));
 
     List<ShowSeat> showSeats =
         request.showSeatPrices().stream()
@@ -51,7 +51,7 @@ public class ShowSeatService {
     List<ShowSeat> showSeats = showSeatRepository.findAllByShowId(showId);
     LocalDateTime requestTime = LocalDateTime.now();
     if (showSeats.isEmpty()) {
-      throw new NotFoundException(ErrorCode.SHOW_SEAT_NOT_FOUND);
+      throw new BusinessException(ErrorCode.SHOW_SEAT_NOT_FOUND);
     }
     return showSeats.stream()
         .map(showSeat -> ShowSeatResponse.from(showSeat, requestTime))

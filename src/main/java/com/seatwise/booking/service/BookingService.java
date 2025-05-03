@@ -5,10 +5,8 @@ import com.seatwise.booking.dto.BookingRequest;
 import com.seatwise.booking.dto.BookingResult;
 import com.seatwise.booking.repository.BookingRedisRepository;
 import com.seatwise.booking.repository.BookingRepository;
-import com.seatwise.common.exception.BadRequestException;
-import com.seatwise.common.exception.ConflictException;
+import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
-import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.member.domain.Member;
 import com.seatwise.member.repository.MemberRepository;
 import com.seatwise.queue.dto.BookingMessage;
@@ -36,20 +34,20 @@ public class BookingService {
   @Transactional
   public Long createBooking(String requestId, Long memberId, List<Long> showSeatIds) {
     if (bookingRepository.existsByRequestId(requestId)) {
-      throw new ConflictException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY);
+      throw new BusinessException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY);
     }
 
     Member member =
         memberRepository
             .findById(memberId)
-            .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+            .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
     LocalDateTime bookingRequestTime = LocalDateTime.now();
     List<ShowSeat> showSeats =
         showSeatRepository.findAllAvailableSeats(showSeatIds, bookingRequestTime);
 
     if (showSeats.size() != showSeatIds.size()) {
-      throw new BadRequestException(ErrorCode.SEAT_NOT_AVAILABLE);
+      throw new BusinessException(ErrorCode.SEAT_NOT_AVAILABLE);
     }
 
     int totalAmount = showSeats.stream().map(ShowSeat::getPrice).reduce(0, Integer::sum);

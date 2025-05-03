@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.seatwise.booking.domain.Booking;
-import com.seatwise.common.exception.BadRequestException;
+import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.member.domain.Member;
 import java.time.LocalDateTime;
@@ -39,7 +39,7 @@ class ShowSeatTest {
 
     // when & then
     assertThatThrownBy(() -> showSeat.assignBooking(booking, newRequestTime))
-        .isInstanceOf(BadRequestException.class)
+        .isInstanceOf(BusinessException.class)
         .hasMessage(ErrorCode.SEAT_NOT_AVAILABLE.getMessage());
   }
 
@@ -52,7 +52,7 @@ class ShowSeatTest {
     showSeat.assignBooking(null, LocalDateTime.now());
     // when & then
     assertThatThrownBy(() -> showSeat.assignBooking(null, requestTime))
-        .isInstanceOf(BadRequestException.class)
+        .isInstanceOf(BusinessException.class)
         .hasMessage(ErrorCode.SEAT_NOT_AVAILABLE.getMessage());
   }
 
@@ -60,7 +60,7 @@ class ShowSeatTest {
   @DisplayName("좌석의 가격이 0이하면 예외를 던진다")
   void createShowSeat_WithNegativePrice_ThrowsException() {
     assertThatThrownBy(() -> ShowSeat.createAvailable(null, null, -10000))
-        .isInstanceOf(BadRequestException.class);
+        .isInstanceOf(BusinessException.class);
   }
 
   @Test
@@ -75,7 +75,7 @@ class ShowSeatTest {
 
     // when & then
     assertThatThrownBy(() -> showSeat.assignBooking(booking, newRequestTime))
-        .isInstanceOf(BadRequestException.class)
+        .isInstanceOf(BusinessException.class)
         .hasMessage(ErrorCode.SEAT_NOT_AVAILABLE.getMessage());
   }
 

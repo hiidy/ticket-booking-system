@@ -1,8 +1,7 @@
 package com.seatwise.show.service;
 
-import com.seatwise.common.exception.ConflictException;
+import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
-import com.seatwise.common.exception.NotFoundException;
 import com.seatwise.event.domain.Event;
 import com.seatwise.event.repository.EventRepository;
 import com.seatwise.show.domain.Show;
@@ -31,12 +30,12 @@ public class ShowService {
     Event event =
         eventRepository
             .findById(request.eventId())
-            .orElseThrow(() -> new NotFoundException(ErrorCode.EVENT_NOT_FOUND));
+            .orElseThrow(() -> new BusinessException(ErrorCode.EVENT_NOT_FOUND));
 
     Venue venue =
         venueRepository
             .findById(request.venueId())
-            .orElseThrow(() -> new NotFoundException(ErrorCode.VENUE_NOT_FOUND));
+            .orElseThrow(() -> new BusinessException(ErrorCode.VENUE_NOT_FOUND));
 
     Show newShow = new Show(event, venue, request.date(), request.startTime(), request.endTime());
     validateOverlappingShow(existingShows, newShow);
@@ -48,7 +47,7 @@ public class ShowService {
         existingShows.stream().anyMatch(existingShow -> existingShow.isOverlapping(newShow));
 
     if (hasOverlap) {
-      throw new ConflictException(ErrorCode.DUPLICATE_SHOW);
+      throw new BusinessException(ErrorCode.DUPLICATE_SHOW);
     }
   }
 

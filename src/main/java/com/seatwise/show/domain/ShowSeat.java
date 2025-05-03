@@ -2,7 +2,7 @@ package com.seatwise.show.domain;
 
 import com.seatwise.booking.domain.Booking;
 import com.seatwise.common.domain.BaseEntity;
-import com.seatwise.common.exception.BadRequestException;
+import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.seat.domain.Seat;
 import jakarta.persistence.Entity;
@@ -65,7 +65,7 @@ public class ShowSeat extends BaseEntity {
   public void assignBooking(Booking booking, LocalDateTime requestTime) {
     validateBookingStatus();
     if (isLocked(requestTime)) {
-      throw new BadRequestException(ErrorCode.SEAT_NOT_AVAILABLE);
+      throw new BusinessException(ErrorCode.SEAT_NOT_AVAILABLE);
     }
     this.booking = booking;
     this.status = Status.PAYMENT_PENDING;
@@ -78,13 +78,13 @@ public class ShowSeat extends BaseEntity {
 
   private void validateBookingStatus() {
     if (this.status == Status.BOOKED) {
-      throw new BadRequestException(ErrorCode.SEAT_ALREADY_BOOKED);
+      throw new BusinessException(ErrorCode.SEAT_ALREADY_BOOKED);
     }
   }
 
   private void validatePrice(Integer price) {
     if (price < 0) {
-      throw new BadRequestException(ErrorCode.INVALID_SEAT_PRICE);
+      throw new BusinessException(ErrorCode.INVALID_SEAT_PRICE);
     }
   }
 }

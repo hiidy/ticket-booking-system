@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.seatwise.common.exception.BadRequestException;
+import com.seatwise.common.exception.BusinessException;
 import com.seatwise.inventory.domain.ShowInventory;
 import com.seatwise.inventory.domain.ShowInventoryPk;
 import com.seatwise.inventory.repository.InventoryRepository;
@@ -49,7 +49,7 @@ class InventoryServiceTest {
     when(inventoryRepository.findById(pk)).thenReturn(Optional.empty());
     // when & then
     assertThatThrownBy(() -> inventoryService.decreaseShowInventoryStock(pk, decreaseCount))
-        .isInstanceOf(BadRequestException.class);
+        .isInstanceOf(BusinessException.class);
     verify(inventoryRepository).findById(pk);
   }
 }
