@@ -2,8 +2,6 @@ package com.seatwise.booking.service;
 
 import com.seatwise.booking.domain.Booking;
 import com.seatwise.booking.dto.BookingRequest;
-import com.seatwise.booking.dto.BookingResult;
-import com.seatwise.booking.repository.BookingRedisRepository;
 import com.seatwise.booking.repository.BookingRepository;
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
@@ -28,7 +26,6 @@ public class BookingService {
   private final BookingRepository bookingRepository;
   private final ShowSeatRepository showSeatRepository;
   private final MemberRepository memberRepository;
-  private final BookingRedisRepository bookingRedisRepository;
   private final BookingMessageProducer producer;
 
   @Transactional
@@ -63,27 +60,5 @@ public class BookingService {
         new BookingMessage(
             requestId, request.memberId(), request.showSeatIds(), request.sectionId());
     producer.sendMessage(message);
-  }
-
-  public BookingResult readBookingResult(String requestId) {
-    int tries = 30;
-    int delayMs = 1;
-    BookingResult result = null;
-
-    while (tries-- > 0) {
-      result = bookingRedisRepository.getBookingResult(requestId);
-
-      if (result != null) {
-        return result;
-      }
-
-      try {
-        Thread.sleep(delayMs);
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        break;
-      }
-    }
-    return null;
   }
 }
