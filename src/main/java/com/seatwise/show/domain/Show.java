@@ -12,12 +12,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,9 +42,6 @@ public class Show extends BaseEntity {
   private LocalTime startTime;
 
   private LocalTime endTime;
-
-  @OneToMany(mappedBy = "show")
-  private List<ShowSeat> showSeats = new ArrayList<>();
 
   public Show(Event event, Venue venue, LocalDate date, LocalTime startTime, LocalTime endTime) {
     validateTimes(startTime, endTime);
