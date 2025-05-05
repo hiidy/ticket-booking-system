@@ -3,7 +3,7 @@ package com.seatwise.common.exception;
 import lombok.Getter;
 
 @Getter
-public class BookingException extends BusinessException {
+public class BookingException extends ErrorCodeException {
 
   private final String requestId;
 
