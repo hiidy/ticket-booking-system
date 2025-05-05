@@ -76,7 +76,6 @@ class SeatServiceTest {
     SeatGradeRangeRequest seatRange = new SeatGradeRangeRequest(1, 20, "A");
     SeatCreateRequest request = new SeatCreateRequest(venue.getId(), List.of(seatRange));
     Seat seat = Seat.builder().venue(venue).seatNumber(1).grade(SeatGrade.S).build();
-    venue.getSeats().add(seat);
     seatRepository.save(seat);
 
     // when & then

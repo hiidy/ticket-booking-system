@@ -30,8 +30,10 @@ public class SeatService {
             .findById(request.venueId())
             .orElseThrow(() -> new BusinessException(ErrorCode.VENUE_NOT_FOUND));
 
-    List<Integer> seatNumbers = extractSeatNumbers(request.seatTypeRanges());
-    venue.validateNewSeatNumbers(seatNumbers);
+    List<Integer> existsSeatNumbers =
+        seatRepository.findByVenueId(request.venueId()).stream().map(Seat::getSeatNumber).toList();
+    List<Integer> newSeatNumbers = extractSeatNumbers(request.seatTypeRanges());
+    validateNewSeatNumbers(existsSeatNumbers, newSeatNumbers);
 
     List<Seat> seats =
         request.seatTypeRanges().stream()
@@ -55,5 +57,13 @@ public class SeatService {
     return request.stream()
         .flatMap(range -> IntStream.rangeClosed(range.startNumber(), range.endNumber()).boxed())
         .toList();
+  }
+
+  private void validateNewSeatNumbers(List<Integer> oldNumbers, List<Integer> newNumbers) {
+    boolean hasDuplicate = newNumbers.stream().anyMatch(oldNumbers::contains);
+
+    if (hasDuplicate) {
+      throw new BusinessException(ErrorCode.DUPLICATE_SEAT_NUMBER);
+    }
   }
 }
