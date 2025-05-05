@@ -3,7 +3,7 @@ package com.seatwise.booking.service;
 import com.seatwise.booking.domain.Booking;
 import com.seatwise.booking.dto.BookingRequest;
 import com.seatwise.booking.repository.BookingRepository;
-import com.seatwise.common.exception.BusinessException;
+import com.seatwise.common.exception.BookingException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.member.domain.Member;
 import com.seatwise.member.repository.MemberRepository;
@@ -31,20 +31,20 @@ public class BookingService {
   @Transactional
   public Long createBooking(String requestId, Long memberId, List<Long> showSeatIds) {
     if (bookingRepository.existsByRequestId(requestId)) {
-      throw new BusinessException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY);
+      throw new BookingException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY, requestId);
     }
 
     Member member =
         memberRepository
             .findById(memberId)
-            .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+            .orElseThrow(() -> new BookingException(ErrorCode.MEMBER_NOT_FOUND, requestId));
 
     LocalDateTime bookingRequestTime = LocalDateTime.now();
     List<ShowSeat> showSeats =
         showSeatRepository.findAllAvailableSeats(showSeatIds, bookingRequestTime);
 
     if (showSeats.size() != showSeatIds.size()) {
-      throw new BusinessException(ErrorCode.SEAT_NOT_AVAILABLE);
+      throw new BookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
     }
 
     int totalAmount = showSeats.stream().map(ShowSeat::getPrice).reduce(0, Integer::sum);

@@ -1,14 +1,8 @@
 package com.seatwise.common.exception;
 
-import lombok.Getter;
-
-@Getter
-public class BusinessException extends RuntimeException {
-
-  private final ErrorCode errorCode;
+public class BusinessException extends ErrorCodeException {
 
   public BusinessException(ErrorCode errorCode) {
-    super(errorCode.getMessage());
-    this.errorCode = errorCode;
+    super(errorCode);
   }
 }

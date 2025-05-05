@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import com.seatwise.annotation.EmbeddedRedisTest;
 import com.seatwise.booking.dto.BookingResult;
 import com.seatwise.booking.service.BookingService;
-import com.seatwise.common.exception.BusinessException;
+import com.seatwise.common.exception.BookingException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.queue.StreamKeyGenerator;
 import com.seatwise.queue.dto.BookingMessage;
@@ -91,7 +91,7 @@ class BookingMessageConsumerTest {
     BookingMessage message = new BookingMessage(requestId, memberId, showSeats, sectionId);
 
     when(bookingService.createBooking(requestId, memberId, showSeats))
-        .thenThrow(new BusinessException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY));
+        .thenThrow(new BookingException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY, requestId));
     ObjectRecord<String, BookingMessage> objectRecord =
         StreamRecords.newRecord().in(streamKey).ofObject(message);
 

@@ -24,7 +24,10 @@ public enum ErrorCode {
   DUPLICATE_SEAT_NUMBER("중복된 좌석 번호입니다.", HttpStatus.CONFLICT),
   DUPLICATE_SHOW("이벤트 시간이 중복됐습니다.", HttpStatus.CONFLICT),
   DUPLICATE_IDEMPOTENCY_KEY(
-      "이미 처리된 요청입니다. 같은 Idempotency-Key로는 중복 요청이 불가능합니다.", HttpStatus.CONFLICT);
+      "이미 처리된 요청입니다. 같은 Idempotency-Key로는 중복 요청이 불가능합니다.", HttpStatus.CONFLICT),
+
+  // 502 Bad Gateway
+  BOOKING_TIMEOUT("좌석 예약 요청이 시간 초과로 실패했습니다.", HttpStatus.GATEWAY_TIMEOUT);
 
   private final String message;
   private final HttpStatus status;

@@ -1,6 +1,8 @@
 package com.seatwise.booking.service;
 
 import com.seatwise.booking.dto.BookingResult;
+import com.seatwise.common.exception.BookingException;
+import com.seatwise.common.exception.ErrorCode;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +26,7 @@ public class BookingResultWaitService {
         () -> {
           waiters.remove(requestId);
           log.warn("requestId {} - 타임아웃 발생", requestId);
-          deferredResult.setErrorResult(BookingResult.failed(requestId));
+          deferredResult.setErrorResult(new BookingException(ErrorCode.BOOKING_TIMEOUT, requestId));
         });
     log.info("결과 있음{}", deferredResult.hasResult());
     return deferredResult;
@@ -37,6 +39,16 @@ public class BookingResultWaitService {
       log.info("requestId {} - 응답 완료", requestId);
     } else {
       log.warn("requestId {} - 대기 중인 요청이 없음", requestId);
+    }
+  }
+
+  public void completeWithFailure(String requestId, BookingException e) {
+    DeferredResult<BookingResult> deferredResult = waiters.remove(requestId);
+    if (deferredResult != null) {
+      deferredResult.setErrorResult(e);
+      log.warn("requestId {} - 예외로 응답 완료: {}", requestId, e.getErrorCode());
+    } else {
+      log.warn("requestId {} - 대기 중인 요청이 없어 실패 응답 불가", requestId);
     }
   }
 }
