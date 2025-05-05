@@ -39,11 +39,6 @@ class BookingMessageConsumerTest {
     requestId = "testRequestId" + System.currentTimeMillis();
     int shardId = 0;
     streamKey = StreamKeyGenerator.createStreamKey(shardId);
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   private void flushRedisDb() {
