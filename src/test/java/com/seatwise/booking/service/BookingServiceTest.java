@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.seatwise.annotation.ServiceTest;
 import com.seatwise.common.builder.ShowTestDataBuilder;
-import com.seatwise.common.exception.BusinessException;
+import com.seatwise.common.exception.BookingException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.member.domain.Member;
 import com.seatwise.member.repository.MemberRepository;
@@ -76,7 +76,7 @@ class BookingServiceTest {
 
     // When & Then
     assertThatThrownBy(() -> bookingService.createBooking(requestId, memberId, showSeatIds))
-        .isInstanceOf(BusinessException.class)
+        .isInstanceOf(BookingException.class)
         .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SEAT_NOT_AVAILABLE);
   }
 
@@ -92,7 +92,7 @@ class BookingServiceTest {
     // then
 
     assertThatThrownBy(() -> bookingService.createBooking(requestId, memberId, showSeatIds))
-        .isInstanceOf(BusinessException.class)
+        .isInstanceOf(BookingException.class)
         .hasFieldOrPropertyWithValue("errorCode", ErrorCode.DUPLICATE_IDEMPOTENCY_KEY);
   }
 }
