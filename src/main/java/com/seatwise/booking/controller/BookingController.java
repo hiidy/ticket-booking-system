@@ -5,6 +5,7 @@ import com.seatwise.booking.dto.BookingResult;
 import com.seatwise.booking.service.BookingResultWaitService;
 import com.seatwise.booking.service.BookingService;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,7 +24,7 @@ public class BookingController {
 
   @PostMapping
   public DeferredResult<BookingResult> createBookingRequest(
-      @RequestHeader("Idempotency-Key") String key, @Valid @RequestBody BookingRequest request) {
+      @RequestHeader("Idempotency-Key") UUID key, @Valid @RequestBody BookingRequest request) {
     DeferredResult<BookingResult> result = waitService.waitForResult(key);
     bookingService.enqueueBooking(key, request);
     return result;

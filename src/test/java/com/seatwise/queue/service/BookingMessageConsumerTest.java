@@ -13,6 +13,7 @@ import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.queue.StreamKeyGenerator;
 import com.seatwise.queue.dto.BookingMessage;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +31,13 @@ class BookingMessageConsumerTest {
   @Autowired private BookingMessageConsumer consumer;
   @Autowired private RedisTemplate<String, Object> objectRedisTemplate;
   @MockBean private BookingService bookingService;
-  private String requestId;
+  private UUID requestId;
   private String streamKey;
 
   @BeforeEach
   void setUp() {
     flushRedisDb();
-    requestId = "testRequestId" + System.currentTimeMillis();
+    requestId = UUID.randomUUID();
     int shardId = 0;
     streamKey = StreamKeyGenerator.createStreamKey(shardId);
   }
@@ -57,7 +58,8 @@ class BookingMessageConsumerTest {
     Long sectionId = 1L;
     Long bookingId = 100L;
 
-    BookingMessage message = new BookingMessage(requestId, memberId, showSeats, sectionId);
+    BookingMessage message =
+        new BookingMessage(requestId.toString(), memberId, showSeats, sectionId);
 
     when(bookingService.createBooking(requestId, memberId, showSeats)).thenReturn(bookingId);
     ObjectRecord<String, BookingMessage> objectRecord =
@@ -83,7 +85,8 @@ class BookingMessageConsumerTest {
     List<Long> showSeats = List.of(1L, 2L);
     Long sectionId = 1L;
 
-    BookingMessage message = new BookingMessage(requestId, memberId, showSeats, sectionId);
+    BookingMessage message =
+        new BookingMessage(requestId.toString(), memberId, showSeats, sectionId);
 
     when(bookingService.createBooking(requestId, memberId, showSeats))
         .thenThrow(new BookingException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY, requestId));

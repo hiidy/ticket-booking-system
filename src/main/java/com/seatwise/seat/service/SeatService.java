@@ -18,12 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class SeatService {
 
   private final SeatRepository seatRepository;
   private final VenueRepository venueRepository;
 
+  @Transactional
   public SeatCreateResponse createSeat(SeatCreateRequest request) {
     Venue venue =
         venueRepository
@@ -33,6 +33,7 @@ public class SeatService {
     List<Integer> existsSeatNumbers =
         seatRepository.findByVenueId(request.venueId()).stream().map(Seat::getSeatNumber).toList();
     List<Integer> newSeatNumbers = extractSeatNumbers(request.seatTypeRanges());
+
     validateNewSeatNumbers(existsSeatNumbers, newSeatNumbers);
 
     List<Seat> seats =
@@ -53,14 +54,14 @@ public class SeatService {
     return SeatCreateResponse.from(savedSeats);
   }
 
-  public List<Integer> extractSeatNumbers(List<SeatGradeRangeRequest> request) {
+  private List<Integer> extractSeatNumbers(List<SeatGradeRangeRequest> request) {
     return request.stream()
         .flatMap(range -> IntStream.rangeClosed(range.startNumber(), range.endNumber()).boxed())
         .toList();
   }
 
-  private void validateNewSeatNumbers(List<Integer> oldNumbers, List<Integer> newNumbers) {
-    boolean hasDuplicate = newNumbers.stream().anyMatch(oldNumbers::contains);
+  private void validateNewSeatNumbers(List<Integer> existing, List<Integer> incoming) {
+    boolean hasDuplicate = incoming.stream().anyMatch(existing::contains);
 
     if (hasDuplicate) {
       throw new BusinessException(ErrorCode.DUPLICATE_SEAT_NUMBER);

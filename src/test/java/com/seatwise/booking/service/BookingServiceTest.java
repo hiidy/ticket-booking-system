@@ -19,6 +19,7 @@ import com.seatwise.show.repository.ShowSeatRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ class BookingServiceTest {
   @Autowired private ShowTestDataBuilder showTestDataBuilder;
 
   Member member;
-  String requestId = "test-request-id";
+  UUID requestId = UUID.randomUUID();
 
   @BeforeEach
   void setUp() {

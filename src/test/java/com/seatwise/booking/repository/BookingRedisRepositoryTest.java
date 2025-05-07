@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.seatwise.annotation.EmbeddedRedisTest;
 import com.seatwise.booking.dto.BookingResult;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,7 +20,7 @@ class BookingRedisRepositoryTest {
   @Test
   void givenPrefixAndRequestId_whenGetBookingResultFromRedis_thenReturnSavedResult() {
     // given
-    String requestId = "testId";
+    UUID requestId = UUID.randomUUID();
     String prefix = "booking:result:";
     Long bookingId = 1L;
     BookingResult result = new BookingResult(true, bookingId, requestId);

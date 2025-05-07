@@ -13,6 +13,7 @@ import com.seatwise.show.domain.ShowSeat;
 import com.seatwise.show.repository.ShowSeatRepository;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class BookingService {
   private final BookingMessageProducer producer;
 
   @Transactional
-  public Long createBooking(String requestId, Long memberId, List<Long> showSeatIds) {
+  public Long createBooking(UUID requestId, Long memberId, List<Long> showSeatIds) {
     if (bookingRepository.existsByRequestId(requestId)) {
       throw new BookingException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY, requestId);
     }
@@ -55,10 +56,10 @@ public class BookingService {
     return savedBooking.getId();
   }
 
-  public void enqueueBooking(String requestId, BookingRequest request) {
+  public void enqueueBooking(UUID requestId, BookingRequest request) {
     BookingMessage message =
         new BookingMessage(
-            requestId, request.memberId(), request.showSeatIds(), request.sectionId());
+            requestId.toString(), request.memberId(), request.showSeatIds(), request.sectionId());
     producer.sendMessage(message);
   }
 }

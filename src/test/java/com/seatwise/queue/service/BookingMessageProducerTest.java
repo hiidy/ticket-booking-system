@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import com.seatwise.queue.QueueProperties;
 import com.seatwise.queue.dto.BookingMessage;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,8 +29,10 @@ class BookingMessageProducerTest {
     int totalShard = 5;
     Long sectionId = 1L;
     Long memberId = 1L;
+    UUID requestId = UUID.randomUUID();
     List<Long> showSeatIds = List.of(1L, 2L);
-    BookingMessage request = new BookingMessage("test", memberId, showSeatIds, sectionId);
+    BookingMessage request =
+        new BookingMessage(requestId.toString(), memberId, showSeatIds, sectionId);
     when(queueProperties.getShardCount()).thenReturn(totalShard);
 
     // when

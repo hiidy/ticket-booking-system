@@ -11,6 +11,7 @@ import com.seatwise.booking.dto.BookingResult;
 import com.seatwise.booking.service.BookingResultWaitService;
 import com.seatwise.booking.service.BookingService;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -27,7 +28,7 @@ class BookingControllerTest {
   @MockBean private BookingService bookingService;
   @MockBean private BookingResultWaitService waitService;
 
-  private static final String IDEMPOTENCY_KEY = "test-key-123";
+  private static final UUID IDEMPOTENCY_KEY = UUID.randomUUID();
 
   @Test
   void givenRequestWithIdempotencyKey_whenCreateBooking_thenReturnsOk() throws Exception {
@@ -48,6 +49,6 @@ class BookingControllerTest {
                 .header("Idempotency-Key", IDEMPOTENCY_KEY)
                 .content(objectMapper.writeValueAsString(bookingRequest)))
         .andExpect(status().isOk());
-    verify(waitService).waitForResult("test-key-123");
+    verify(waitService).waitForResult(IDEMPOTENCY_KEY);
   }
 }

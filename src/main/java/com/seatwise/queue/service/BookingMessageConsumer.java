@@ -9,6 +9,7 @@ import com.seatwise.queue.StreamKeyGenerator;
 import com.seatwise.queue.dto.BookingMessage;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -73,6 +74,7 @@ public class BookingMessageConsumer
   @Override
   public void onMessage(ObjectRecord<String, BookingMessage> message) {
     BookingMessage request = message.getValue();
+    UUID requestId = UUID.fromString(request.requestId());
     log.info(
         "멤버Id: {}, 좌석Id: {}, 섹션Id: {}에 대한 요청 처리중",
         request.memberId(),
@@ -80,12 +82,11 @@ public class BookingMessageConsumer
         request.sectionId());
     try {
       Long bookingId =
-          bookingService.createBooking(
-              request.requestId(), request.memberId(), request.showSeatIds());
-      BookingResult result = BookingResult.success(bookingId, request.requestId());
-      waitService.completeResult(request.requestId(), result);
+          bookingService.createBooking(requestId, request.memberId(), request.showSeatIds());
+      BookingResult result = BookingResult.success(bookingId, requestId);
+      waitService.completeResult(requestId, result);
     } catch (BookingException e) {
-      waitService.completeWithFailure(request.requestId(), e);
+      waitService.completeWithFailure(requestId, e);
     } finally {
       redisTemplate.opsForStream().acknowledge(queueProperties.getConsumerGroup(), message);
     }

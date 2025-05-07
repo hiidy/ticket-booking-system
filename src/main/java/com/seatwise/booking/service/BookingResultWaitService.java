@@ -4,6 +4,7 @@ import com.seatwise.booking.dto.BookingResult;
 import com.seatwise.common.exception.BookingException;
 import com.seatwise.common.exception.ErrorCode;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +16,10 @@ import org.springframework.web.context.request.async.DeferredResult;
 @Slf4j
 public class BookingResultWaitService {
 
-  private final Map<String, DeferredResult<BookingResult>> waiters = new ConcurrentHashMap<>();
+  private final Map<UUID, DeferredResult<BookingResult>> waiters = new ConcurrentHashMap<>();
   private static final long WAIT_TIMEOUT = 10000L;
 
-  public DeferredResult<BookingResult> waitForResult(String requestId) {
+  public DeferredResult<BookingResult> waitForResult(UUID requestId) {
     DeferredResult<BookingResult> deferredResult = new DeferredResult<>(WAIT_TIMEOUT);
     waiters.put(requestId, deferredResult);
 
@@ -32,7 +33,7 @@ public class BookingResultWaitService {
     return deferredResult;
   }
 
-  public void completeResult(String requestId, BookingResult result) {
+  public void completeResult(UUID requestId, BookingResult result) {
     DeferredResult<BookingResult> deferredResult = waiters.remove(requestId);
     if (deferredResult != null) {
       deferredResult.setResult(result);
@@ -42,7 +43,7 @@ public class BookingResultWaitService {
     }
   }
 
-  public void completeWithFailure(String requestId, BookingException e) {
+  public void completeWithFailure(UUID requestId, BookingException e) {
     DeferredResult<BookingResult> deferredResult = waiters.remove(requestId);
     if (deferredResult != null) {
       deferredResult.setErrorResult(e);
