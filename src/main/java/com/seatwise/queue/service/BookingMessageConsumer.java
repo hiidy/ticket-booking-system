@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 public class BookingMessageConsumer
     implements StreamListener<String, ObjectRecord<String, BookingMessage>> {
 
-  @Value("${booking.instance-id:${random.uuid}}")
+  @Value("${spring.application.instance-id}")
   private String instanceId;
 
   private final StreamMessageListenerContainer<String, ObjectRecord<String, BookingMessage>>
