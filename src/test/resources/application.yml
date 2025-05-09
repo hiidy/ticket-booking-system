@@ -7,13 +7,15 @@ spring:
   config:
     activate:
       on-profile: local
+  application:
+    instance-id: ${INSTANCE_ID:${random.uuid}}
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
   jpa:
     hibernate:
       ddl-auto: create
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -26,6 +28,8 @@ spring:
   config:
     activate:
       on-profile: test-mysql
+  application:
+    instance-id: ${INSTANCE_ID:${random.uuid}}
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/ticket_test?useSSL=true&serverTimezone=UTC&characterEncoding=UTF-8
@@ -42,7 +46,7 @@ spring:
     init:
       mode: always
       schema-locations: classpath:sql/test-schema.sql
-  queue:
-    shard-count: 1
-    consumer-group: 'bookingGroup'
-    instance-count: 1
+queue:
+  shard-count: 1
+  consumer-group: 'bookingGroup'
+  instance-count: 1
