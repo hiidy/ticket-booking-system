@@ -6,14 +6,18 @@ import com.seatwise.event.domain.Event;
 import com.seatwise.event.repository.EventRepository;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.dto.request.ShowCreateRequest;
+import com.seatwise.show.dto.request.ShowSearchCondition;
 import com.seatwise.show.dto.response.ShowCreateResponse;
 import com.seatwise.show.dto.response.ShowDatesResponse;
+import com.seatwise.show.dto.response.ShowSummaryResponse;
 import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.venue.domain.Venue;
 import com.seatwise.venue.repository.VenueRepository;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -56,5 +60,12 @@ public class ShowService {
     LocalDate endDate = startDate.plusMonths(1);
     List<Show> shows = showRepository.findByEventIdAndDateBetween(eventId, startDate, endDate);
     return shows.stream().map(ShowDatesResponse::from).toList();
+  }
+
+  public List<ShowSummaryResponse> getShows(ShowSearchCondition searchCondition, Pageable pageable) {
+    Slice<Show> result =
+        showRepository.findByEvent_TypeAndDateAfterOrderByDateAsc(
+            searchCondition.type(), searchCondition.date(), pageable);
+    return result.getContent().stream().map(ShowSummaryResponse::from).toList();
   }
 }

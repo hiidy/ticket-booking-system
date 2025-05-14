@@ -87,3 +87,4 @@ CREATE TABLE inventory
 );
 
 CREATE INDEX idx_show_seat_show_seat_id ON show_seat (show_id, seat_id, status);
+CREATE INDEX idx_show_date_event_id_index ON `show` (date, event_id);
