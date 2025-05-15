@@ -2,8 +2,13 @@ package com.seatwise.inventory.domain;
 
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
-import jakarta.persistence.EmbeddedId;
+import com.seatwise.seat.domain.SeatGrade;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -15,14 +20,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ShowInventory {
 
-  @EmbeddedId private ShowInventoryPk id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  private Long showId;
+
+  @Enumerated(EnumType.STRING)
+  private SeatGrade grade;
 
   private int totalCount;
 
   private int availableCount;
 
-  public ShowInventory(ShowInventoryPk id, int totalCount, int availableCount) {
-    this.id = id;
+  public ShowInventory(Long showId, SeatGrade grade, int totalCount, int availableCount) {
+    this.showId = showId;
+    this.grade = grade;
     this.totalCount = totalCount;
     this.availableCount = availableCount;
   }

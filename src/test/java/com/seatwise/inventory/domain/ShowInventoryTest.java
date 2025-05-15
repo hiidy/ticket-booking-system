@@ -14,8 +14,7 @@ class ShowInventoryTest {
     // given
     int totalCount = 100;
     int decreaseCount = 1;
-    ShowInventoryPk pk = new ShowInventoryPk(1L, SeatGrade.S);
-    ShowInventory showInventory = new ShowInventory(pk, totalCount, totalCount);
+    ShowInventory showInventory = new ShowInventory(1L, SeatGrade.S, totalCount, totalCount);
 
     // when
     showInventory.decreaseStock(decreaseCount);
@@ -30,8 +29,7 @@ class ShowInventoryTest {
     int totalCount = 100;
     int availableCount = 0;
     int decreaseCount = 1;
-    ShowInventoryPk pk = new ShowInventoryPk(1L, SeatGrade.S);
-    ShowInventory showInventory = new ShowInventory(pk, totalCount, availableCount);
+    ShowInventory showInventory = new ShowInventory(1L, SeatGrade.S, totalCount, availableCount);
 
     // when & then
     assertThatThrownBy(() -> showInventory.decreaseStock(decreaseCount))

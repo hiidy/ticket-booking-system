@@ -79,12 +79,20 @@ CREATE TABLE venue
 
 CREATE TABLE inventory
 (
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
     show_id         BIGINT      NOT NULL,
     grade           VARCHAR(50) NOT NULL,
     total_count     INT         NOT NULL,
-    available_count INT         NOT NULL,
-    PRIMARY KEY (show_id, grade)
+    available_count INT         NOT NULL
+);
+
+CREATE TABLE location
+(
+    id      BIGINT AUTO_INCREMENT PRIMARY KEY,
+    address VARCHAR(50) NOT NULL,
+    city    VARCHAR(50) NOT NULL
 );
 
 CREATE INDEX idx_show_seat_show_seat_id ON show_seat (show_id, seat_id, status);
-CREATE INDEX idx_show_date_event_id_index ON `show` (date, event_id);
+CREATE INDEX idx_show_date_event_id ON `show` (date, event_id);
+CREATE INDEX idx_inventory_show_id_grade ON inventory (show_id, grade);
