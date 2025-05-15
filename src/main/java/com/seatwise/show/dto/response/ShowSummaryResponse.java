@@ -10,8 +10,8 @@ public record ShowSummaryResponse(
         show.getId(),
         show.getEvent().getTitle(),
         show.getEvent().getType().name(),
-        show.getDate().toString(),
         show.getStartTime().toString(),
+        show.getDate().toString(),
         show.getVenue().getName());
   }
 }
