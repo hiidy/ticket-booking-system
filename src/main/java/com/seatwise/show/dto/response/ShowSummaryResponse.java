@@ -1,17 +1,15 @@
 package com.seatwise.show.dto.response;
 
-import com.seatwise.show.domain.Show;
-
 public record ShowSummaryResponse(
     Long id, String eventName, String eventType, String startTime, String date, String venue) {
 
-  public static ShowSummaryResponse from(Show show) {
+  public static ShowSummaryResponse from(ShowSummaryQueryDto queryDto) {
     return new ShowSummaryResponse(
-        show.getId(),
-        show.getEvent().getTitle(),
-        show.getEvent().getType().name(),
-        show.getStartTime().toString(),
-        show.getDate().toString(),
-        show.getVenue().getName());
+        queryDto.showId(),
+        queryDto.eventTitle(),
+        queryDto.eventType().name(),
+        queryDto.startTime().toString(),
+        queryDto.date().toString(),
+        queryDto.venueName());
   }
 }

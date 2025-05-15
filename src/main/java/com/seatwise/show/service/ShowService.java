@@ -9,6 +9,7 @@ import com.seatwise.show.dto.request.ShowCreateRequest;
 import com.seatwise.show.dto.request.ShowSearchCondition;
 import com.seatwise.show.dto.response.ShowCreateResponse;
 import com.seatwise.show.dto.response.ShowDatesResponse;
+import com.seatwise.show.dto.response.ShowSummaryQueryDto;
 import com.seatwise.show.dto.response.ShowSummaryResponse;
 import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.venue.domain.Venue;
@@ -62,9 +63,10 @@ public class ShowService {
     return shows.stream().map(ShowDatesResponse::from).toList();
   }
 
-  public List<ShowSummaryResponse> getShows(ShowSearchCondition searchCondition, Pageable pageable) {
-    Slice<Show> result =
-        showRepository.findByEvent_TypeAndDateAfterOrderByDateAsc(
+  public List<ShowSummaryResponse> getShows(
+      ShowSearchCondition searchCondition, Pageable pageable) {
+    Slice<ShowSummaryQueryDto> result =
+        showRepository.findShowSummaryByTypeAndDate(
             searchCondition.type(), searchCondition.date(), pageable);
     return result.getContent().stream().map(ShowSummaryResponse::from).toList();
   }
