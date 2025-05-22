@@ -2,6 +2,7 @@ package com.seatwise.show.domain;
 
 import com.seatwise.booking.domain.Booking;
 import com.seatwise.common.domain.BaseEntity;
+import com.seatwise.common.exception.BookingException;
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.seat.domain.Seat;
@@ -65,7 +66,7 @@ public class ShowSeat extends BaseEntity {
   public void assignBooking(Booking booking, LocalDateTime requestTime) {
     validateBookingStatus();
     if (isLocked(requestTime)) {
-      throw new BusinessException(ErrorCode.SEAT_NOT_AVAILABLE);
+      throw new BookingException(ErrorCode.SEAT_NOT_AVAILABLE, booking.getRequestId());
     }
     this.booking = booking;
     this.status = Status.PAYMENT_PENDING;

@@ -16,8 +16,8 @@ import org.springframework.web.context.request.async.DeferredResult;
 @Slf4j
 public class BookingResultWaitService {
 
-  private final Map<UUID, DeferredResult<BookingResult>> waiters = new ConcurrentHashMap<>();
   private static final long WAIT_TIMEOUT = 10000L;
+  private final Map<UUID, DeferredResult<BookingResult>> waiters = new ConcurrentHashMap<>();
 
   public DeferredResult<BookingResult> waitForResult(UUID requestId) {
     DeferredResult<BookingResult> deferredResult = new DeferredResult<>(WAIT_TIMEOUT);
