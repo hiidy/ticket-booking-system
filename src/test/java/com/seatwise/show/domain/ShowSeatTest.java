@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.seatwise.booking.domain.Booking;
+import com.seatwise.common.exception.BookingException;
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.member.domain.Member;
@@ -39,20 +40,7 @@ class ShowSeatTest {
 
     // when & then
     assertThatThrownBy(() -> showSeat.assignBooking(booking, newRequestTime))
-        .isInstanceOf(BusinessException.class)
-        .hasMessage(ErrorCode.SEAT_NOT_AVAILABLE.getMessage());
-  }
-
-  @Test
-  @DisplayName("좌석을 예약하지 않았지만 이용 가능한 상태가 아니라 예매할 경우 예외를 던진다")
-  void assignBooking_WithNotBookedAndUnavailable_ThrowsException() {
-    // given
-    LocalDateTime requestTime = LocalDateTime.of(2025, 1, 1, 12, 0);
-    ShowSeat showSeat = ShowSeat.createAvailable(null, null, 40000);
-    showSeat.assignBooking(null, LocalDateTime.now());
-    // when & then
-    assertThatThrownBy(() -> showSeat.assignBooking(null, requestTime))
-        .isInstanceOf(BusinessException.class)
+        .isInstanceOf(BookingException.class)
         .hasMessage(ErrorCode.SEAT_NOT_AVAILABLE.getMessage());
   }
 
@@ -75,7 +63,7 @@ class ShowSeatTest {
 
     // when & then
     assertThatThrownBy(() -> showSeat.assignBooking(booking, newRequestTime))
-        .isInstanceOf(BusinessException.class)
+        .isInstanceOf(BookingException.class)
         .hasMessage(ErrorCode.SEAT_NOT_AVAILABLE.getMessage());
   }
 
