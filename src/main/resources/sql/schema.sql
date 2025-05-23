@@ -93,6 +93,14 @@ CREATE TABLE location
     city    VARCHAR(50) NOT NULL
 );
 
+create table stream_message
+(
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    stream_name VARCHAR(50) NOT NULL,
+    message_id  VARCHAR(50) NOT NULL,
+    status      VARCHAR(50) NOT NULL
+);
+
 CREATE INDEX idx_show_seat_show_seat_id ON show_seat (show_id, seat_id, status);
 CREATE INDEX idx_show_date_event_id ON `show` (date, event_id);
 CREATE INDEX idx_inventory_show_id_grade ON inventory (show_id, grade);
