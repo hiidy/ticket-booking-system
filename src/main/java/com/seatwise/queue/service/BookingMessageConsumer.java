@@ -28,22 +28,23 @@ import org.springframework.stereotype.Service;
 public class BookingMessageConsumer
     implements StreamListener<String, ObjectRecord<String, BookingMessage>> {
 
-  @Value("${spring.application.instance-id}")
-  private String instanceId;
-
   private final StreamMessageListenerContainer<String, ObjectRecord<String, BookingMessage>>
       container;
   private final RedisTemplate<String, Object> redisTemplate;
-  private final QueueProperties queueProperties;
+  private final QueueProperties properties;
   private final BookingService bookingService;
   private final BookingResultWaitService waitService;
+  private final BookingMessageAckService bookingMessageAckService;
+
+  @Value("${spring.application.instance-id}")
+  private String instanceId;
 
   @PostConstruct
   protected void init() {
     int instanceHash = instanceId.hashCode();
-    int shardCount = queueProperties.getShardCount();
-    int instanceCount = queueProperties.getInstanceCount();
-    String group = queueProperties.getConsumerGroup();
+    int shardCount = properties.getShardCount();
+    int instanceCount = properties.getInstanceCount();
+    String group = properties.getConsumerGroup();
 
     for (int shardId = 0; shardId < shardCount; shardId++) {
       if (shardId % instanceCount == instanceHash % instanceCount) {
@@ -88,7 +89,7 @@ public class BookingMessageConsumer
     } catch (BookingException e) {
       waitService.completeWithFailure(requestId, e);
     } finally {
-      redisTemplate.opsForStream().acknowledge(queueProperties.getConsumerGroup(), message);
+      bookingMessageAckService.acknowledge(properties.getConsumerGroup(), message);
     }
   }
 }
