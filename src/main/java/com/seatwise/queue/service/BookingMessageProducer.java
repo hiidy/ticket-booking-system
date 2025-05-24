@@ -6,6 +6,7 @@ import com.seatwise.queue.dto.BookingMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.StreamOperations;
@@ -27,6 +28,6 @@ public class BookingMessageProducer {
         StreamKeyGenerator.forSectionShard(message.sectionId(), queueProperties.getShardCount());
     ObjectRecord<String, BookingMessage> objectRecord =
         StreamRecords.newRecord().in(streamKey).ofObject(message);
-    streamOperations.add(objectRecord);
+    streamOperations.add(objectRecord, XAddOptions.maxlen(1000).approximateTrimming(true));
   }
 }
