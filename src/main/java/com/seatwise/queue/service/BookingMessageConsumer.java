@@ -36,18 +36,17 @@ public class BookingMessageConsumer
   private final BookingResultWaitService waitService;
   private final BookingMessageAckService bookingMessageAckService;
 
-  @Value("${spring.application.instance-id}")
-  private String instanceId;
+  @Value("${spring.application.instance-idx}")
+  private int instanceIdx;
 
   @PostConstruct
   protected void init() {
-    int instanceHash = instanceId.hashCode();
     int shardCount = properties.getShardCount();
     int instanceCount = properties.getInstanceCount();
     String group = properties.getConsumerGroup();
 
     for (int shardId = 0; shardId < shardCount; shardId++) {
-      if (shardId % instanceCount == instanceHash % instanceCount) {
+      if (shardId % instanceCount == instanceIdx % instanceCount) {
         String streamKey = StreamKeyGenerator.createStreamKey(shardId);
 
         try {
@@ -57,7 +56,7 @@ public class BookingMessageConsumer
         }
 
         container.receive(
-            Consumer.from(group, instanceId),
+            Consumer.from(group, String.valueOf(instanceIdx)),
             StreamOffset.create(streamKey, ReadOffset.lastConsumed()),
             this);
       }
