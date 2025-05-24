@@ -9,7 +9,8 @@ import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.StreamRecords;
-import org.springframework.data.redis.core.StreamOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.hash.Jackson2HashMapper;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class BookingMessageProducer {
 
   private final QueueProperties queueProperties;
-  private final StreamOperations<String, String, Object> streamOperations;
+  private final RedisTemplate<String, Object> redisTemplate;
 
   @Retryable(retryFor = RedisConnectionFailureException.class, backoff = @Backoff(delay = 1000))
   public void sendMessage(BookingMessage message) {
@@ -28,6 +29,8 @@ public class BookingMessageProducer {
         StreamKeyGenerator.forSectionShard(message.sectionId(), queueProperties.getShardCount());
     ObjectRecord<String, BookingMessage> objectRecord =
         StreamRecords.newRecord().in(streamKey).ofObject(message);
-    streamOperations.add(objectRecord, XAddOptions.maxlen(1000).approximateTrimming(true));
+    redisTemplate
+        .opsForStream(new Jackson2HashMapper(true))
+        .add(objectRecord, XAddOptions.maxlen(1000).approximateTrimming(true));
   }
 }

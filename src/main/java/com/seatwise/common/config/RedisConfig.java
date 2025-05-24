@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.seatwise.booking.dto.BookingResult;
 import com.seatwise.queue.dto.BookingMessage;
 import java.time.Duration;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
@@ -15,7 +14,6 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StreamOperations;
 import org.springframework.data.redis.hash.Jackson2HashMapper;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -64,18 +62,6 @@ public class RedisConfig {
   @Bean
   public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
     return createRedisTemplate(factory, Object.class);
-  }
-
-  @Bean
-  public RedisTemplate<String, BookingResult> bookingResultRedisTemplate(
-      RedisConnectionFactory factory) {
-    return createRedisTemplate(factory, BookingResult.class);
-  }
-
-  @Bean
-  public StreamOperations<String, String, Object> streamOperations(
-      RedisTemplate<String, Object> redisTemplate) {
-    return redisTemplate.opsForStream(new Jackson2HashMapper(true));
   }
 
   @Bean
