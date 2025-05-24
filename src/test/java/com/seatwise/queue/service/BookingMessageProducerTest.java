@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.core.StreamOperations;
 
@@ -39,6 +40,6 @@ class BookingMessageProducerTest {
     bookingMessageProducer.sendMessage(request);
 
     // then
-    verify(streamOperations).add(any(ObjectRecord.class));
+    verify(streamOperations).add(any(ObjectRecord.class), any(XAddOptions.class));
   }
 }
