@@ -12,15 +12,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StreamOperations;
+import org.springframework.data.redis.hash.Jackson2HashMapper;
 
 @ExtendWith(MockitoExtension.class)
 class BookingMessageProducerTest {
 
-  @Mock private StreamOperations<String, String, Object> streamOperations;
+  @Mock private RedisTemplate<String, Object> redisTemplate;
   @Mock private QueueProperties queueProperties;
   @InjectMocks private BookingMessageProducer bookingMessageProducer;
 
@@ -35,6 +38,10 @@ class BookingMessageProducerTest {
     BookingMessage request =
         new BookingMessage(requestId.toString(), memberId, showSeatIds, sectionId);
     when(queueProperties.getShardCount()).thenReturn(totalShard);
+
+    StreamOperations<String, String, Object> streamOperations =
+        Mockito.mock(StreamOperations.class);
+    when(redisTemplate.opsForStream(any(Jackson2HashMapper.class))).thenReturn(streamOperations);
 
     // when
     bookingMessageProducer.sendMessage(request);
