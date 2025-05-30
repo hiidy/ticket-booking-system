@@ -128,9 +128,9 @@ class ShowSeatServiceTest {
         .hasSize(3)
         .extracting("seatNumber", "seatGrade", "status", "isLocked")
         .containsExactlyInAnyOrder(
-            tuple(1, SeatGrade.VIP, "예매 가능", false),
-            tuple(2, SeatGrade.VIP, "예매 가능", false),
-            tuple(3, SeatGrade.R, "예매 가능", false));
+            tuple(1, SeatGrade.VIP, "예매 가능", true),
+            tuple(2, SeatGrade.VIP, "예매 가능", true),
+            tuple(3, SeatGrade.R, "예매 가능", true));
   }
 
   private List<Seat> createSeats(int count) {

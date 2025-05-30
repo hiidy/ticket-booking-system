@@ -13,6 +13,6 @@ public record ShowSeatResponse(
         showSeat.getSeat().getSeatNumber(),
         showSeat.getStatus().getDescription(),
         showSeat.getSeat().getGrade(),
-        showSeat.isLocked(currentTime));
+        showSeat.canAssignBooking(currentTime));
   }
 }

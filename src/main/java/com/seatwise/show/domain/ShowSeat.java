@@ -64,17 +64,19 @@ public class ShowSeat extends BaseEntity {
   }
 
   public boolean canAssignBooking(LocalDateTime now) {
-    return status != Status.BOOKED && !isLocked(now);
+    if (status == Status.AVAILABLE) {
+      return expirationTime == null;
+    }
+    if (status == Status.PAYMENT_PENDING) {
+      return expirationTime != null && expirationTime.isBefore(now);
+    }
+    return false;
   }
 
   public void assignBooking(Booking booking, LocalDateTime requestTime, Duration duration) {
     this.booking = booking;
     this.status = Status.PAYMENT_PENDING;
     this.expirationTime = requestTime.plus(duration);
-  }
-
-  public boolean isLocked(LocalDateTime currentTime) {
-    return status == Status.PAYMENT_PENDING && expirationTime.isAfter(currentTime);
   }
 
   private void validatePrice(Integer price) {

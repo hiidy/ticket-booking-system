@@ -27,6 +27,36 @@ class ShowSeatTest {
   }
 
   @Test
+  void shouldUpdateExpirationTime_whenBookingAssigned() {
+    // given
+    ShowSeat showSeat = ShowSeat.createAvailable(null, null, 40000);
+    Booking booking = new Booking(null, null, 0);
+    LocalDateTime requestTime = LocalDateTime.of(2025, 1, 1, 12, 0);
+    Duration duration = Duration.ofMinutes(10);
+
+    // when
+    showSeat.assignBooking(booking, requestTime, duration);
+
+    // then
+    assertThat(showSeat.getExpirationTime()).isEqualTo(requestTime.plus(duration));
+  }
+
+  @Test
+  void shouldUpdateBooking_whenBookingAssigned() {
+    // given
+    ShowSeat showSeat = ShowSeat.createAvailable(null, null, 40000);
+    Booking booking = new Booking(null, null, 0);
+    LocalDateTime requestTime = LocalDateTime.of(2025, 1, 1, 12, 0);
+    Duration duration = Duration.ofMinutes(10);
+
+    // when
+    showSeat.assignBooking(booking, requestTime, duration);
+
+    // then
+    assertThat(showSeat.getBooking()).isEqualTo(booking);
+  }
+
+  @Test
   void shouldReturnTrue_whenAssignAvailableSeat() {
     // given
     ShowSeat showSeat = ShowSeat.createAvailable(null, null, 40000);
@@ -72,5 +102,14 @@ class ShowSeatTest {
 
     // then
     assertThat(showSeat.getBooking()).isEqualTo(booking2);
+  }
+
+  @Test
+  void shouldReturnAvailableShowSeat_whenInitializeShowSeat() {
+    // given
+    ShowSeat showSeat = ShowSeat.createAvailable(null, null, 40000);
+
+    // then
+    assertThat(showSeat.getStatus()).isEqualTo(Status.AVAILABLE);
   }
 }
