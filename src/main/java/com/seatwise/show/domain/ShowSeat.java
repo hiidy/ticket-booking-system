@@ -2,7 +2,6 @@ package com.seatwise.show.domain;
 
 import com.seatwise.booking.domain.Booking;
 import com.seatwise.common.domain.BaseEntity;
-import com.seatwise.common.exception.BookingException;
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.seat.domain.Seat;
@@ -16,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -63,24 +63,18 @@ public class ShowSeat extends BaseEntity {
     return new ShowSeat(show, seat, price, Status.AVAILABLE);
   }
 
-  public void assignBooking(Booking booking, LocalDateTime requestTime) {
-    validateBookingStatus();
-    if (isLocked(requestTime)) {
-      throw new BookingException(ErrorCode.SEAT_NOT_AVAILABLE, booking.getRequestId());
-    }
+  public boolean canAssignBooking(LocalDateTime now) {
+    return status != Status.BOOKED && !isLocked(now);
+  }
+
+  public void assignBooking(Booking booking, LocalDateTime requestTime, Duration duration) {
     this.booking = booking;
     this.status = Status.PAYMENT_PENDING;
-    this.expirationTime = requestTime.plusMinutes(10);
+    this.expirationTime = requestTime.plus(duration);
   }
 
   public boolean isLocked(LocalDateTime currentTime) {
     return status == Status.PAYMENT_PENDING && expirationTime.isAfter(currentTime);
-  }
-
-  private void validateBookingStatus() {
-    if (this.status == Status.BOOKED) {
-      throw new BusinessException(ErrorCode.SEAT_ALREADY_BOOKED);
-    }
   }
 
   private void validatePrice(Integer price) {

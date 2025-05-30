@@ -11,6 +11,7 @@ import com.seatwise.queue.dto.BookingMessage;
 import com.seatwise.queue.service.BookingMessageProducer;
 import com.seatwise.show.domain.ShowSeat;
 import com.seatwise.show.repository.ShowSeatRepository;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -41,6 +42,7 @@ public class BookingService {
             .orElseThrow(() -> new BookingException(ErrorCode.MEMBER_NOT_FOUND, requestId));
 
     LocalDateTime bookingRequestTime = LocalDateTime.now();
+
     List<ShowSeat> showSeats =
         showSeatRepository.findAllAvailableSeats(showSeatIds, bookingRequestTime);
 
@@ -48,9 +50,17 @@ public class BookingService {
       throw new BookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
     }
 
+    boolean anyUnavailable =
+        showSeats.stream().anyMatch(seat -> !seat.canAssignBooking(bookingRequestTime));
+
+    if (anyUnavailable) {
+      throw new BookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
+    }
+
     int totalAmount = showSeats.stream().map(ShowSeat::getPrice).reduce(0, Integer::sum);
     Booking booking = new Booking(requestId, member, totalAmount);
-    showSeats.forEach(showSeat -> showSeat.assignBooking(booking, bookingRequestTime));
+    showSeats.forEach(
+        showSeat -> showSeat.assignBooking(booking, bookingRequestTime, Duration.ofMinutes(10)));
     Booking savedBooking = bookingRepository.save(booking);
 
     return savedBooking.getId();
