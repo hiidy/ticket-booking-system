@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.*;
 import com.seatwise.annotation.ServiceTest;
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
-import com.seatwise.event.entity.Event;
-import com.seatwise.event.entity.EventType;
-import com.seatwise.event.repository.EventRepository;
+import com.seatwise.show.entity.Show;
+import com.seatwise.show.entity.ShowType;
+import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.showtime.dto.request.ShowTimeCreateRequest;
 import com.seatwise.showtime.entity.ShowTime;
 import com.seatwise.showtime.repository.ShowTimeRepository;
@@ -25,16 +25,16 @@ class ShowTimeServiceTest {
 
   @Autowired private ShowTimeService showTimeService;
   @Autowired private ShowTimeRepository showTimeRepository;
-  @Autowired private EventRepository eventRepository;
+  @Autowired private ShowRepository showRepository;
   @Autowired private VenueRepository venueRepository;
 
-  private Event event;
+  private Show show;
   private Venue venue;
 
   @BeforeEach
   void setUp() {
-    event = new Event("지킬 앤 하이드", "테스트 공연", EventType.MUSICAL);
-    eventRepository.save(event);
+    show = new Show("지킬 앤 하이드", "테스트 공연", ShowType.MUSICAL);
+    showRepository.save(show);
     venue = new Venue("test", 100);
     venueRepository.save(venue);
   }
@@ -45,12 +45,12 @@ class ShowTimeServiceTest {
     // given
     ShowTime existingShowTime =
         new ShowTime(
-            event, venue, LocalDate.of(2024, 1, 1), LocalTime.of(15, 0), LocalTime.of(17, 0));
+            show, venue, LocalDate.of(2024, 1, 1), LocalTime.of(15, 0), LocalTime.of(17, 0));
     showTimeRepository.save(existingShowTime);
 
     ShowTimeCreateRequest request =
         new ShowTimeCreateRequest(
-            event.getId(),
+            show.getId(),
             venue.getId(),
             LocalDate.of(2024, 1, 1),
             LocalTime.of(16, 0),

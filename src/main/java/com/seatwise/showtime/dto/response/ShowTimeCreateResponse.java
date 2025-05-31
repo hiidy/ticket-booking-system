@@ -5,6 +5,6 @@ import com.seatwise.showtime.entity.ShowTime;
 public record ShowTimeCreateResponse(Long id, Long eventId) {
 
   public static ShowTimeCreateResponse from(ShowTime showTime) {
-    return new ShowTimeCreateResponse(showTime.getId(), showTime.getEvent().getId());
+    return new ShowTimeCreateResponse(showTime.getId(), showTime.getShow().getId());
   }
 }

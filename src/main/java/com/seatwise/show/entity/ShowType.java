@@ -1,16 +1,16 @@
-package com.seatwise.event.entity;
+package com.seatwise.show.entity;
 
 import lombok.Getter;
 
 @Getter
-public enum EventType {
+public enum ShowType {
   CONCERT("콘서트"),
   MUSICAL("뮤지컬"),
   THEATER("연극");
 
   private final String description;
 
-  EventType(String description) {
+  ShowType(String description) {
     this.description = description;
   }
 }

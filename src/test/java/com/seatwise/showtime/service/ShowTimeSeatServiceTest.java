@@ -9,11 +9,11 @@ import com.seatwise.common.builder.EventTestDataBuilder;
 import com.seatwise.common.builder.ShowTestDataBuilder;
 import com.seatwise.common.builder.VenueTestDataBuilder;
 import com.seatwise.common.exception.BusinessException;
-import com.seatwise.event.entity.Event;
-import com.seatwise.event.entity.EventType;
 import com.seatwise.seat.entity.Seat;
 import com.seatwise.seat.entity.SeatGrade;
 import com.seatwise.seat.repository.SeatRepository;
+import com.seatwise.show.entity.Show;
+import com.seatwise.show.entity.ShowType;
 import com.seatwise.showtime.dto.ShowSeatPrice;
 import com.seatwise.showtime.dto.request.ShowSeatCreateRequest;
 import com.seatwise.showtime.dto.response.ShowSeatResponse;
@@ -95,15 +95,15 @@ class ShowTimeSeatServiceTest {
     LocalDate date = LocalDate.of(2024, 1, 1);
     LocalTime startTime = LocalTime.of(15, 0);
     Venue venue = venueData.withName("test-venue").withToTalSeat(1000).build();
-    Event event =
+    Show show =
         eventData
             .withTitle("지킬 앤 하이드")
             .withDescription("test-desc")
-            .withType(EventType.MUSICAL)
+            .withType(ShowType.MUSICAL)
             .build();
     showTime =
         showData
-            .withEvent(event)
+            .withEvent(show)
             .withVenue(venue)
             .withDate(date)
             .withTime(startTime, startTime.plusHours(2))

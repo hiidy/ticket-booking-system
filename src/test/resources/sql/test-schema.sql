@@ -22,7 +22,7 @@ CREATE TABLE member
     updated_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE event
+CREATE TABLE `show`
 (
     id          INT AUTO_INCREMENT PRIMARY KEY,
     title       VARCHAR(100) NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE event
 CREATE TABLE show_time
 (
     id         INT AUTO_INCREMENT PRIMARY KEY,
-    event_id   INT,
+    show_id   INT,
     date       DATE      NOT NULL,
     start_time TIME      NOT NULL,
     end_time   TIME      NOT NULL,
@@ -85,5 +85,5 @@ CREATE TABLE inventory
 );
 
 CREATE INDEX idx_show_seat_show_seat_id ON show_seat (show_id, seat_id, status);
-CREATE INDEX idx_show_date_event_id ON showTime (date, event_id);
+CREATE INDEX idx_show_date_show_id ON showTime (date, show_id);
 CREATE INDEX idx_inventory_show_id_grade ON inventory (show_id, grade);

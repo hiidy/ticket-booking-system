@@ -7,7 +7,7 @@ public record ShowSummaryResponse(
     return new ShowSummaryResponse(
         queryDto.showId(),
         queryDto.eventTitle(),
-        queryDto.eventType().name(),
+        queryDto.showType().name(),
         queryDto.startTime().toString(),
         queryDto.date().toString(),
         queryDto.venueName());

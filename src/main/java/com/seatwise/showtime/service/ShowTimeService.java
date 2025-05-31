@@ -2,8 +2,8 @@ package com.seatwise.showtime.service;
 
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
-import com.seatwise.event.entity.Event;
-import com.seatwise.event.repository.EventRepository;
+import com.seatwise.show.entity.Show;
+import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.showtime.dto.request.ShowSearchCondition;
 import com.seatwise.showtime.dto.request.ShowTimeCreateRequest;
 import com.seatwise.showtime.dto.response.ShowDatesResponse;
@@ -26,14 +26,14 @@ import org.springframework.stereotype.Service;
 public class ShowTimeService {
 
   private final ShowTimeRepository showTimeRepository;
-  private final EventRepository eventRepository;
+  private final ShowRepository showRepository;
   private final VenueRepository venueRepository;
 
   public ShowTimeCreateResponse createShow(ShowTimeCreateRequest request) {
-    List<ShowTime> existingShowTimes = showTimeRepository.findByEventId(request.eventId());
+    List<ShowTime> existingShowTimes = showTimeRepository.findByShowId(request.eventId());
 
-    Event event =
-        eventRepository
+    Show show =
+        showRepository
             .findById(request.eventId())
             .orElseThrow(() -> new BusinessException(ErrorCode.EVENT_NOT_FOUND));
 
@@ -43,7 +43,7 @@ public class ShowTimeService {
             .orElseThrow(() -> new BusinessException(ErrorCode.VENUE_NOT_FOUND));
 
     ShowTime newShowTime =
-        new ShowTime(event, venue, request.date(), request.startTime(), request.endTime());
+        new ShowTime(show, venue, request.date(), request.startTime(), request.endTime());
     validateOverlappingShow(existingShowTimes, newShowTime);
     return ShowTimeCreateResponse.from(showTimeRepository.save(newShowTime));
   }
@@ -62,7 +62,7 @@ public class ShowTimeService {
     LocalDate startDate = LocalDate.of(year, month, 1);
     LocalDate endDate = startDate.plusMonths(1);
     List<ShowTime> showTimes =
-        showTimeRepository.findByEventIdAndDateBetween(eventId, startDate, endDate);
+        showTimeRepository.findByShowIdAndDateBetween(eventId, startDate, endDate);
     return showTimes.stream().map(ShowDatesResponse::from).toList();
   }
 

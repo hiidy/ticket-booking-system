@@ -1,6 +1,6 @@
 package com.seatwise.showtime.repository;
 
-import com.seatwise.event.entity.EventType;
+import com.seatwise.show.entity.ShowType;
 import com.seatwise.showtime.dto.response.ShowSummaryQueryDto;
 import com.seatwise.showtime.entity.ShowTime;
 import io.lettuce.core.dynamic.annotation.Param;
@@ -17,21 +17,21 @@ import org.springframework.stereotype.Repository;
 public interface ShowTimeRepository
     extends JpaRepository<ShowTime, Long>, JpaSpecificationExecutor<ShowTime> {
 
-  List<ShowTime> findByEventId(Long eventId);
+  List<ShowTime> findByShowId(Long showId);
 
-  List<ShowTime> findByEventIdAndDateBetween(Long eventId, LocalDate startDate, LocalDate endDate);
+  List<ShowTime> findByShowIdAndDateBetween(Long showId, LocalDate startDate, LocalDate endDate);
 
-  List<ShowTime> findShowTimesByEventIdAndDate(Long eventId, LocalDate date);
+  List<ShowTime> findShowTimesByShowIdAndDate(Long showId, LocalDate date);
 
   @Query(
       """
-              select new com.seatwise.showtime.dto.response.ShowSummaryQueryDto(s.id, e.title, e.type, s.date, s.startTime, v.name)
-              from ShowTime s
-              join s.event e
-              join s.venue v
-              where e.type = :type and s.date > :date
-              order by s.date asc
+              select new com.seatwise.showtime.dto.response.ShowSummaryQueryDto(s.id, s.title, s.type, st.date, st.startTime, v.name)
+              from ShowTime st
+              join st.show s
+              join st.venue v
+              where s.type = :type and st.date > :date
+              order by st.date asc
           """)
   Slice<ShowSummaryQueryDto> findShowSummaryByTypeAndDate(
-      @Param("type") EventType type, @Param("date") LocalDate date, Pageable pageable);
+      @Param("type") ShowType type, @Param("date") LocalDate date, Pageable pageable);
 }

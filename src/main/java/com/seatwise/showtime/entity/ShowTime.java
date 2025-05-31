@@ -3,7 +3,7 @@ package com.seatwise.showtime.entity;
 import com.seatwise.common.domain.BaseEntity;
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
-import com.seatwise.event.entity.Event;
+import com.seatwise.show.entity.Show;
 import com.seatwise.venue.entity.Venue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -30,8 +30,8 @@ public class ShowTime extends BaseEntity {
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "event_id")
-  private Event event;
+  @JoinColumn(name = "show_id")
+  private Show show;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "venue_id")
@@ -43,10 +43,9 @@ public class ShowTime extends BaseEntity {
 
   private LocalTime endTime;
 
-  public ShowTime(
-      Event event, Venue venue, LocalDate date, LocalTime startTime, LocalTime endTime) {
+  public ShowTime(Show show, Venue venue, LocalDate date, LocalTime startTime, LocalTime endTime) {
     validateTimes(startTime, endTime);
-    this.event = event;
+    this.show = show;
     this.date = date;
     this.startTime = startTime;
     this.endTime = endTime;

@@ -1,4 +1,4 @@
-package com.seatwise.event.entity;
+package com.seatwise.show.entity;
 
 import com.seatwise.common.domain.BaseEntity;
 import jakarta.persistence.Entity;
@@ -13,10 +13,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "event")
+@Table(name = "`show`")
 @NoArgsConstructor
 @Getter
-public class Event extends BaseEntity {
+public class Show extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,10 +27,10 @@ public class Event extends BaseEntity {
   private String description;
 
   @Enumerated(EnumType.STRING)
-  private EventType type;
+  private ShowType type;
 
   @Builder
-  public Event(String title, String description, EventType type) {
+  public Show(String title, String description, ShowType type) {
     this.title = title;
     this.description = description;
     this.type = type;

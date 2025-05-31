@@ -1,13 +1,13 @@
 package com.seatwise.showtime.dto.response;
 
-import com.seatwise.event.entity.EventType;
+import com.seatwise.show.entity.ShowType;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 public record ShowSummaryQueryDto(
     Long showId,
     String eventTitle,
-    EventType eventType,
+    ShowType showType,
     LocalDate date,
     LocalTime startTime,
     String venueName) {}

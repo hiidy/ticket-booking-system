@@ -1,9 +1,9 @@
-package com.seatwise.event.controller;
+package com.seatwise.show.controller;
 
-import com.seatwise.event.dto.request.EventRequest;
-import com.seatwise.event.dto.response.EventCreateResponse;
-import com.seatwise.event.dto.response.EventResponse;
-import com.seatwise.event.service.EventService;
+import com.seatwise.show.dto.request.ShowRequest;
+import com.seatwise.show.dto.response.ShowCreateResponse;
+import com.seatwise.show.dto.response.ShowResponse;
+import com.seatwise.show.service.ShowService;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
@@ -18,18 +18,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/events")
 @RequiredArgsConstructor
-public class EventController {
+public class ShowController {
 
-  private final EventService eventService;
+  private final ShowService showService;
 
   @PostMapping
-  public ResponseEntity<Void> createEvent(@Valid @RequestBody EventRequest eventRequest) {
-    EventCreateResponse response = eventService.createEvent(eventRequest);
+  public ResponseEntity<Void> createEvent(@Valid @RequestBody ShowRequest showRequest) {
+    ShowCreateResponse response = showService.createEvent(showRequest);
     return ResponseEntity.created(URI.create("/api/events/" + response.id())).build();
   }
 
   @GetMapping("/{eventId}")
-  public ResponseEntity<EventResponse> findEventById(@PathVariable Long eventId) {
-    return ResponseEntity.ok(eventService.findEventById(eventId));
+  public ResponseEntity<ShowResponse> findEventById(@PathVariable Long eventId) {
+    return ResponseEntity.ok(showService.findEventById(eventId));
   }
 }
