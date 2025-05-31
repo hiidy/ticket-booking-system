@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 import com.seatwise.annotation.ServiceTest;
-import com.seatwise.common.builder.EventTestDataBuilder;
 import com.seatwise.common.builder.ShowTestDataBuilder;
+import com.seatwise.common.builder.ShowTimeTestDataBuilder;
 import com.seatwise.common.builder.VenueTestDataBuilder;
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.seat.entity.Seat;
@@ -36,8 +36,8 @@ class ShowTimeSeatServiceTest {
   @Autowired private ShowSeatService showSeatService;
   @Autowired private SeatRepository seatRepository;
   @Autowired private ShowSeatRepository showSeatRepository;
-  @Autowired private ShowTestDataBuilder showData;
-  @Autowired private EventTestDataBuilder eventData;
+  @Autowired private ShowTimeTestDataBuilder showData;
+  @Autowired private ShowTestDataBuilder eventData;
   @Autowired private VenueTestDataBuilder venueData;
 
   private ShowTime showTime;

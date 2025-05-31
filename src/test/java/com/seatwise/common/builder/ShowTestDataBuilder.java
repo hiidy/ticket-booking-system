@@ -1,47 +1,40 @@
 package com.seatwise.common.builder;
 
 import com.seatwise.show.entity.Show;
-import com.seatwise.showtime.entity.ShowTime;
-import com.seatwise.showtime.repository.ShowTimeRepository;
-import com.seatwise.venue.entity.Venue;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import com.seatwise.show.entity.ShowType;
+import com.seatwise.show.repository.ShowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ShowTestDataBuilder {
 
-  @Autowired private ShowTimeRepository showTimeRepository;
-  private Show show;
-  private Venue venue;
-  private LocalDate date;
-  private LocalTime startTime;
-  private LocalTime endTime;
+  @Autowired private ShowRepository showRepository;
+  private String title;
+  private String description;
+  private ShowType type;
 
-  public ShowTestDataBuilder withEvent(Show show) {
-    this.show = show;
+  public ShowTestDataBuilder(ShowRepository showRepository) {
+    this.showRepository = showRepository;
+  }
+
+  public ShowTestDataBuilder withTitle(String title) {
+    this.title = title;
     return this;
   }
 
-  public ShowTestDataBuilder withVenue(Venue venue) {
-    this.venue = venue;
+  public ShowTestDataBuilder withDescription(String description) {
+    this.description = description;
     return this;
   }
 
-  public ShowTestDataBuilder withDate(LocalDate date) {
-    this.date = date;
+  public ShowTestDataBuilder withType(ShowType type) {
+    this.type = type;
     return this;
   }
 
-  public ShowTestDataBuilder withTime(LocalTime startTime, LocalTime endTime) {
-    this.startTime = startTime;
-    this.endTime = endTime;
-    return this;
-  }
-
-  public ShowTime build() {
-    ShowTime showTime = new ShowTime(show, venue, date, startTime, endTime);
-    return showTimeRepository.save(showTime);
+  public Show build() {
+    Show show = new Show(title, description, type);
+    return showRepository.save(show);
   }
 }
