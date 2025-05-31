@@ -1,7 +1,7 @@
 package com.seatwise.common.builder;
 
-import com.seatwise.event.domain.Event;
-import com.seatwise.event.domain.EventType;
+import com.seatwise.event.entity.Event;
+import com.seatwise.event.entity.EventType;
 import com.seatwise.event.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

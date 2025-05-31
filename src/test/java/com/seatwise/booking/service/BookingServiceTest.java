@@ -12,10 +12,10 @@ import com.seatwise.member.repository.MemberRepository;
 import com.seatwise.seat.entity.Seat;
 import com.seatwise.seat.entity.SeatGrade;
 import com.seatwise.seat.repository.SeatRepository;
-import com.seatwise.show.entity.Show;
-import com.seatwise.show.entity.ShowSeat;
-import com.seatwise.show.entity.Status;
-import com.seatwise.show.repository.ShowSeatRepository;
+import com.seatwise.showtime.entity.ShowSeat;
+import com.seatwise.showtime.entity.ShowTime;
+import com.seatwise.showtime.entity.Status;
+import com.seatwise.showtime.repository.ShowSeatRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -40,12 +40,12 @@ class BookingServiceTest {
     LocalTime startTime = LocalTime.of(18, 0);
     LocalTime endTime = LocalTime.of(20, 0);
 
-    Show show = showTestDataBuilder.withTime(startTime, endTime).withDate(date).build();
+    ShowTime showTime = showTestDataBuilder.withTime(startTime, endTime).withDate(date).build();
 
     Seat seat = Seat.builder().seatNumber(1).grade(SeatGrade.A).build();
     seatRepository.save(seat);
 
-    showSeatRepository.save(ShowSeat.createAvailable(show, seat, 40000));
+    showSeatRepository.save(ShowSeat.createAvailable(showTime, seat, 40000));
 
     member = new Member("테스트유저", "abcd@gmail.com", "1234");
     memberRepository.save(member);

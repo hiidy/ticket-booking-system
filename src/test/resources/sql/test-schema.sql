@@ -32,7 +32,7 @@ CREATE TABLE event
     updated_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE `show`
+CREATE TABLE show_time
 (
     id         INT AUTO_INCREMENT PRIMARY KEY,
     event_id   INT,
@@ -56,7 +56,7 @@ CREATE TABLE booking
 CREATE TABLE show_seat
 (
     id              INT AUTO_INCREMENT PRIMARY KEY,
-    show_id         INT          NOT NULL,
+    show_time_id         INT          NOT NULL,
     seat_id         INT          NOT NULL,
     booking_id      INT,
     price           BIGINT       NOT NULL,
@@ -85,5 +85,5 @@ CREATE TABLE inventory
 );
 
 CREATE INDEX idx_show_seat_show_seat_id ON show_seat (show_id, seat_id, status);
-CREATE INDEX idx_show_date_event_id ON `show` (date, event_id);
+CREATE INDEX idx_show_date_event_id ON showTime (date, event_id);
 CREATE INDEX idx_inventory_show_id_grade ON inventory (show_id, grade);
