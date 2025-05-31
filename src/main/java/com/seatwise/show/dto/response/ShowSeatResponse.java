@@ -1,7 +1,7 @@
 package com.seatwise.show.dto.response;
 
-import com.seatwise.seat.domain.SeatGrade;
-import com.seatwise.show.domain.ShowSeat;
+import com.seatwise.seat.entity.SeatGrade;
+import com.seatwise.show.entity.ShowSeat;
 import java.time.LocalDateTime;
 
 public record ShowSeatResponse(

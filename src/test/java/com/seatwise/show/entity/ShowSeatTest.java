@@ -1,11 +1,11 @@
-package com.seatwise.show.domain;
+package com.seatwise.show.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.seatwise.booking.domain.Booking;
+import com.seatwise.booking.entity.Booking;
 import com.seatwise.common.exception.BusinessException;
-import com.seatwise.member.domain.Member;
+import com.seatwise.member.entity.Member;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;

@@ -1,6 +1,6 @@
 package com.seatwise.show.dto.response;
 
-import com.seatwise.event.domain.EventType;
+import com.seatwise.event.entity.EventType;
 import java.time.LocalDate;
 import java.time.LocalTime;
 

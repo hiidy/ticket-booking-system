@@ -1,7 +1,7 @@
-package com.seatwise.seat.domain;
+package com.seatwise.seat.entity;
 
 import com.seatwise.common.domain.BaseEntity;
-import com.seatwise.venue.domain.Venue;
+import com.seatwise.venue.entity.Venue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

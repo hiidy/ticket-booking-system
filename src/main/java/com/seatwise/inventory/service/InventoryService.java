@@ -2,8 +2,8 @@ package com.seatwise.inventory.service;
 
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
-import com.seatwise.inventory.domain.ShowInventory;
 import com.seatwise.inventory.dto.ShowInventoryResponse;
+import com.seatwise.inventory.entity.ShowInventory;
 import com.seatwise.inventory.repository.InventoryRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

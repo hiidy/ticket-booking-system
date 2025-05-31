@@ -6,9 +6,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.seatwise.common.exception.BusinessException;
-import com.seatwise.inventory.domain.ShowInventory;
+import com.seatwise.inventory.entity.ShowInventory;
 import com.seatwise.inventory.repository.InventoryRepository;
-import com.seatwise.seat.domain.SeatGrade;
+import com.seatwise.seat.entity.SeatGrade;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

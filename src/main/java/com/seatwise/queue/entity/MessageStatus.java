@@ -1,4 +1,4 @@
-package com.seatwise.queue.domain;
+package com.seatwise.queue.entity;
 
 import lombok.Getter;
 

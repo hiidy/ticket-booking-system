@@ -1,15 +1,15 @@
 package com.seatwise.booking.service;
 
-import com.seatwise.booking.domain.Booking;
 import com.seatwise.booking.dto.BookingRequest;
+import com.seatwise.booking.entity.Booking;
 import com.seatwise.booking.repository.BookingRepository;
 import com.seatwise.common.exception.BookingException;
 import com.seatwise.common.exception.ErrorCode;
-import com.seatwise.member.domain.Member;
+import com.seatwise.member.entity.Member;
 import com.seatwise.member.repository.MemberRepository;
 import com.seatwise.queue.dto.BookingMessage;
 import com.seatwise.queue.service.BookingMessageProducer;
-import com.seatwise.show.domain.ShowSeat;
+import com.seatwise.show.entity.ShowSeat;
 import com.seatwise.show.repository.ShowSeatRepository;
 import java.time.Duration;
 import java.time.LocalDateTime;

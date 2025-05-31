@@ -1,9 +1,9 @@
-package com.seatwise.show.domain;
+package com.seatwise.show.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.seatwise.seat.domain.Seat;
-import com.seatwise.seat.domain.SeatGrade;
+import com.seatwise.seat.entity.Seat;
+import com.seatwise.seat.entity.SeatGrade;
 import com.seatwise.seat.repository.SeatRepository;
 import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.show.repository.ShowSeatRepository;

@@ -1,8 +1,8 @@
-package com.seatwise.inventory.domain;
+package com.seatwise.inventory.entity;
 
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
-import com.seatwise.seat.domain.SeatGrade;
+import com.seatwise.seat.entity.SeatGrade;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

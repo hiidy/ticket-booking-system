@@ -1,6 +1,6 @@
 package com.seatwise.event.dto.response;
 
-import com.seatwise.event.domain.Event;
+import com.seatwise.event.entity.Event;
 
 public record EventCreateResponse(Long id) {
 

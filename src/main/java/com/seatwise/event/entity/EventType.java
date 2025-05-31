@@ -1,4 +1,4 @@
-package com.seatwise.event.domain;
+package com.seatwise.event.entity;
 
 import lombok.Getter;
 

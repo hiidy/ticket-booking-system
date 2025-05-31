@@ -1,6 +1,6 @@
 package com.seatwise.show.dto.response;
 
-import com.seatwise.show.domain.ShowSeat;
+import com.seatwise.show.entity.ShowSeat;
 import java.util.List;
 
 public record ShowSeatCreateResponse(List<Long> showSeatIds) {

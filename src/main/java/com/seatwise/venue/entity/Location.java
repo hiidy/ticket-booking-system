@@ -1,6 +1,5 @@
-package com.seatwise.member.domain;
+package com.seatwise.venue.entity;
 
-import com.seatwise.common.domain.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,24 +10,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "member")
+@Table(name = "location")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member extends BaseEntity {
+public class Location {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private String name;
+  private String address;
 
-  private String email;
+  private String city;
 
-  private String password;
-
-  public Member(String name, String email, String password) {
-    this.name = name;
-    this.email = email;
-    this.password = password;
+  public Location(String address, String city) {
+    this.address = address;
+    this.city = city;
   }
 }

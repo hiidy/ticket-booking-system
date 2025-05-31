@@ -1,6 +1,6 @@
 package com.seatwise.event.dto.response;
 
-import com.seatwise.event.domain.Event;
+import com.seatwise.event.entity.Event;
 
 public record EventResponse(Long id, String title, String description, String type) {
 

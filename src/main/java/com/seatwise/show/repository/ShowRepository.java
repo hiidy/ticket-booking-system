@@ -1,8 +1,8 @@
 package com.seatwise.show.repository;
 
-import com.seatwise.event.domain.EventType;
-import com.seatwise.show.domain.Show;
+import com.seatwise.event.entity.EventType;
 import com.seatwise.show.dto.response.ShowSummaryQueryDto;
+import com.seatwise.show.entity.Show;
 import io.lettuce.core.dynamic.annotation.Param;
 import java.time.LocalDate;
 import java.util.List;

@@ -1,10 +1,10 @@
-package com.seatwise.show.domain;
+package com.seatwise.show.entity;
 
-import com.seatwise.booking.domain.Booking;
+import com.seatwise.booking.entity.Booking;
 import com.seatwise.common.domain.BaseEntity;
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
-import com.seatwise.seat.domain.Seat;
+import com.seatwise.seat.entity.Seat;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

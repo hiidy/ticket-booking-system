@@ -1,7 +1,7 @@
 package com.seatwise.event.dto.request;
 
-import com.seatwise.event.domain.Event;
-import com.seatwise.event.domain.EventType;
+import com.seatwise.event.entity.Event;
+import com.seatwise.event.entity.EventType;
 import jakarta.validation.constraints.NotBlank;
 
 public record EventRequest(

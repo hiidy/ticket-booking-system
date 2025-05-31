@@ -1,10 +1,10 @@
-package com.seatwise.inventory.domain;
+package com.seatwise.inventory.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.seatwise.common.exception.BusinessException;
-import com.seatwise.seat.domain.SeatGrade;
+import com.seatwise.seat.entity.SeatGrade;
 import org.junit.jupiter.api.Test;
 
 class ShowInventoryTest {
