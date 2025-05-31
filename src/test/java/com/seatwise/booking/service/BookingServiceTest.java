@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.seatwise.annotation.ServiceTest;
-import com.seatwise.common.builder.ShowTestDataBuilder;
+import com.seatwise.common.builder.ShowTimeTestDataBuilder;
 import com.seatwise.common.exception.BookingException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.member.entity.Member;
@@ -32,7 +32,7 @@ class BookingServiceTest {
   @Autowired private ShowSeatRepository showSeatRepository;
   @Autowired private SeatRepository seatRepository;
   @Autowired private MemberRepository memberRepository;
-  @Autowired private ShowTestDataBuilder showTestDataBuilder;
+  @Autowired private ShowTimeTestDataBuilder showTimeTestDataBuilder;
 
   @BeforeEach
   void setUp() {
@@ -40,7 +40,7 @@ class BookingServiceTest {
     LocalTime startTime = LocalTime.of(18, 0);
     LocalTime endTime = LocalTime.of(20, 0);
 
-    ShowTime showTime = showTestDataBuilder.withTime(startTime, endTime).withDate(date).build();
+    ShowTime showTime = showTimeTestDataBuilder.withTime(startTime, endTime).withDate(date).build();
 
     Seat seat = Seat.builder().seatNumber(1).grade(SeatGrade.A).build();
     seatRepository.save(seat);
