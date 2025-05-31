@@ -1,21 +1,21 @@
 package com.seatwise.common.builder;
 
-import com.seatwise.event.entity.Event;
-import com.seatwise.event.entity.EventType;
-import com.seatwise.event.repository.EventRepository;
+import com.seatwise.show.entity.Show;
+import com.seatwise.show.entity.ShowType;
+import com.seatwise.show.repository.ShowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class EventTestDataBuilder {
 
-  @Autowired private EventRepository eventRepository;
+  @Autowired private ShowRepository showRepository;
   private String title;
   private String description;
-  private EventType type;
+  private ShowType type;
 
-  public EventTestDataBuilder(EventRepository eventRepository) {
-    this.eventRepository = eventRepository;
+  public EventTestDataBuilder(ShowRepository showRepository) {
+    this.showRepository = showRepository;
   }
 
   public EventTestDataBuilder withTitle(String title) {
@@ -28,13 +28,13 @@ public class EventTestDataBuilder {
     return this;
   }
 
-  public EventTestDataBuilder withType(EventType type) {
+  public EventTestDataBuilder withType(ShowType type) {
     this.type = type;
     return this;
   }
 
-  public Event build() {
-    Event event = new Event(title, description, type);
-    return eventRepository.save(event);
+  public Show build() {
+    Show show = new Show(title, description, type);
+    return showRepository.save(show);
   }
 }

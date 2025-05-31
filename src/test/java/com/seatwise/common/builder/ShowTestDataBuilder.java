@@ -1,6 +1,6 @@
 package com.seatwise.common.builder;
 
-import com.seatwise.event.entity.Event;
+import com.seatwise.show.entity.Show;
 import com.seatwise.showtime.entity.ShowTime;
 import com.seatwise.showtime.repository.ShowTimeRepository;
 import com.seatwise.venue.entity.Venue;
@@ -13,14 +13,14 @@ import org.springframework.stereotype.Component;
 public class ShowTestDataBuilder {
 
   @Autowired private ShowTimeRepository showTimeRepository;
-  private Event event;
+  private Show show;
   private Venue venue;
   private LocalDate date;
   private LocalTime startTime;
   private LocalTime endTime;
 
-  public ShowTestDataBuilder withEvent(Event event) {
-    this.event = event;
+  public ShowTestDataBuilder withEvent(Show show) {
+    this.show = show;
     return this;
   }
 
@@ -41,7 +41,7 @@ public class ShowTestDataBuilder {
   }
 
   public ShowTime build() {
-    ShowTime showTime = new ShowTime(event, venue, date, startTime, endTime);
+    ShowTime showTime = new ShowTime(show, venue, date, startTime, endTime);
     return showTimeRepository.save(showTime);
   }
 }
