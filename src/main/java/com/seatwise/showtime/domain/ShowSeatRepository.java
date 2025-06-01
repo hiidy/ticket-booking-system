@@ -14,20 +14,23 @@ import org.springframework.data.jpa.repository.QueryHints;
 public interface ShowSeatRepository extends JpaRepository<ShowSeat, Long> {
 
   @Query(
-      "SELECT ss from ShowSeat ss " + "JOIN FETCH ss.seat st " + "WHERE ss.showTime.id = :showId")
-  List<ShowSeat> findAllByShowId(Long showId);
+      "SELECT ss from ShowSeat ss "
+          + "JOIN FETCH ss.seat st "
+          + "WHERE ss.showTime.id = :showTimeId")
+  List<ShowSeat> findAllByShowTimeId(Long showTimeId);
 
   @Query(
-      value =
-          "SELECT "
-              + "st.grade AS grade, "
-              + "COUNT(ss.id) AS totalCount, "
-              + "SUM(CASE WHEN ss.status IN ('AVAILABLE', 'PAYMENT_PENDING') THEN 1 ELSE 0 END) AS availableCount "
-              + "FROM show_seat ss "
-              + "JOIN seat st ON ss.seat_id = st.id "
-              + "WHERE ss.show_time_id = :showTimeId "
-              + "GROUP BY st.grade",
-      nativeQuery = true)
+      """
+      select new com.seatwise.showtime.dto.response.SeatAvailabilityResponse(
+              s.grade,
+              count(ss),
+              sum(case when ss.status in ('AVAILABLE','PAYMENT_PENDING') then 1 else 0 end)
+      )
+      from ShowSeat ss
+      join ss.seat s
+      where ss.showTime.id = :showTimeId
+      group by s.grade
+      """)
   List<SeatAvailabilityResponse> findSeatAvailabilityByShowId(@Param("showTimeId") Long showTimeId);
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)

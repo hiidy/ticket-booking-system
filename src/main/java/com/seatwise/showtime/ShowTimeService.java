@@ -8,10 +8,10 @@ import com.seatwise.showtime.domain.ShowTime;
 import com.seatwise.showtime.domain.ShowTimeRepository;
 import com.seatwise.showtime.dto.request.ShowSearchCondition;
 import com.seatwise.showtime.dto.request.ShowTimeCreateRequest;
-import com.seatwise.showtime.dto.response.ShowDatesResponse;
 import com.seatwise.showtime.dto.response.ShowSummaryQueryDto;
 import com.seatwise.showtime.dto.response.ShowSummaryResponse;
 import com.seatwise.showtime.dto.response.ShowTimeCreateResponse;
+import com.seatwise.showtime.dto.response.ShowTimeSummaryResponse;
 import com.seatwise.venue.domain.Venue;
 import com.seatwise.venue.domain.VenueRepository;
 import java.time.LocalDate;
@@ -30,11 +30,11 @@ public class ShowTimeService {
   private final VenueRepository venueRepository;
 
   public ShowTimeCreateResponse createShow(ShowTimeCreateRequest request) {
-    List<ShowTime> existingShowTimes = showTimeRepository.findByShowId(request.eventId());
+    List<ShowTime> existingShowTimes = showTimeRepository.findByShowId(request.showId());
 
     Show show =
         showRepository
-            .findById(request.eventId())
+            .findById(request.showId())
             .orElseThrow(() -> new BusinessException(ErrorCode.EVENT_NOT_FOUND));
 
     Venue venue =
@@ -58,12 +58,12 @@ public class ShowTimeService {
     }
   }
 
-  public List<ShowDatesResponse> getAvailableDates(Long eventId, int year, int month) {
+  public List<ShowTimeSummaryResponse> getAvailableDates(Long showId, int year, int month) {
     LocalDate startDate = LocalDate.of(year, month, 1);
     LocalDate endDate = startDate.plusMonths(1);
     List<ShowTime> showTimes =
-        showTimeRepository.findByShowIdAndDateBetween(eventId, startDate, endDate);
-    return showTimes.stream().map(ShowDatesResponse::from).toList();
+        showTimeRepository.findByShowIdAndDateBetween(showId, startDate, endDate);
+    return showTimes.stream().map(ShowTimeSummaryResponse::from).toList();
   }
 
   public List<ShowSummaryResponse> getShows(

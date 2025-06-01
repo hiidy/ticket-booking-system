@@ -48,7 +48,7 @@ public class ShowSeatService {
   }
 
   public List<ShowSeatResponse> getShowSeats(Long showId) {
-    List<ShowSeat> showSeats = showSeatRepository.findAllByShowId(showId);
+    List<ShowSeat> showSeats = showSeatRepository.findAllByShowTimeId(showId);
     LocalDateTime requestTime = LocalDateTime.now();
     if (showSeats.isEmpty()) {
       throw new BusinessException(ErrorCode.SHOW_SEAT_NOT_FOUND);

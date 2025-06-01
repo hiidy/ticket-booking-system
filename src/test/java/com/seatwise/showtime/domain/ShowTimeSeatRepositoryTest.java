@@ -37,7 +37,7 @@ class ShowTimeSeatRepositoryTest {
     showSeatRepository.saveAll(List.of(showSeat, showSeat1));
 
     // when
-    List<ShowSeat> showSeats = showSeatRepository.findAllByShowId(showTime.getId());
+    List<ShowSeat> showSeats = showSeatRepository.findAllByShowTimeId(showTime.getId());
 
     // then
     assertThat(showSeats).hasSize(2);
@@ -62,7 +62,7 @@ class ShowTimeSeatRepositoryTest {
     showSeatRepository.saveAll(List.of(showSeat, showSeat1));
 
     // when
-    List<ShowSeat> showSeats = showSeatRepository.findAllByShowId(showTime.getId());
+    List<ShowSeat> showSeats = showSeatRepository.findAllByShowTimeId(showTime.getId());
 
     // then
     assertThat(showSeats).hasSize(2);
