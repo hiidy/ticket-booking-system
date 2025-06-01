@@ -1,4 +1,4 @@
-package com.seatwise.show.entity;
+package com.seatwise.show.domain;
 
 import com.seatwise.common.domain.BaseEntity;
 import jakarta.persistence.Entity;

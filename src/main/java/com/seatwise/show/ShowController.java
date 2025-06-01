@@ -1,9 +1,8 @@
-package com.seatwise.show.controller;
+package com.seatwise.show;
 
 import com.seatwise.show.dto.request.ShowRequest;
 import com.seatwise.show.dto.response.ShowCreateResponse;
 import com.seatwise.show.dto.response.ShowResponse;
-import com.seatwise.show.service.ShowService;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;

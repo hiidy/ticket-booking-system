@@ -1,7 +1,7 @@
 package com.seatwise.show.dto.request;
 
-import com.seatwise.show.entity.Show;
-import com.seatwise.show.entity.ShowType;
+import com.seatwise.show.domain.Show;
+import com.seatwise.show.domain.ShowType;
 import jakarta.validation.constraints.NotBlank;
 
 public record ShowRequest(

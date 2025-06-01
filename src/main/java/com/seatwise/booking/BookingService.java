@@ -9,7 +9,7 @@ import com.seatwise.common.exception.BookingException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.member.Member;
 import com.seatwise.member.MemberRepository;
-import com.seatwise.showtime.entity.ShowSeat;
+import com.seatwise.showtime.domain.ShowSeat;
 import com.seatwise.showtime.repository.ShowSeatRepository;
 import java.time.Duration;
 import java.time.LocalDateTime;

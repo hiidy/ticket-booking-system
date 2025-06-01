@@ -1,10 +1,10 @@
-package com.seatwise.showtime.entity;
+package com.seatwise.showtime.domain;
 
 import static org.assertj.core.api.Assertions.*;
 
-import com.seatwise.show.entity.Show;
-import com.seatwise.show.entity.ShowType;
-import com.seatwise.show.repository.ShowRepository;
+import com.seatwise.show.domain.Show;
+import com.seatwise.show.domain.ShowType;
+import com.seatwise.show.domain.ShowRepository;
 import com.seatwise.showtime.repository.ShowTimeRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;

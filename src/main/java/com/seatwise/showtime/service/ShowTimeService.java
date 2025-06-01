@@ -2,15 +2,15 @@ package com.seatwise.showtime.service;
 
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
-import com.seatwise.show.entity.Show;
-import com.seatwise.show.repository.ShowRepository;
+import com.seatwise.show.domain.Show;
+import com.seatwise.show.domain.ShowRepository;
 import com.seatwise.showtime.dto.request.ShowSearchCondition;
 import com.seatwise.showtime.dto.request.ShowTimeCreateRequest;
 import com.seatwise.showtime.dto.response.ShowDatesResponse;
 import com.seatwise.showtime.dto.response.ShowSummaryQueryDto;
 import com.seatwise.showtime.dto.response.ShowSummaryResponse;
 import com.seatwise.showtime.dto.response.ShowTimeCreateResponse;
-import com.seatwise.showtime.entity.ShowTime;
+import com.seatwise.showtime.domain.ShowTime;
 import com.seatwise.showtime.repository.ShowTimeRepository;
 import com.seatwise.venue.entity.Venue;
 import com.seatwise.venue.repository.VenueRepository;

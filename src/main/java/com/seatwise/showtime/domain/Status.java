@@ -1,4 +1,4 @@
-package com.seatwise.showtime.entity;
+package com.seatwise.showtime.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

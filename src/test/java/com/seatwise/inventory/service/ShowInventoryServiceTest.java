@@ -9,7 +9,7 @@ import com.seatwise.common.exception.BusinessException;
 import com.seatwise.inventory.ShowInventoryService;
 import com.seatwise.inventory.domain.ShowInventory;
 import com.seatwise.inventory.domain.ShowInventoryRepository;
-import com.seatwise.seat.entity.SeatGrade;
+import com.seatwise.seat.domain.SeatGrade;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

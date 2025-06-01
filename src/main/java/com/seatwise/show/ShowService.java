@@ -1,12 +1,12 @@
-package com.seatwise.show.service;
+package com.seatwise.show;
 
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.show.dto.request.ShowRequest;
 import com.seatwise.show.dto.response.ShowCreateResponse;
 import com.seatwise.show.dto.response.ShowResponse;
-import com.seatwise.show.entity.Show;
-import com.seatwise.show.repository.ShowRepository;
+import com.seatwise.show.domain.Show;
+import com.seatwise.show.domain.ShowRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

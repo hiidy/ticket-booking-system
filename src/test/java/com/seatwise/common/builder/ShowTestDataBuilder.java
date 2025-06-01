@@ -1,8 +1,8 @@
 package com.seatwise.common.builder;
 
-import com.seatwise.show.entity.Show;
-import com.seatwise.show.entity.ShowType;
-import com.seatwise.show.repository.ShowRepository;
+import com.seatwise.show.domain.Show;
+import com.seatwise.show.domain.ShowType;
+import com.seatwise.show.domain.ShowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -1,7 +1,7 @@
 package com.seatwise.common.builder;
 
-import com.seatwise.show.entity.Show;
-import com.seatwise.showtime.entity.ShowTime;
+import com.seatwise.show.domain.Show;
+import com.seatwise.showtime.domain.ShowTime;
 import com.seatwise.showtime.repository.ShowTimeRepository;
 import com.seatwise.venue.entity.Venue;
 import java.time.LocalDate;
