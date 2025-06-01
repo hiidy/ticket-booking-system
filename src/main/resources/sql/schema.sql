@@ -35,7 +35,7 @@ CREATE TABLE `show`
 CREATE TABLE show_time
 (
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
-    show_id   BIGINT    NOT NULL,
+    show_id    BIGINT    NOT NULL,
     venue_id   BIGINT    NOT NULL,
     date       DATE      NOT NULL,
     start_time TIME      NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE booking
 CREATE TABLE show_seat
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
-    show_time_id         BIGINT       NOT NULL,
+    show_time_id    BIGINT       NOT NULL,
     seat_id         BIGINT       NOT NULL,
     booking_id      BIGINT,
     price           BIGINT       NOT NULL,
@@ -80,17 +80,10 @@ CREATE TABLE venue
 CREATE TABLE inventory
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
-    show_id         BIGINT      NOT NULL,
+    show_time_id    BIGINT      NOT NULL,
     grade           VARCHAR(50) NOT NULL,
     total_count     INT         NOT NULL,
     available_count INT         NOT NULL
-);
-
-CREATE TABLE location
-(
-    id      BIGINT AUTO_INCREMENT PRIMARY KEY,
-    address VARCHAR(50) NOT NULL,
-    city    VARCHAR(50) NOT NULL
 );
 
 create table stream_message
@@ -101,6 +94,7 @@ create table stream_message
     status      VARCHAR(50) NOT NULL
 );
 
-CREATE INDEX idx_show_seat_show_seat_id ON show_seat (show_id, seat_id, status);
-CREATE INDEX idx_show_date_show_id ON showTime (date, show_id);
+CREATE INDEX show_type_index ON `show` (type);
+CREATE INDEX show_seat_show_time_id_seat_id_status_index ON show_seat (show_time_id, seat_id, status);
+CREATE INDEX idx_show_date_show_id ON show_time (date, show_id);
 CREATE INDEX idx_inventory_show_id_grade ON inventory (show_id, grade);
