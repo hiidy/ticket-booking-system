@@ -1,10 +1,10 @@
-package com.seatwise.booking.service;
+package com.seatwise.booking;
 
 import com.seatwise.Messaging.dto.BookingMessage;
 import com.seatwise.Messaging.service.BookingMessageProducer;
+import com.seatwise.booking.domain.Booking;
+import com.seatwise.booking.domain.BookingRepository;
 import com.seatwise.booking.dto.BookingRequest;
-import com.seatwise.booking.entity.Booking;
-import com.seatwise.booking.repository.BookingRepository;
 import com.seatwise.common.exception.BookingException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.member.entity.Member;

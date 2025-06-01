@@ -1,9 +1,7 @@
-package com.seatwise.booking.controller;
+package com.seatwise.booking;
 
 import com.seatwise.booking.dto.BookingRequest;
 import com.seatwise.booking.dto.BookingResult;
-import com.seatwise.booking.service.BookingResultWaitService;
-import com.seatwise.booking.service.BookingService;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

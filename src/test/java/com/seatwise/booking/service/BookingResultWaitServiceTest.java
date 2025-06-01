@@ -2,6 +2,7 @@ package com.seatwise.booking.service;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.seatwise.booking.BookingResultWaitService;
 import com.seatwise.booking.dto.BookingResult;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;

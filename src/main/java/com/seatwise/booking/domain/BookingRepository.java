@@ -1,6 +1,5 @@
-package com.seatwise.booking.repository;
+package com.seatwise.booking.domain;
 
-import com.seatwise.booking.entity.Booking;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 

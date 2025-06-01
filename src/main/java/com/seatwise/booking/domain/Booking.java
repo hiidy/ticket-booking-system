@@ -1,4 +1,4 @@
-package com.seatwise.booking.entity;
+package com.seatwise.booking.domain;
 
 import com.seatwise.common.domain.BaseEntity;
 import com.seatwise.member.entity.Member;

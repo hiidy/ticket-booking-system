@@ -6,10 +6,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.seatwise.booking.BookingController;
+import com.seatwise.booking.BookingResultWaitService;
+import com.seatwise.booking.BookingService;
 import com.seatwise.booking.dto.BookingRequest;
 import com.seatwise.booking.dto.BookingResult;
-import com.seatwise.booking.service.BookingResultWaitService;
-import com.seatwise.booking.service.BookingService;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -23,12 +24,11 @@ import org.springframework.web.context.request.async.DeferredResult;
 @WebMvcTest(BookingController.class)
 class BookingControllerTest {
 
+  private static final UUID IDEMPOTENCY_KEY = UUID.randomUUID();
   @Autowired MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
   @MockBean private BookingService bookingService;
   @MockBean private BookingResultWaitService waitService;
-
-  private static final UUID IDEMPOTENCY_KEY = UUID.randomUUID();
 
   @Test
   void givenRequestWithIdempotencyKey_whenCreateBooking_thenReturnsOk() throws Exception {

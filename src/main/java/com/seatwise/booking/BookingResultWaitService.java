@@ -1,4 +1,4 @@
-package com.seatwise.booking.service;
+package com.seatwise.booking;
 
 import com.seatwise.booking.dto.BookingResult;
 import com.seatwise.common.exception.BookingException;

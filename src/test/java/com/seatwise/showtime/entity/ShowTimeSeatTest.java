@@ -3,7 +3,7 @@ package com.seatwise.showtime.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.seatwise.booking.entity.Booking;
+import com.seatwise.booking.domain.Booking;
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.member.entity.Member;
 import java.time.Duration;

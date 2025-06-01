@@ -1,6 +1,6 @@
 package com.seatwise.showtime.entity;
 
-import com.seatwise.booking.entity.Booking;
+import com.seatwise.booking.domain.Booking;
 import com.seatwise.common.domain.BaseEntity;
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
