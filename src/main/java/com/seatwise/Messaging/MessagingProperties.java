@@ -1,4 +1,4 @@
-package com.seatwise.queue;
+package com.seatwise.Messaging;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 
 @ConfigurationProperties(prefix = "queue")
 @Getter
-public class QueueProperties {
+public class MessagingProperties {
 
   @Min(value = 1, message = "샤드 수는 최소 1 이상이어야 합니다.")
   private final int shardCount;
@@ -21,7 +21,7 @@ public class QueueProperties {
   private final String consumerGroup;
 
   @ConstructorBinding
-  public QueueProperties(
+  public MessagingProperties(
       @DefaultValue("1") int shardCount,
       @DefaultValue("1") int instanceCount,
       @DefaultValue("booking-group") String consumerGroup) {

@@ -1,8 +1,8 @@
-package com.seatwise.queue.service;
+package com.seatwise.Messaging.service;
 
-import com.seatwise.queue.dto.request.StreamMessageRequest;
-import com.seatwise.queue.entity.StreamMessage;
-import com.seatwise.queue.repository.StreamMessageRepository;
+import com.seatwise.Messaging.dto.request.StreamMessageRequest;
+import com.seatwise.Messaging.entity.StreamMessage;
+import com.seatwise.Messaging.repository.StreamMessageRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

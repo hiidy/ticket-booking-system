@@ -1,11 +1,11 @@
-package com.seatwise.queue.service;
+package com.seatwise.Messaging.service;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.seatwise.queue.QueueProperties;
-import com.seatwise.queue.dto.BookingMessage;
+import com.seatwise.Messaging.MessagingProperties;
+import com.seatwise.Messaging.dto.BookingMessage;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import org.springframework.data.redis.hash.Jackson2HashMapper;
 class BookingMessageProducerTest {
 
   @Mock private RedisTemplate<String, Object> redisTemplate;
-  @Mock private QueueProperties queueProperties;
+  @Mock private MessagingProperties messagingProperties;
   @InjectMocks private BookingMessageProducer bookingMessageProducer;
 
   @Test
@@ -37,7 +37,7 @@ class BookingMessageProducerTest {
     List<Long> showSeatIds = List.of(1L, 2L);
     BookingMessage request =
         new BookingMessage(requestId.toString(), memberId, showSeatIds, sectionId);
-    when(queueProperties.getShardCount()).thenReturn(totalShard);
+    when(messagingProperties.getShardCount()).thenReturn(totalShard);
 
     StreamOperations<String, String, Object> streamOperations =
         Mockito.mock(StreamOperations.class);

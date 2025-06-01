@@ -1,8 +1,8 @@
-package com.seatwise.queue.service;
+package com.seatwise.Messaging.service;
 
-import com.seatwise.queue.QueueProperties;
-import com.seatwise.queue.StreamKeyGenerator;
-import com.seatwise.queue.dto.BookingMessage;
+import com.seatwise.Messaging.MessagingProperties;
+import com.seatwise.Messaging.StreamKeyGenerator;
+import com.seatwise.Messaging.dto.BookingMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.RedisConnectionFailureException;
@@ -20,13 +20,14 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class BookingMessageProducer {
 
-  private final QueueProperties queueProperties;
+  private final MessagingProperties messagingProperties;
   private final RedisTemplate<String, Object> redisTemplate;
 
   @Retryable(retryFor = RedisConnectionFailureException.class, backoff = @Backoff(delay = 1000))
   public void sendMessage(BookingMessage message) {
     String streamKey =
-        StreamKeyGenerator.forSectionShard(message.sectionId(), queueProperties.getShardCount());
+        StreamKeyGenerator.forSectionShard(
+            message.sectionId(), messagingProperties.getShardCount());
     ObjectRecord<String, BookingMessage> objectRecord =
         StreamRecords.newRecord().in(streamKey).ofObject(message);
     redisTemplate

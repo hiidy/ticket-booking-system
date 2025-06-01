@@ -1,12 +1,12 @@
 package com.seatwise;
 
-import com.seatwise.queue.QueueProperties;
+import com.seatwise.Messaging.MessagingProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
-@EnableConfigurationProperties(QueueProperties.class)
+@EnableConfigurationProperties(MessagingProperties.class)
 public class TicketBookingSystemApplication {
 
   public static void main(String[] args) {

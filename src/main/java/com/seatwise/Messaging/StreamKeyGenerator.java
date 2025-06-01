@@ -1,4 +1,4 @@
-package com.seatwise.queue;
+package com.seatwise.Messaging;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

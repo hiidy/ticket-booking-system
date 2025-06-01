@@ -1,4 +1,4 @@
-package com.seatwise.queue;
+package com.seatwise.Messaging;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

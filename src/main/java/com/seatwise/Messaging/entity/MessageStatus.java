@@ -1,4 +1,4 @@
-package com.seatwise.queue.entity;
+package com.seatwise.Messaging.entity;
 
 import lombok.Getter;
 

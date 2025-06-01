@@ -1,12 +1,12 @@
-package com.seatwise.queue.service;
+package com.seatwise.Messaging.service;
 
+import com.seatwise.Messaging.MessagingProperties;
+import com.seatwise.Messaging.StreamKeyGenerator;
+import com.seatwise.Messaging.dto.BookingMessage;
 import com.seatwise.booking.dto.BookingResult;
 import com.seatwise.booking.service.BookingResultWaitService;
 import com.seatwise.booking.service.BookingService;
 import com.seatwise.common.exception.BookingException;
-import com.seatwise.queue.QueueProperties;
-import com.seatwise.queue.StreamKeyGenerator;
-import com.seatwise.queue.dto.BookingMessage;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import java.util.UUID;
@@ -31,7 +31,7 @@ public class BookingMessageConsumer
   private final StreamMessageListenerContainer<String, ObjectRecord<String, BookingMessage>>
       container;
   private final RedisTemplate<String, Object> redisTemplate;
-  private final QueueProperties properties;
+  private final MessagingProperties properties;
   private final BookingService bookingService;
   private final BookingResultWaitService waitService;
   private final BookingMessageAckService bookingMessageAckService;

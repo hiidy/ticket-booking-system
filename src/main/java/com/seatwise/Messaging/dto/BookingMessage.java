@@ -1,4 +1,4 @@
-package com.seatwise.queue.dto;
+package com.seatwise.Messaging.dto;
 
 import java.util.List;
 
