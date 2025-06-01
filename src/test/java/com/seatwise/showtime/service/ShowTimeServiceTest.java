@@ -42,7 +42,7 @@ class ShowTimeServiceTest {
 
   @Test
   @DisplayName("show를 만들때 시간이 겹치면 예외 반환")
-  void createShow_WithOverlappingTime_ThrowsException() {
+  void createShowTime_WithOverlappingTime_ThrowsException() {
     // given
     ShowTime existingShowTime =
         new ShowTime(
@@ -58,7 +58,7 @@ class ShowTimeServiceTest {
             LocalTime.of(17, 0));
 
     // when & then
-    assertThatThrownBy(() -> showTimeService.createShow(request))
+    assertThatThrownBy(() -> showTimeService.createShowTime(request))
         .isInstanceOf(BusinessException.class)
         .hasMessage(ErrorCode.DUPLICATE_SHOW.getMessage());
   }

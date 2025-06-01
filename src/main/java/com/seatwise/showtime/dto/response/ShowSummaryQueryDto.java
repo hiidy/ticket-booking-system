@@ -6,8 +6,8 @@ import java.time.LocalTime;
 
 public record ShowSummaryQueryDto(
     Long showId,
-    String eventTitle,
-    ShowType showType,
+    String title,
+    ShowType type,
     LocalDate date,
     LocalTime startTime,
     String venueName) {}

@@ -29,7 +29,7 @@ public class ShowTimeService {
   private final ShowRepository showRepository;
   private final VenueRepository venueRepository;
 
-  public ShowTimeCreateResponse createShow(ShowTimeCreateRequest request) {
+  public ShowTimeCreateResponse createShowTime(ShowTimeCreateRequest request) {
     List<ShowTime> existingShowTimes = showTimeRepository.findByShowId(request.showId());
 
     Show show =
