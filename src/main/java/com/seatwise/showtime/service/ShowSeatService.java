@@ -2,7 +2,7 @@ package com.seatwise.showtime.service;
 
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
-import com.seatwise.seat.repository.SeatRepository;
+import com.seatwise.seat.domain.SeatRepository;
 import com.seatwise.showtime.dto.request.ShowSeatCreateRequest;
 import com.seatwise.showtime.dto.response.SeatAvailabilityResponse;
 import com.seatwise.showtime.dto.response.ShowSeatResponse;

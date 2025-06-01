@@ -4,7 +4,7 @@ import com.seatwise.booking.domain.Booking;
 import com.seatwise.common.domain.BaseEntity;
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
-import com.seatwise.seat.entity.Seat;
+import com.seatwise.seat.domain.Seat;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

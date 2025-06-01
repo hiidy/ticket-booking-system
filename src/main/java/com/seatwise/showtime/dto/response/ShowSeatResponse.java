@@ -1,6 +1,6 @@
 package com.seatwise.showtime.dto.response;
 
-import com.seatwise.seat.entity.SeatGrade;
+import com.seatwise.seat.domain.SeatGrade;
 import com.seatwise.showtime.entity.ShowSeat;
 import java.time.LocalDateTime;
 

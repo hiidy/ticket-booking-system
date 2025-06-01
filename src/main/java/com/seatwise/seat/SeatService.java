@@ -1,13 +1,13 @@
-package com.seatwise.seat.service;
+package com.seatwise.seat;
 
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
+import com.seatwise.seat.domain.Seat;
+import com.seatwise.seat.domain.SeatGrade;
+import com.seatwise.seat.domain.SeatRepository;
 import com.seatwise.seat.dto.request.SeatCreateRequest;
 import com.seatwise.seat.dto.request.SeatGradeRangeRequest;
 import com.seatwise.seat.dto.response.SeatCreateResponse;
-import com.seatwise.seat.entity.Seat;
-import com.seatwise.seat.entity.SeatGrade;
-import com.seatwise.seat.repository.SeatRepository;
 import com.seatwise.venue.entity.Venue;
 import com.seatwise.venue.repository.VenueRepository;
 import java.util.List;

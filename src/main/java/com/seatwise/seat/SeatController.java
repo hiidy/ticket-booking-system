@@ -1,8 +1,7 @@
-package com.seatwise.seat.controller;
+package com.seatwise.seat;
 
 import com.seatwise.seat.dto.request.SeatCreateRequest;
 import com.seatwise.seat.dto.response.SeatCreateResponse;
-import com.seatwise.seat.service.SeatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

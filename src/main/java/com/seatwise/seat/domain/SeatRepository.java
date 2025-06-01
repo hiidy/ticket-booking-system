@@ -1,6 +1,5 @@
-package com.seatwise.seat.repository;
+package com.seatwise.seat.domain;
 
-import com.seatwise.seat.entity.Seat;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

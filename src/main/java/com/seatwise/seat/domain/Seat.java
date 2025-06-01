@@ -1,4 +1,4 @@
-package com.seatwise.seat.entity;
+package com.seatwise.seat.domain;
 
 import com.seatwise.common.domain.BaseEntity;
 import com.seatwise.venue.entity.Venue;
