@@ -12,10 +12,12 @@ import com.seatwise.showtime.ShowTimeService;
 import com.seatwise.showtime.domain.ShowTime;
 import com.seatwise.showtime.domain.ShowTimeRepository;
 import com.seatwise.showtime.dto.request.ShowTimeCreateRequest;
+import com.seatwise.showtime.dto.response.ShowTimeSummaryResponse;
 import com.seatwise.venue.domain.Venue;
 import com.seatwise.venue.domain.VenueRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -61,5 +63,30 @@ class ShowTimeServiceTest {
     assertThatThrownBy(() -> showTimeService.createShowTime(request))
         .isInstanceOf(BusinessException.class)
         .hasMessage(ErrorCode.DUPLICATE_SHOW.getMessage());
+  }
+
+  @Test
+  void shouldReturnOnlyShowDatesWithinSpecifiedMonth() {
+    // given
+    LocalDate may31 = LocalDate.of(2025, 5, 31);
+    LocalDate june15 = LocalDate.of(2025, 6, 15);
+    LocalDate june30 = LocalDate.of(2025, 6, 30);
+    LocalDate july1 = LocalDate.of(2025, 7, 1);
+
+    showTimeRepository.saveAll(
+        List.of(
+            new ShowTime(show, venue, may31, LocalTime.of(10, 0), LocalTime.of(12, 0)),
+            new ShowTime(show, venue, june15, LocalTime.of(10, 0), LocalTime.of(12, 0)),
+            new ShowTime(show, venue, june30, LocalTime.of(14, 0), LocalTime.of(16, 0)),
+            new ShowTime(show, venue, july1, LocalTime.of(10, 0), LocalTime.of(12, 0))));
+
+    // when
+    List<ShowTimeSummaryResponse> results =
+        showTimeService.getAvailableDates(show.getId(), 2025, 6);
+
+    // then
+    assertThat(results)
+        .hasSize(2)
+        .allSatisfy(resp -> assertThat(resp.date().getMonthValue()).isEqualTo(6));
   }
 }

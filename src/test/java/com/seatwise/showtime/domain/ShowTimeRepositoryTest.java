@@ -31,13 +31,14 @@ class ShowTimeRepositoryTest {
     LocalTime endTime = startTime.plusHours(1);
 
     ShowTime showTime1 = new ShowTime(show, null, date, startTime, endTime);
-    ShowTime showTime2 = new ShowTime(show, null, date.plusDays(3), startTime, endTime);
-    ShowTime showTime3 = new ShowTime(show, null, date.plusDays(4), startTime, endTime);
+    ShowTime showTime2 = new ShowTime(show, null, date.plusDays(2), startTime, endTime);
+    ShowTime showTime3 = new ShowTime(show, null, date.plusDays(3), startTime, endTime);
     showTimeRepository.saveAll(List.of(showTime1, showTime2, showTime3));
 
     // when
     List<ShowTime> datesInRange =
-        showTimeRepository.findByShowIdAndDateBetween(show.getId(), date, date.plusDays(3));
+        showTimeRepository.findByShowIdAndDateGreaterThanEqualAndDateLessThan(
+            show.getId(), date, date.plusDays(3));
 
     // then
     assertThat(datesInRange).hasSize(2);

@@ -17,10 +17,12 @@ import com.seatwise.venue.domain.VenueRepository;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ShowTimeService {
@@ -58,11 +60,12 @@ public class ShowTimeService {
     }
   }
 
-  public List<ShowTimeSummaryResponse> getAvailableDates(Long showId, int year, int month) {
+  public List<ShowTimeSummaryResponse> getAvailableDates(Long showTimeId, int year, int month) {
     LocalDate startDate = LocalDate.of(year, month, 1);
     LocalDate endDate = startDate.plusMonths(1);
     List<ShowTime> showTimes =
-        showTimeRepository.findByShowIdAndDateBetween(showId, startDate, endDate);
+        showTimeRepository.findByShowIdAndDateGreaterThanEqualAndDateLessThan(
+            showTimeId, startDate, endDate);
     return showTimes.stream().map(ShowTimeSummaryResponse::from).toList();
   }
 

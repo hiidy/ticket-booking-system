@@ -18,8 +18,6 @@ public interface ShowTimeRepository
 
   List<ShowTime> findByShowId(Long showId);
 
-  List<ShowTime> findByShowIdAndDateBetween(Long showId, LocalDate startDate, LocalDate endDate);
-
   List<ShowTime> findShowTimesByShowIdAndDate(Long showId, LocalDate date);
 
   @Query(
@@ -33,4 +31,7 @@ public interface ShowTimeRepository
           """)
   Slice<ShowSummaryQueryDto> findShowSummaryByTypeAndDate(
       @Param("type") ShowType type, @Param("date") LocalDate date, Pageable pageable);
+
+  List<ShowTime> findByShowIdAndDateGreaterThanEqualAndDateLessThan(
+      Long showId, LocalDate startDate, LocalDate endDate);
 }
