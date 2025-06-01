@@ -1,7 +1,7 @@
 package com.seatwise.booking.domain;
 
 import com.seatwise.common.domain.BaseEntity;
-import com.seatwise.member.entity.Member;
+import com.seatwise.member.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

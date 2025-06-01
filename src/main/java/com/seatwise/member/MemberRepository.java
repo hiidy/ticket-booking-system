@@ -1,6 +1,5 @@
-package com.seatwise.member.repository;
+package com.seatwise.member;
 
-import com.seatwise.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {}
