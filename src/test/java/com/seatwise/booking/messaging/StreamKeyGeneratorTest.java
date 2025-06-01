@@ -1,4 +1,4 @@
-package com.seatwise.Messaging;
+package com.seatwise.booking.messaging;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

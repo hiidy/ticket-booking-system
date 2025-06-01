@@ -1,4 +1,4 @@
-package com.seatwise.Messaging;
+package com.seatwise.booking.messaging;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

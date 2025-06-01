@@ -1,4 +1,4 @@
-package com.seatwise.Messaging.entity;
+package com.seatwise.booking.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "stream_message")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class StreamMessage {
+public class BookingStreamMessage {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,13 +28,13 @@ public class StreamMessage {
   @Enumerated(value = EnumType.STRING)
   private MessageStatus status;
 
-  public StreamMessage(String streamName, String messageId, MessageStatus status) {
+  public BookingStreamMessage(String streamName, String messageId, MessageStatus status) {
     this.streamName = streamName;
     this.messageId = messageId;
     this.status = status;
   }
 
-  public static StreamMessage failed(String streamName, String messageId) {
-    return new StreamMessage(streamName, messageId, MessageStatus.FAILED);
+  public static BookingStreamMessage failed(String streamName, String messageId) {
+    return new BookingStreamMessage(streamName, messageId, MessageStatus.FAILED);
   }
 }

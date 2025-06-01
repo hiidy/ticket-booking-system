@@ -1,6 +1,6 @@
 package com.seatwise;
 
-import com.seatwise.Messaging.MessagingProperties;
+import com.seatwise.booking.messaging.MessagingProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

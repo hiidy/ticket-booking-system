@@ -1,8 +1,6 @@
-package com.seatwise.Messaging.service;
+package com.seatwise.booking.messaging;
 
-import com.seatwise.Messaging.MessagingProperties;
-import com.seatwise.Messaging.StreamKeyGenerator;
-import com.seatwise.Messaging.dto.BookingMessage;
+import com.seatwise.booking.dto.BookingMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.RedisConnectionFailureException;

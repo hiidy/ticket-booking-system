@@ -1,4 +1,4 @@
-package com.seatwise.Messaging.entity;
+package com.seatwise.booking.domain;
 
 import lombok.Getter;
 

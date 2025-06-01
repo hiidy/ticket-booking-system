@@ -1,4 +1,4 @@
-package com.seatwise.Messaging;
+package com.seatwise.booking.messaging;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

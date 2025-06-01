@@ -1,10 +1,8 @@
-package com.seatwise.Messaging.service;
+package com.seatwise.booking.messaging;
 
-import com.seatwise.Messaging.MessagingProperties;
-import com.seatwise.Messaging.StreamKeyGenerator;
-import com.seatwise.Messaging.dto.BookingMessage;
 import com.seatwise.booking.BookingResultWaitService;
 import com.seatwise.booking.BookingService;
+import com.seatwise.booking.dto.BookingMessage;
 import com.seatwise.booking.dto.BookingResult;
 import com.seatwise.common.exception.BookingException;
 import jakarta.annotation.PostConstruct;

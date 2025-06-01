@@ -1,4 +1,4 @@
-package com.seatwise.Messaging.dto;
+package com.seatwise.booking.dto;
 
 import java.util.List;
 

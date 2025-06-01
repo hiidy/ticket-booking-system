@@ -1,14 +1,13 @@
-package com.seatwise.Messaging.service;
+package com.seatwise.booking.messaging;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.seatwise.Messaging.StreamKeyGenerator;
-import com.seatwise.Messaging.dto.BookingMessage;
 import com.seatwise.annotation.EmbeddedRedisTest;
 import com.seatwise.booking.BookingService;
+import com.seatwise.booking.dto.BookingMessage;
 import com.seatwise.booking.dto.BookingResult;
 import com.seatwise.common.exception.BookingException;
 import com.seatwise.common.exception.ErrorCode;
