@@ -10,7 +10,7 @@ import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.member.Member;
 import com.seatwise.member.MemberRepository;
 import com.seatwise.showtime.domain.ShowSeat;
-import com.seatwise.showtime.repository.ShowSeatRepository;
+import com.seatwise.showtime.domain.ShowSeatRepository;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;

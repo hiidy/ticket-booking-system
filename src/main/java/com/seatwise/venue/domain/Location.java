@@ -1,4 +1,4 @@
-package com.seatwise.venue.entity;
+package com.seatwise.venue.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

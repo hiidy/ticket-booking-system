@@ -2,8 +2,8 @@ package com.seatwise.common.builder;
 
 import com.seatwise.show.domain.Show;
 import com.seatwise.showtime.domain.ShowTime;
-import com.seatwise.showtime.repository.ShowTimeRepository;
-import com.seatwise.venue.entity.Venue;
+import com.seatwise.showtime.domain.ShowTimeRepository;
+import com.seatwise.venue.domain.Venue;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.springframework.beans.factory.annotation.Autowired;

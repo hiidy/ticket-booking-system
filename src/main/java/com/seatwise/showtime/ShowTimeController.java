@@ -1,4 +1,4 @@
-package com.seatwise.showtime.controller;
+package com.seatwise.showtime;
 
 import com.seatwise.showtime.dto.request.ShowSearchCondition;
 import com.seatwise.showtime.dto.request.ShowSeatCreateRequest;
@@ -8,8 +8,6 @@ import com.seatwise.showtime.dto.response.ShowDatesResponse;
 import com.seatwise.showtime.dto.response.ShowSeatResponse;
 import com.seatwise.showtime.dto.response.ShowSummaryResponse;
 import com.seatwise.showtime.dto.response.ShowTimeCreateResponse;
-import com.seatwise.showtime.service.ShowSeatService;
-import com.seatwise.showtime.service.ShowTimeService;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;

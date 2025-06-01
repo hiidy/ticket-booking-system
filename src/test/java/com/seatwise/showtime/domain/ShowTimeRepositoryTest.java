@@ -3,9 +3,8 @@ package com.seatwise.showtime.domain;
 import static org.assertj.core.api.Assertions.*;
 
 import com.seatwise.show.domain.Show;
-import com.seatwise.show.domain.ShowType;
 import com.seatwise.show.domain.ShowRepository;
-import com.seatwise.showtime.repository.ShowTimeRepository;
+import com.seatwise.show.domain.ShowType;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;

@@ -1,15 +1,15 @@
-package com.seatwise.showtime.service;
+package com.seatwise.showtime;
 
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.seat.domain.SeatRepository;
+import com.seatwise.showtime.domain.ShowSeat;
+import com.seatwise.showtime.domain.ShowSeatRepository;
+import com.seatwise.showtime.domain.ShowTime;
+import com.seatwise.showtime.domain.ShowTimeRepository;
 import com.seatwise.showtime.dto.request.ShowSeatCreateRequest;
 import com.seatwise.showtime.dto.response.SeatAvailabilityResponse;
 import com.seatwise.showtime.dto.response.ShowSeatResponse;
-import com.seatwise.showtime.domain.ShowSeat;
-import com.seatwise.showtime.domain.ShowTime;
-import com.seatwise.showtime.repository.ShowSeatRepository;
-import com.seatwise.showtime.repository.ShowTimeRepository;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;

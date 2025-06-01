@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.seatwise.seat.domain.Seat;
 import com.seatwise.seat.domain.SeatGrade;
 import com.seatwise.seat.domain.SeatRepository;
-import com.seatwise.showtime.repository.ShowSeatRepository;
-import com.seatwise.showtime.repository.ShowTimeRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;

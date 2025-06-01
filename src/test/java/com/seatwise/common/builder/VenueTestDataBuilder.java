@@ -1,7 +1,7 @@
 package com.seatwise.common.builder;
 
-import com.seatwise.venue.entity.Venue;
-import com.seatwise.venue.repository.VenueRepository;
+import com.seatwise.venue.domain.Venue;
+import com.seatwise.venue.domain.VenueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -1,7 +1,6 @@
-package com.seatwise.showtime.repository;
+package com.seatwise.showtime.domain;
 
 import com.seatwise.showtime.dto.response.SeatAvailabilityResponse;
-import com.seatwise.showtime.domain.ShowSeat;
 import io.lettuce.core.dynamic.annotation.Param;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.QueryHint;

@@ -1,8 +1,7 @@
-package com.seatwise.showtime.repository;
+package com.seatwise.showtime.domain;
 
 import com.seatwise.show.domain.ShowType;
 import com.seatwise.showtime.dto.response.ShowSummaryQueryDto;
-import com.seatwise.showtime.domain.ShowTime;
 import io.lettuce.core.dynamic.annotation.Param;
 import java.time.LocalDate;
 import java.util.List;

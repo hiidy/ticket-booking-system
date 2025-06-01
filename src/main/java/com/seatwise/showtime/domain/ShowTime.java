@@ -4,7 +4,7 @@ import com.seatwise.common.domain.BaseEntity;
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
 import com.seatwise.show.domain.Show;
-import com.seatwise.venue.entity.Venue;
+import com.seatwise.venue.domain.Venue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
