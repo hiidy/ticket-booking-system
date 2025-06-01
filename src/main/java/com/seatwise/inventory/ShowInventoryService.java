@@ -1,10 +1,10 @@
-package com.seatwise.inventory.service;
+package com.seatwise.inventory;
 
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;
+import com.seatwise.inventory.domain.ShowInventory;
+import com.seatwise.inventory.domain.ShowInventoryRepository;
 import com.seatwise.inventory.dto.ShowInventoryResponse;
-import com.seatwise.inventory.entity.ShowInventory;
-import com.seatwise.inventory.repository.InventoryRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,12 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class InventoryService {
+public class ShowInventoryService {
 
-  private final InventoryRepository inventoryRepository;
+  private final ShowInventoryRepository showInventoryRepository;
 
   public List<ShowInventoryResponse> getShowInventory(Long showId) {
-    return inventoryRepository.findByShowId(showId).stream()
+    return showInventoryRepository.findByShowId(showId).stream()
         .map(
             inventory ->
                 new ShowInventoryResponse(
@@ -30,7 +30,7 @@ public class InventoryService {
   @Transactional
   public void decreaseShowInventoryStock(Long id, int decreaseCount) {
     ShowInventory showInventory =
-        inventoryRepository
+        showInventoryRepository
             .findById(id)
             .orElseThrow(() -> new BusinessException(ErrorCode.NO_AVAILABLE_STOCK));
 

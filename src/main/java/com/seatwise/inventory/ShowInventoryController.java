@@ -1,7 +1,6 @@
-package com.seatwise.inventory.controller;
+package com.seatwise.inventory;
 
 import com.seatwise.inventory.dto.ShowInventoryResponse;
-import com.seatwise.inventory.service.InventoryService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ShowInventoryController {
 
-  private final InventoryService inventoryService;
+  private final ShowInventoryService showInventoryService;
 
   @GetMapping
   public ResponseEntity<List<ShowInventoryResponse>> getShowInventory(@PathVariable Long showId) {
-    return ResponseEntity.ok(inventoryService.getShowInventory(showId));
+    return ResponseEntity.ok(showInventoryService.getShowInventory(showId));
   }
 }

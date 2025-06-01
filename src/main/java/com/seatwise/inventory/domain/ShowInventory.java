@@ -1,4 +1,4 @@
-package com.seatwise.inventory.entity;
+package com.seatwise.inventory.domain;
 
 import com.seatwise.common.exception.BusinessException;
 import com.seatwise.common.exception.ErrorCode;

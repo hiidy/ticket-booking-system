@@ -6,8 +6,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.seatwise.common.exception.BusinessException;
-import com.seatwise.inventory.entity.ShowInventory;
-import com.seatwise.inventory.repository.InventoryRepository;
+import com.seatwise.inventory.ShowInventoryService;
+import com.seatwise.inventory.domain.ShowInventory;
+import com.seatwise.inventory.domain.ShowInventoryRepository;
 import com.seatwise.seat.entity.SeatGrade;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -17,10 +18,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class InventoryServiceTest {
+class ShowInventoryServiceTest {
 
-  @Mock private InventoryRepository inventoryRepository;
-  @InjectMocks private InventoryService inventoryService;
+  @Mock private ShowInventoryRepository showInventoryRepository;
+  @InjectMocks private ShowInventoryService showInventoryService;
 
   @Test
   void givenShowInventory_whenDecreaseShowInventoryStock_thenAvailableStockIsDecreased() {
@@ -28,12 +29,12 @@ class InventoryServiceTest {
     ShowInventory vipInventory = new ShowInventory(1L, SeatGrade.VIP, 100, 100);
     int decreaseCount = 10;
 
-    when(inventoryRepository.findById(1L)).thenReturn(Optional.of(vipInventory));
+    when(showInventoryRepository.findById(1L)).thenReturn(Optional.of(vipInventory));
     // when
-    inventoryService.decreaseShowInventoryStock(1L, decreaseCount);
+    showInventoryService.decreaseShowInventoryStock(1L, decreaseCount);
 
     // then
-    verify(inventoryRepository).findById(1L);
+    verify(showInventoryRepository).findById(1L);
     assertThat(vipInventory.getAvailableCount())
         .isEqualTo(vipInventory.getTotalCount() - decreaseCount);
   }
@@ -44,11 +45,11 @@ class InventoryServiceTest {
     Long inventoryId = 1L;
     int decreaseCount = 10;
 
-    when(inventoryRepository.findById(inventoryId)).thenReturn(Optional.empty());
+    when(showInventoryRepository.findById(inventoryId)).thenReturn(Optional.empty());
     // when & then
     assertThatThrownBy(
-            () -> inventoryService.decreaseShowInventoryStock(inventoryId, decreaseCount))
+            () -> showInventoryService.decreaseShowInventoryStock(inventoryId, decreaseCount))
         .isInstanceOf(BusinessException.class);
-    verify(inventoryRepository).findById(inventoryId);
+    verify(showInventoryRepository).findById(inventoryId);
   }
 }
