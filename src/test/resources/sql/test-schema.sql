@@ -55,7 +55,7 @@ CREATE TABLE booking
     updated_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE show_seat
+CREATE TABLE ticket
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
     show_time_id    BIGINT       NOT NULL,
@@ -95,6 +95,6 @@ create table stream_message
 );
 
 CREATE INDEX show_type_index ON `show` (type);
-CREATE INDEX show_seat_show_time_id_seat_id_status_index ON show_seat (show_time_id, seat_id, status);
+CREATE INDEX ticket_show_time_id_seat_id_status_index ON ticket (show_time_id, seat_id, status);
 CREATE INDEX idx_show_date_show_id ON show_time (date, show_id);
-CREATE INDEX idx_inventory_show_id_grade ON inventory (show_id, grade);
+CREATE INDEX idx_inventory_show_id_grade ON inventory (show_time_id, grade);

@@ -14,14 +14,14 @@ import com.seatwise.seat.domain.SeatGrade;
 import com.seatwise.seat.domain.SeatRepository;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.domain.ShowType;
-import com.seatwise.showtime.ShowSeatService;
-import com.seatwise.showtime.domain.ShowSeat;
-import com.seatwise.showtime.domain.ShowSeatRepository;
 import com.seatwise.showtime.domain.ShowTime;
-import com.seatwise.showtime.domain.Status;
 import com.seatwise.showtime.dto.ShowSeatPrice;
-import com.seatwise.showtime.dto.request.ShowSeatCreateRequest;
-import com.seatwise.showtime.dto.response.ShowSeatResponse;
+import com.seatwise.ticket.TicketService;
+import com.seatwise.ticket.domain.Status;
+import com.seatwise.ticket.domain.Ticket;
+import com.seatwise.ticket.domain.TicketRepository;
+import com.seatwise.ticket.dto.ShowSeatCreateRequest;
+import com.seatwise.ticket.dto.ShowSeatResponse;
 import com.seatwise.venue.domain.Venue;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -34,9 +34,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 @ServiceTest
 class ShowTimeSeatServiceTest {
 
-  @Autowired private ShowSeatService showSeatService;
+  @Autowired private TicketService ticketService;
   @Autowired private SeatRepository seatRepository;
-  @Autowired private ShowSeatRepository showSeatRepository;
+  @Autowired private TicketRepository ticketRepository;
   @Autowired private ShowTimeTestDataBuilder showData;
   @Autowired private ShowTestDataBuilder eventData;
   @Autowired private VenueTestDataBuilder venueData;
@@ -63,12 +63,12 @@ class ShowTimeSeatServiceTest {
     ShowSeatCreateRequest request = new ShowSeatCreateRequest(List.of(showSeatPrice));
 
     // when
-    List<Long> showSeatIds = showSeatService.createShowSeat(showTime.getId(), request);
+    List<Long> showSeatIds = ticketService.createShowSeat(showTime.getId(), request);
 
     // then
     assertThat(showSeatIds).hasSize(5);
-    List<ShowSeat> showSeats = showSeatRepository.findAllById(showSeatIds);
-    assertThat(showSeats)
+    List<Ticket> tickets = ticketRepository.findAllById(showSeatIds);
+    assertThat(tickets)
         .hasSize(5)
         .allSatisfy(
             showSeat -> {
@@ -86,7 +86,7 @@ class ShowTimeSeatServiceTest {
     ShowSeatCreateRequest request = new ShowSeatCreateRequest(List.of(showSeatPrice));
 
     // when & then
-    assertThatThrownBy(() -> showSeatService.createShowSeat(invalidId, request))
+    assertThatThrownBy(() -> ticketService.createShowSeat(invalidId, request))
         .isInstanceOf(BusinessException.class);
   }
 
@@ -115,14 +115,14 @@ class ShowTimeSeatServiceTest {
     Seat rSeat = new Seat(3, SeatGrade.R, venue);
     seatRepository.saveAll(List.of(vip1, vip2, rSeat));
 
-    showSeatRepository.saveAll(
+    ticketRepository.saveAll(
         List.of(
-            ShowSeat.createAvailable(showTime, vip1, 40000),
-            ShowSeat.createAvailable(showTime, vip2, 40000),
-            ShowSeat.createAvailable(showTime, rSeat, 20000)));
+            Ticket.createAvailable(showTime, vip1, 40000),
+            Ticket.createAvailable(showTime, vip2, 40000),
+            Ticket.createAvailable(showTime, rSeat, 20000)));
 
     // when
-    List<ShowSeatResponse> result = showSeatService.getShowSeats(showTime.getId());
+    List<ShowSeatResponse> result = ticketService.getShowSeats(showTime.getId());
 
     // then
     assertThat(result)

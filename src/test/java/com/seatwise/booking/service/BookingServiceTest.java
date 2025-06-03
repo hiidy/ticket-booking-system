@@ -5,18 +5,18 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.seatwise.annotation.ServiceTest;
 import com.seatwise.booking.BookingService;
-import com.seatwise.common.builder.ShowTimeTestDataBuilder;
 import com.seatwise.booking.exception.BookingException;
+import com.seatwise.common.builder.ShowTimeTestDataBuilder;
 import com.seatwise.core.ErrorCode;
 import com.seatwise.member.Member;
 import com.seatwise.member.MemberRepository;
 import com.seatwise.seat.domain.Seat;
 import com.seatwise.seat.domain.SeatGrade;
 import com.seatwise.seat.domain.SeatRepository;
-import com.seatwise.showtime.domain.ShowSeat;
-import com.seatwise.showtime.domain.ShowSeatRepository;
 import com.seatwise.showtime.domain.ShowTime;
-import com.seatwise.showtime.domain.Status;
+import com.seatwise.ticket.domain.Status;
+import com.seatwise.ticket.domain.Ticket;
+import com.seatwise.ticket.domain.TicketRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -30,7 +30,7 @@ class BookingServiceTest {
 
   Member member;
   @Autowired private BookingService bookingService;
-  @Autowired private ShowSeatRepository showSeatRepository;
+  @Autowired private TicketRepository ticketRepository;
   @Autowired private SeatRepository seatRepository;
   @Autowired private MemberRepository memberRepository;
   @Autowired private ShowTimeTestDataBuilder showTimeTestDataBuilder;
@@ -46,7 +46,7 @@ class BookingServiceTest {
     Seat seat = Seat.builder().seatNumber(1).grade(SeatGrade.A).build();
     seatRepository.save(seat);
 
-    showSeatRepository.save(ShowSeat.createAvailable(showTime, seat, 40000));
+    ticketRepository.save(Ticket.createAvailable(showTime, seat, 40000));
 
     member = new Member("테스트유저", "abcd@gmail.com", "1234");
     memberRepository.save(member);
@@ -56,14 +56,14 @@ class BookingServiceTest {
   void shouldCreateBookingSuccessfully() {
     // given
     UUID requestId = UUID.randomUUID();
-    Long showSeatId = showSeatRepository.findAll().get(0).getId();
+    Long showSeatId = ticketRepository.findAll().get(0).getId();
 
     // when
     Long bookingId = bookingService.createBooking(requestId, member.getId(), List.of(showSeatId));
 
     // then
     assertThat(bookingId).isPositive();
-    Status status = showSeatRepository.findById(showSeatId).orElseThrow().getStatus();
+    Status status = ticketRepository.findById(showSeatId).orElseThrow().getStatus();
     assertThat(status).isEqualTo(Status.PAYMENT_PENDING);
   }
 
@@ -85,7 +85,7 @@ class BookingServiceTest {
     // given
     Long memberId = member.getId();
     UUID duplicatedId = UUID.randomUUID();
-    List<Long> showSeatId = List.of(showSeatRepository.findAll().get(0).getId());
+    List<Long> showSeatId = List.of(ticketRepository.findAll().get(0).getId());
 
     bookingService.createBooking(duplicatedId, memberId, showSeatId);
 
@@ -100,7 +100,7 @@ class BookingServiceTest {
     // given
     Long newMemberId =
         memberRepository.save(new Member("new member", "test@gmail.com", "test")).getId();
-    List<Long> showSeatIds = List.of(showSeatRepository.findAll().get(0).getId());
+    List<Long> showSeatIds = List.of(ticketRepository.findAll().get(0).getId());
     UUID firstRequestId = UUID.randomUUID();
     UUID secondRequestId = UUID.randomUUID();
 

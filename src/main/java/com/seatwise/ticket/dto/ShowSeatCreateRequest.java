@@ -1,4 +1,4 @@
-package com.seatwise.showtime.dto.request;
+package com.seatwise.ticket.dto;
 
 import com.seatwise.showtime.dto.ShowSeatPrice;
 import jakarta.validation.constraints.NotNull;

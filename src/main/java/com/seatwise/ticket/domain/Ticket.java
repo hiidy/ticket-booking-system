@@ -1,10 +1,11 @@
-package com.seatwise.showtime.domain;
+package com.seatwise.ticket.domain;
 
 import com.seatwise.booking.domain.Booking;
 import com.seatwise.core.BusinessException;
 import com.seatwise.core.ErrorCode;
 import com.seatwise.core.jpa.BaseEntity;
 import com.seatwise.seat.domain.Seat;
+import com.seatwise.showtime.domain.ShowTime;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -22,10 +23,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "show_seat")
+@Table(name = "ticket")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ShowSeat extends BaseEntity {
+public class Ticket extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,7 +51,7 @@ public class ShowSeat extends BaseEntity {
 
   private LocalDateTime expirationTime;
 
-  private ShowSeat(ShowTime showTime, Seat seat, Integer price, Status status) {
+  private Ticket(ShowTime showTime, Seat seat, Integer price, Status status) {
     validatePrice(price);
     this.showTime = showTime;
     this.seat = seat;
@@ -59,8 +60,8 @@ public class ShowSeat extends BaseEntity {
     this.status = status;
   }
 
-  public static ShowSeat createAvailable(ShowTime showTime, Seat seat, Integer price) {
-    return new ShowSeat(showTime, seat, price, Status.AVAILABLE);
+  public static Ticket createAvailable(ShowTime showTime, Seat seat, Integer price) {
+    return new Ticket(showTime, seat, price, Status.AVAILABLE);
   }
 
   public boolean canAssignBooking(LocalDateTime now) {

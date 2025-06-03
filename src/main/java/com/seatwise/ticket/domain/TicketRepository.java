@@ -1,4 +1,4 @@
-package com.seatwise.showtime.domain;
+package com.seatwise.ticket.domain;
 
 import com.seatwise.showtime.dto.response.SeatAvailabilityResponse;
 import io.lettuce.core.dynamic.annotation.Param;
@@ -11,13 +11,11 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 
-public interface ShowSeatRepository extends JpaRepository<ShowSeat, Long> {
+public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
   @Query(
-      "SELECT ss from ShowSeat ss "
-          + "JOIN FETCH ss.seat st "
-          + "WHERE ss.showTime.id = :showTimeId")
-  List<ShowSeat> findAllByShowTimeId(Long showTimeId);
+      "SELECT ss from Ticket ss " + "JOIN FETCH ss.seat st " + "WHERE ss.showTime.id = :showTimeId")
+  List<Ticket> findAllByShowTimeId(Long showTimeId);
 
   @Query(
       """
@@ -26,7 +24,7 @@ public interface ShowSeatRepository extends JpaRepository<ShowSeat, Long> {
               count(ss),
               sum(case when ss.status in ('AVAILABLE','PAYMENT_PENDING') then 1 else 0 end)
       )
-      from ShowSeat ss
+      from Ticket ss
       join ss.seat s
       where ss.showTime.id = :showTimeId
       group by s.grade
@@ -35,11 +33,11 @@ public interface ShowSeatRepository extends JpaRepository<ShowSeat, Long> {
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query(
-      "SELECT ss FROM ShowSeat ss WHERE ss.id IN :showSeatIds AND (ss.expirationTime IS NULL OR ss.expirationTime > :currentTime) AND ss.status != 'BOOKED'")
+      "SELECT ss FROM Ticket ss WHERE ss.id IN :showSeatIds AND (ss.expirationTime IS NULL OR ss.expirationTime > :currentTime) AND ss.status != 'BOOKED'")
   @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "0")})
-  List<ShowSeat> findAllAvailableSeatsWithLock(List<Long> showSeatIds, LocalDateTime currentTime);
+  List<Ticket> findAllAvailableSeatsWithLock(List<Long> showSeatIds, LocalDateTime currentTime);
 
   @Query(
-      "SELECT ss FROM ShowSeat ss WHERE ss.id IN :showSeatIds AND (ss.expirationTime IS NULL OR ss.expirationTime > :currentTime) AND ss.status != 'BOOKED'")
-  List<ShowSeat> findAllAvailableSeats(List<Long> showSeatIds, LocalDateTime currentTime);
+      "SELECT ss FROM Ticket ss WHERE ss.id IN :showSeatIds AND (ss.expirationTime IS NULL OR ss.expirationTime > :currentTime) AND ss.status != 'BOOKED'")
+  List<Ticket> findAllAvailableSeats(List<Long> showSeatIds, LocalDateTime currentTime);
 }

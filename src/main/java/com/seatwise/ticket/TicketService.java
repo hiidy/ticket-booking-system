@@ -1,15 +1,15 @@
-package com.seatwise.showtime;
+package com.seatwise.ticket;
 
 import com.seatwise.core.BusinessException;
 import com.seatwise.core.ErrorCode;
 import com.seatwise.seat.domain.SeatRepository;
-import com.seatwise.showtime.domain.ShowSeat;
-import com.seatwise.showtime.domain.ShowSeatRepository;
 import com.seatwise.showtime.domain.ShowTime;
 import com.seatwise.showtime.domain.ShowTimeRepository;
-import com.seatwise.showtime.dto.request.ShowSeatCreateRequest;
 import com.seatwise.showtime.dto.response.SeatAvailabilityResponse;
-import com.seatwise.showtime.dto.response.ShowSeatResponse;
+import com.seatwise.ticket.domain.Ticket;
+import com.seatwise.ticket.domain.TicketRepository;
+import com.seatwise.ticket.dto.ShowSeatCreateRequest;
+import com.seatwise.ticket.dto.ShowSeatResponse;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -18,9 +18,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ShowSeatService {
+public class TicketService {
 
-  private final ShowSeatRepository showSeatRepository;
+  private final TicketRepository ticketRepository;
   private final ShowTimeRepository showTimeRepository;
   private final SeatRepository seatRepository;
 
@@ -31,34 +31,32 @@ public class ShowSeatService {
             .findById(showId)
             .orElseThrow(() -> new BusinessException(ErrorCode.SHOW_NOT_FOUND));
 
-    List<ShowSeat> showSeats =
+    List<Ticket> tickets =
         request.showSeatPrices().stream()
             .map(
                 seatPrice ->
                     seatRepository
                         .findByIdBetween(seatPrice.startSeatId(), seatPrice.endSeatId())
                         .stream()
-                        .map(seat -> ShowSeat.createAvailable(showTime, seat, seatPrice.price()))
+                        .map(seat -> Ticket.createAvailable(showTime, seat, seatPrice.price()))
                         .toList())
             .flatMap(Collection::stream)
             .toList();
 
-    List<ShowSeat> savedShowSeats = showSeatRepository.saveAll(showSeats);
-    return savedShowSeats.stream().map(ShowSeat::getId).toList();
+    List<Ticket> savedTickets = ticketRepository.saveAll(tickets);
+    return savedTickets.stream().map(Ticket::getId).toList();
   }
 
   public List<ShowSeatResponse> getShowSeats(Long showId) {
-    List<ShowSeat> showSeats = showSeatRepository.findAllByShowTimeId(showId);
+    List<Ticket> tickets = ticketRepository.findAllByShowTimeId(showId);
     LocalDateTime requestTime = LocalDateTime.now();
-    if (showSeats.isEmpty()) {
+    if (tickets.isEmpty()) {
       throw new BusinessException(ErrorCode.SHOW_SEAT_NOT_FOUND);
     }
-    return showSeats.stream()
-        .map(showSeat -> ShowSeatResponse.from(showSeat, requestTime))
-        .toList();
+    return tickets.stream().map(showSeat -> ShowSeatResponse.from(showSeat, requestTime)).toList();
   }
 
   public List<SeatAvailabilityResponse> getAvailableSeatsForShow(Long showId) {
-    return showSeatRepository.findSeatAvailabilityByShowId(showId);
+    return ticketRepository.findSeatAvailabilityByShowId(showId);
   }
 }

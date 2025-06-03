@@ -1,10 +1,7 @@
 package com.seatwise.showtime;
 
 import com.seatwise.showtime.dto.request.ShowSearchCondition;
-import com.seatwise.showtime.dto.request.ShowSeatCreateRequest;
 import com.seatwise.showtime.dto.request.ShowTimeCreateRequest;
-import com.seatwise.showtime.dto.response.SeatAvailabilityResponse;
-import com.seatwise.showtime.dto.response.ShowSeatResponse;
 import com.seatwise.showtime.dto.response.ShowSummaryResponse;
 import com.seatwise.showtime.dto.response.ShowTimeCreateResponse;
 import com.seatwise.showtime.dto.response.ShowTimeSummaryResponse;
@@ -13,7 +10,6 @@ import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,20 +19,12 @@ import org.springframework.web.bind.annotation.*;
 public class ShowTimeController {
 
   private final ShowTimeService showTimeService;
-  private final ShowSeatService showSeatService;
 
   @PostMapping
   public ResponseEntity<Void> createShowTime(
       @Valid @RequestBody ShowTimeCreateRequest createRequest) {
     ShowTimeCreateResponse response = showTimeService.createShowTime(createRequest);
     return ResponseEntity.created(URI.create("/api/showtimes/" + response.id())).build();
-  }
-
-  @PostMapping("/{showTimeId}/seats")
-  public ResponseEntity<List<Long>> createShowSeats(
-      @PathVariable Long showTimeId, @Valid @RequestBody ShowSeatCreateRequest request) {
-    List<Long> response = showSeatService.createShowSeat(showTimeId, request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
   @GetMapping
@@ -52,18 +40,5 @@ public class ShowTimeController {
     List<ShowTimeSummaryResponse> dates =
         showTimeService.getAvailableDates(showTimeId, year, month);
     return ResponseEntity.ok(dates);
-  }
-
-  @GetMapping("/{showTimeId}/seats")
-  public ResponseEntity<List<ShowSeatResponse>> getShowSeats(@PathVariable Long showTimeId) {
-    List<ShowSeatResponse> response = showSeatService.getShowSeats(showTimeId);
-    return ResponseEntity.ok(response);
-  }
-
-  @GetMapping("/{showTimeId}/seat-availability")
-  public ResponseEntity<List<SeatAvailabilityResponse>> getSeatAvailability(
-      @PathVariable Long showTimeId) {
-    List<SeatAvailabilityResponse> response = showSeatService.getAvailableSeatsForShow(showTimeId);
-    return ResponseEntity.ok(response);
   }
 }
