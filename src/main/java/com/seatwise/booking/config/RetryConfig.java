@@ -1,4 +1,4 @@
-package com.seatwise.common.config;
+package com.seatwise.booking.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;

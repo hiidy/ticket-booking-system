@@ -1,4 +1,4 @@
-package com.seatwise.common.config;
+package com.seatwise.booking.config;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
