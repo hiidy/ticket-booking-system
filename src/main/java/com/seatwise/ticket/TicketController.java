@@ -30,10 +30,11 @@ public class TicketController {
     return ResponseEntity.ok(response);
   }
 
-  @GetMapping("/{showTimeId}/seat-availability")
-  public ResponseEntity<List<SeatAvailabilityResponse>> getSeatAvailability(
-      @PathVariable Long showTimeId) {
-    List<SeatAvailabilityResponse> response = ticketService.getAvailableSeatsForShow(showTimeId);
+  @GetMapping("/availability")
+  public ResponseEntity<List<SeatAvailabilityResponse>> getTicketAvailabilityByGrade(
+      @RequestParam Long showTimeId) {
+    List<SeatAvailabilityResponse> response =
+        ticketService.getTicketAvailabilityByGrade(showTimeId);
     return ResponseEntity.ok(response);
   }
 }

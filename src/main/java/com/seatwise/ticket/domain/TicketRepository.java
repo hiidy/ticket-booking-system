@@ -28,7 +28,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
       WHERE t.showTime.id = :showTimeId
       GROUP BY s.grade
       """)
-  List<SeatAvailabilityResponse> findSeatAvailabilityByShowId(@Param("showTimeId") Long showTimeId);
+  List<SeatAvailabilityResponse> findTicketAvailabilityByShowTimeId(
+      @Param("showTimeId") Long showTimeId);
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query(

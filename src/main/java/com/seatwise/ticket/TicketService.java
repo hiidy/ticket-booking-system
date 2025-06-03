@@ -56,7 +56,7 @@ public class TicketService {
     return tickets.stream().map(showSeat -> TicketResponse.from(showSeat, requestTime)).toList();
   }
 
-  public List<SeatAvailabilityResponse> getAvailableSeatsForShow(Long showId) {
-    return ticketRepository.findSeatAvailabilityByShowId(showId);
+  public List<SeatAvailabilityResponse> getTicketAvailabilityByGrade(Long showId) {
+    return ticketRepository.findTicketAvailabilityByShowTimeId(showId);
   }
 }
