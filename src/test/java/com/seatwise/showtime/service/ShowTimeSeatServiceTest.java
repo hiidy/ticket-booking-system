@@ -50,7 +50,17 @@ class ShowTimeSeatServiceTest {
     LocalTime startTime = LocalTime.of(12, 0);
     LocalTime endTime = LocalTime.of(14, 0);
 
-    showTime = showData.withTime(startTime, endTime).withDate(date).build();
+    Venue venue = venueData.withName("기본 장소").withToTalSeat(500).build();
+    Show show = eventData.withTitle("기본 공연").withType(ShowType.MUSICAL).build();
+
+    showTime =
+        showData
+            .withEvent(show)
+            .withVenue(venue)
+            .withTime(startTime, endTime)
+            .withDate(date)
+            .build();
+
     seats = createSeats(5);
   }
 
