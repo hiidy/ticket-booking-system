@@ -15,13 +15,13 @@ import com.seatwise.seat.domain.SeatRepository;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.domain.ShowType;
 import com.seatwise.showtime.domain.ShowTime;
-import com.seatwise.showtime.dto.ShowSeatPrice;
+import com.seatwise.showtime.dto.TicketPrice;
 import com.seatwise.ticket.TicketService;
 import com.seatwise.ticket.domain.Status;
 import com.seatwise.ticket.domain.Ticket;
 import com.seatwise.ticket.domain.TicketRepository;
-import com.seatwise.ticket.dto.ShowSeatCreateRequest;
-import com.seatwise.ticket.dto.ShowSeatResponse;
+import com.seatwise.ticket.dto.TicketCreateRequest;
+import com.seatwise.ticket.dto.TicketResponse;
 import com.seatwise.venue.domain.Venue;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -55,43 +55,42 @@ class ShowTimeSeatServiceTest {
   }
 
   @Test
-  void givenValidShowIdAndSeatRequest_whenCreateShowSeat_thenCreatedSuccessfully() {
+  void givenValidShowIdAndSeatRequest_whenCreateTicket_thenCreatedSuccessfully() {
     // given
     Long startSeatId = seats.get(0).getId();
     Long endSeatId = seats.get(4).getId();
-    ShowSeatPrice showSeatPrice = new ShowSeatPrice(startSeatId, endSeatId, 50000);
-    ShowSeatCreateRequest request = new ShowSeatCreateRequest(List.of(showSeatPrice));
+    TicketPrice ticketPrice = new TicketPrice(startSeatId, endSeatId, 50000);
+    TicketCreateRequest request = new TicketCreateRequest(List.of(ticketPrice));
 
     // when
-    List<Long> showSeatIds = ticketService.createShowSeat(showTime.getId(), request);
+    List<Long> ticketIds = ticketService.createTickets(showTime.getId(), request);
 
     // then
-    assertThat(showSeatIds).hasSize(5);
-    List<Ticket> tickets = ticketRepository.findAllById(showSeatIds);
+    assertThat(ticketIds).hasSize(5);
+    List<Ticket> tickets = ticketRepository.findAllById(ticketIds);
     assertThat(tickets)
         .hasSize(5)
         .allSatisfy(
-            showSeat -> {
-              assertThat(showSeat.getPrice()).isEqualTo(50000);
-              assertThat(showSeat.getStatus()).isEqualTo(Status.AVAILABLE);
+            ticket -> {
+              assertThat(ticket.getPrice()).isEqualTo(50000);
+              assertThat(ticket.getStatus()).isEqualTo(Status.AVAILABLE);
             });
   }
 
   @Test
-  void givenInvalidShowId_whenCreateShowSeat_thenThrowsException() {
+  void givenInvalidShowId_whenCreateTickets_thenThrowsException() {
     // given
     Long invalidId = 9999L;
-    ShowSeatPrice showSeatPrice =
-        new ShowSeatPrice(seats.get(0).getId(), seats.get(4).getId(), 50000);
-    ShowSeatCreateRequest request = new ShowSeatCreateRequest(List.of(showSeatPrice));
+    TicketPrice ticketPrice = new TicketPrice(seats.get(0).getId(), seats.get(4).getId(), 50000);
+    TicketCreateRequest request = new TicketCreateRequest(List.of(ticketPrice));
 
     // when & then
-    assertThatThrownBy(() -> ticketService.createShowSeat(invalidId, request))
+    assertThatThrownBy(() -> ticketService.createTickets(invalidId, request))
         .isInstanceOf(BusinessException.class);
   }
 
   @Test
-  void givenValidShowId_whenGetShowSeats_thenReturnsDetailedSeatInfo() {
+  void givenValidShowId_whenGetTickets_thenReturnsDetailedSeatInfo() {
     // given
     LocalDate date = LocalDate.of(2024, 1, 1);
     LocalTime startTime = LocalTime.of(15, 0);
@@ -122,7 +121,7 @@ class ShowTimeSeatServiceTest {
             Ticket.createAvailable(showTime, rSeat, 20000)));
 
     // when
-    List<ShowSeatResponse> result = ticketService.getShowSeats(showTime.getId());
+    List<TicketResponse> result = ticketService.getTickets(showTime.getId());
 
     // then
     assertThat(result)

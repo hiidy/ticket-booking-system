@@ -5,4 +5,4 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public record BookingRequest(
-    @NotNull Long memberId, @NotNull @NotEmpty List<Long> showSeatIds, @NotNull Long sectionId) {}
+    @NotNull Long memberId, @NotNull @NotEmpty List<Long> ticketIds, @NotNull Long sectionId) {}

@@ -8,8 +8,8 @@ import com.seatwise.showtime.domain.ShowTimeRepository;
 import com.seatwise.showtime.dto.response.SeatAvailabilityResponse;
 import com.seatwise.ticket.domain.Ticket;
 import com.seatwise.ticket.domain.TicketRepository;
-import com.seatwise.ticket.dto.ShowSeatCreateRequest;
-import com.seatwise.ticket.dto.ShowSeatResponse;
+import com.seatwise.ticket.dto.TicketCreateRequest;
+import com.seatwise.ticket.dto.TicketResponse;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -24,7 +24,7 @@ public class TicketService {
   private final ShowTimeRepository showTimeRepository;
   private final SeatRepository seatRepository;
 
-  public List<Long> createShowSeat(Long showId, ShowSeatCreateRequest request) {
+  public List<Long> createTickets(Long showId, TicketCreateRequest request) {
 
     ShowTime showTime =
         showTimeRepository
@@ -32,13 +32,13 @@ public class TicketService {
             .orElseThrow(() -> new BusinessException(ErrorCode.SHOW_NOT_FOUND));
 
     List<Ticket> tickets =
-        request.showSeatPrices().stream()
+        request.ticketPrices().stream()
             .map(
-                seatPrice ->
+                ticketPrice ->
                     seatRepository
-                        .findByIdBetween(seatPrice.startSeatId(), seatPrice.endSeatId())
+                        .findByIdBetween(ticketPrice.startSeatId(), ticketPrice.endSeatId())
                         .stream()
-                        .map(seat -> Ticket.createAvailable(showTime, seat, seatPrice.price()))
+                        .map(seat -> Ticket.createAvailable(showTime, seat, ticketPrice.price()))
                         .toList())
             .flatMap(Collection::stream)
             .toList();
@@ -47,13 +47,13 @@ public class TicketService {
     return savedTickets.stream().map(Ticket::getId).toList();
   }
 
-  public List<ShowSeatResponse> getShowSeats(Long showId) {
+  public List<TicketResponse> getTickets(Long showId) {
     List<Ticket> tickets = ticketRepository.findAllByShowTimeId(showId);
     LocalDateTime requestTime = LocalDateTime.now();
     if (tickets.isEmpty()) {
-      throw new BusinessException(ErrorCode.SHOW_SEAT_NOT_FOUND);
+      throw new BusinessException(ErrorCode.TICKET_NOT_FOUND);
     }
-    return tickets.stream().map(showSeat -> ShowSeatResponse.from(showSeat, requestTime)).toList();
+    return tickets.stream().map(showSeat -> TicketResponse.from(showSeat, requestTime)).toList();
   }
 
   public List<SeatAvailabilityResponse> getAvailableSeatsForShow(Long showId) {

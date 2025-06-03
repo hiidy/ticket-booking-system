@@ -21,7 +21,7 @@ public class ErrorCodeToStatusMapper {
     MAP.put(ErrorCode.EVENT_NOT_FOUND, HttpStatus.NOT_FOUND);
     MAP.put(ErrorCode.VENUE_NOT_FOUND, HttpStatus.NOT_FOUND);
     MAP.put(ErrorCode.SHOW_NOT_FOUND, HttpStatus.NOT_FOUND);
-    MAP.put(ErrorCode.SHOW_SEAT_NOT_FOUND, HttpStatus.NOT_FOUND);
+    MAP.put(ErrorCode.TICKET_NOT_FOUND, HttpStatus.NOT_FOUND);
     MAP.put(ErrorCode.MEMBER_NOT_FOUND, HttpStatus.NOT_FOUND);
 
     // 409

@@ -85,30 +85,29 @@ class BookingServiceTest {
     // given
     Long memberId = member.getId();
     UUID duplicatedId = UUID.randomUUID();
-    List<Long> showSeatId = List.of(ticketRepository.findAll().get(0).getId());
+    List<Long> ticketIds = List.of(ticketRepository.findAll().get(0).getId());
 
-    bookingService.createBooking(duplicatedId, memberId, showSeatId);
+    bookingService.createBooking(duplicatedId, memberId, ticketIds);
 
     // when & then
-    assertThatThrownBy(() -> bookingService.createBooking(duplicatedId, memberId, showSeatId))
+    assertThatThrownBy(() -> bookingService.createBooking(duplicatedId, memberId, ticketIds))
         .isInstanceOf(BookingException.class)
         .hasFieldOrPropertyWithValue("errorCode", ErrorCode.DUPLICATE_IDEMPOTENCY_KEY);
   }
 
   @Test
-  void canNotBeAssignedWhenShowSeatIsLocked() {
+  void canNotBeAssignedWhenTicketIsLocked() {
     // given
     Long newMemberId =
         memberRepository.save(new Member("new member", "test@gmail.com", "test")).getId();
-    List<Long> showSeatIds = List.of(ticketRepository.findAll().get(0).getId());
+    List<Long> ticketIds = List.of(ticketRepository.findAll().get(0).getId());
     UUID firstRequestId = UUID.randomUUID();
     UUID secondRequestId = UUID.randomUUID();
 
-    bookingService.createBooking(firstRequestId, member.getId(), showSeatIds);
+    bookingService.createBooking(firstRequestId, member.getId(), ticketIds);
 
     // when & then
-    assertThatThrownBy(
-            () -> bookingService.createBooking(secondRequestId, newMemberId, showSeatIds))
+    assertThatThrownBy(() -> bookingService.createBooking(secondRequestId, newMemberId, ticketIds))
         .isInstanceOf(BookingException.class)
         .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SEAT_NOT_AVAILABLE);
   }

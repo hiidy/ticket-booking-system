@@ -4,11 +4,11 @@ import com.seatwise.seat.domain.SeatGrade;
 import com.seatwise.ticket.domain.Ticket;
 import java.time.LocalDateTime;
 
-public record ShowSeatResponse(
-    Long showSeatId, int seatNumber, String status, SeatGrade seatGrade, boolean isLocked) {
+public record TicketResponse(
+    Long ticketId, int seatNumber, String status, SeatGrade seatGrade, boolean isLocked) {
 
-  public static ShowSeatResponse from(Ticket ticket, LocalDateTime currentTime) {
-    return new ShowSeatResponse(
+  public static TicketResponse from(Ticket ticket, LocalDateTime currentTime) {
+    return new TicketResponse(
         ticket.getId(),
         ticket.getSeat().getSeatNumber(),
         ticket.getStatus().getDescription(),

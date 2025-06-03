@@ -31,7 +31,7 @@ public class BookingService {
   private final BookingMessageProducer producer;
 
   @Transactional
-  public Long createBooking(UUID requestId, Long memberId, List<Long> showSeatIds) {
+  public Long createBooking(UUID requestId, Long memberId, List<Long> ticketIds) {
     if (bookingRepository.existsByRequestId(requestId)) {
       throw new BookingException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY, requestId);
     }
@@ -43,9 +43,9 @@ public class BookingService {
 
     LocalDateTime bookingRequestTime = LocalDateTime.now();
 
-    List<Ticket> tickets = ticketRepository.findAllAvailableSeats(showSeatIds, bookingRequestTime);
+    List<Ticket> tickets = ticketRepository.findAllAvailableSeats(ticketIds, bookingRequestTime);
 
-    if (tickets.size() != showSeatIds.size()) {
+    if (tickets.size() != ticketIds.size()) {
       throw new BookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
     }
 
@@ -59,7 +59,7 @@ public class BookingService {
     int totalAmount = tickets.stream().map(Ticket::getPrice).reduce(0, Integer::sum);
     Booking booking = new Booking(requestId, member, totalAmount);
     tickets.forEach(
-        showSeat -> showSeat.assignBooking(booking, bookingRequestTime, Duration.ofMinutes(10)));
+        ticket -> ticket.assignBooking(booking, bookingRequestTime, Duration.ofMinutes(10)));
     Booking savedBooking = bookingRepository.save(booking);
 
     return savedBooking.getId();
@@ -68,7 +68,7 @@ public class BookingService {
   public void enqueueBooking(UUID requestId, BookingRequest request) {
     BookingMessage message =
         new BookingMessage(
-            requestId.toString(), request.memberId(), request.showSeatIds(), request.sectionId());
+            requestId.toString(), request.memberId(), request.ticketIds(), request.sectionId());
     producer.sendMessage(message);
   }
 }
