@@ -1,7 +1,7 @@
 package com.seatwise.inventory;
 
-import com.seatwise.common.exception.BusinessException;
-import com.seatwise.common.exception.ErrorCode;
+import com.seatwise.core.BusinessException;
+import com.seatwise.core.ErrorCode;
 import com.seatwise.inventory.domain.ShowInventory;
 import com.seatwise.inventory.domain.ShowInventoryRepository;
 import com.seatwise.inventory.dto.ShowInventoryResponse;

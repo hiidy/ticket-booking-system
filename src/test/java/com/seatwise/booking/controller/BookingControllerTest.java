@@ -27,8 +27,8 @@ class BookingControllerTest {
   private static final UUID IDEMPOTENCY_KEY = UUID.randomUUID();
   @Autowired MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
-  @MockBean private BookingService bookingService;
   @MockBean private BookingResultWaitService waitService;
+  @MockBean private BookingService bookingService;
 
   @Test
   void givenRequestWithIdempotencyKey_whenCreateBooking_thenReturnsOk() throws Exception {

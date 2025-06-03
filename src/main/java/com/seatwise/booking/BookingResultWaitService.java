@@ -1,8 +1,8 @@
 package com.seatwise.booking;
 
 import com.seatwise.booking.dto.BookingResult;
-import com.seatwise.common.exception.BookingException;
-import com.seatwise.common.exception.ErrorCode;
+import com.seatwise.booking.exception.BookingException;
+import com.seatwise.core.ErrorCode;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;

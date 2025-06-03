@@ -2,8 +2,8 @@ package com.seatwise.showtime.domain;
 
 import static org.assertj.core.api.Assertions.*;
 
-import com.seatwise.common.exception.BusinessException;
-import com.seatwise.common.exception.ErrorCode;
+import com.seatwise.core.BusinessException;
+import com.seatwise.core.ErrorCode;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;

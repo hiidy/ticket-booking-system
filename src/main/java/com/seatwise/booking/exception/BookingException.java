@@ -1,5 +1,7 @@
-package com.seatwise.common.exception;
+package com.seatwise.booking.exception;
 
+import com.seatwise.core.ErrorCodeException;
+import com.seatwise.core.ErrorCode;
 import java.util.UUID;
 import lombok.Getter;
 

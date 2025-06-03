@@ -1,5 +1,6 @@
-package com.seatwise.common.exception;
+package com.seatwise.core.web;
 
+import com.seatwise.core.ErrorCode;
 import java.util.EnumMap;
 import java.util.Map;
 import org.springframework.http.HttpStatus;

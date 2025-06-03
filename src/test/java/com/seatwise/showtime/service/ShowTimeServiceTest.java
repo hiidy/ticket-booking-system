@@ -3,8 +3,8 @@ package com.seatwise.showtime.service;
 import static org.assertj.core.api.Assertions.*;
 
 import com.seatwise.annotation.ServiceTest;
-import com.seatwise.common.exception.BusinessException;
-import com.seatwise.common.exception.ErrorCode;
+import com.seatwise.core.BusinessException;
+import com.seatwise.core.ErrorCode;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.domain.ShowRepository;
 import com.seatwise.show.domain.ShowType;

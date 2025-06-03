@@ -1,7 +1,7 @@
 package com.seatwise.showtime;
 
-import com.seatwise.common.exception.BusinessException;
-import com.seatwise.common.exception.ErrorCode;
+import com.seatwise.core.BusinessException;
+import com.seatwise.core.ErrorCode;
 import com.seatwise.seat.domain.SeatRepository;
 import com.seatwise.showtime.domain.ShowSeat;
 import com.seatwise.showtime.domain.ShowSeatRepository;

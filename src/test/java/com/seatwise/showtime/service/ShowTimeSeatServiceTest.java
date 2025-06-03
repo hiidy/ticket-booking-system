@@ -8,7 +8,7 @@ import com.seatwise.annotation.ServiceTest;
 import com.seatwise.common.builder.ShowTestDataBuilder;
 import com.seatwise.common.builder.ShowTimeTestDataBuilder;
 import com.seatwise.common.builder.VenueTestDataBuilder;
-import com.seatwise.common.exception.BusinessException;
+import com.seatwise.core.BusinessException;
 import com.seatwise.seat.domain.Seat;
 import com.seatwise.seat.domain.SeatGrade;
 import com.seatwise.seat.domain.SeatRepository;

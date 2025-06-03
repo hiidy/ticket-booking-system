@@ -1,4 +1,7 @@
-package com.seatwise.common.exception;
+package com.seatwise.core.web;
+
+import com.seatwise.core.ErrorCode;
+import com.seatwise.core.ErrorCodeException;
 
 public record ErrorResponse(ErrorCode errorCode, String message) {
 

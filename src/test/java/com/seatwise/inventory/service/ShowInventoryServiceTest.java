@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.seatwise.common.exception.BusinessException;
+import com.seatwise.core.BusinessException;
 import com.seatwise.inventory.ShowInventoryService;
 import com.seatwise.inventory.domain.ShowInventory;
 import com.seatwise.inventory.domain.ShowInventoryRepository;

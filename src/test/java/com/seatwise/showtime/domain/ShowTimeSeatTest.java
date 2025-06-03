@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.seatwise.booking.domain.Booking;
-import com.seatwise.common.exception.BusinessException;
+import com.seatwise.core.BusinessException;
 import com.seatwise.member.Member;
 import java.time.Duration;
 import java.time.LocalDateTime;

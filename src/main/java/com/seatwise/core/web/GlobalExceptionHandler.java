@@ -1,6 +1,8 @@
-package com.seatwise.common.exception;
+package com.seatwise.core.web;
 
 import com.seatwise.booking.dto.BookingResult;
+import com.seatwise.booking.exception.BookingException;
+import com.seatwise.core.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -3,7 +3,7 @@ package com.seatwise.inventory.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.seatwise.common.exception.BusinessException;
+import com.seatwise.core.BusinessException;
 import com.seatwise.inventory.domain.ShowInventory;
 import com.seatwise.seat.domain.SeatGrade;
 import org.junit.jupiter.api.Test;

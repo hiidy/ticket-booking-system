@@ -1,6 +1,6 @@
 package com.seatwise.venue.domain;
 
-import com.seatwise.common.domain.BaseEntity;
+import com.seatwise.core.jpa.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

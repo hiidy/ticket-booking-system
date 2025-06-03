@@ -1,4 +1,4 @@
-package com.seatwise.common.exception;
+package com.seatwise.core;
 
 import lombok.Getter;
 

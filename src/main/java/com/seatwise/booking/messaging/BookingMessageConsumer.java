@@ -4,7 +4,7 @@ import com.seatwise.booking.BookingResultWaitService;
 import com.seatwise.booking.BookingService;
 import com.seatwise.booking.dto.BookingMessage;
 import com.seatwise.booking.dto.BookingResult;
-import com.seatwise.common.exception.BookingException;
+import com.seatwise.booking.exception.BookingException;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import java.util.UUID;

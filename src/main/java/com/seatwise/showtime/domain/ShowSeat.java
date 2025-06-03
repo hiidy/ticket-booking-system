@@ -1,9 +1,9 @@
 package com.seatwise.showtime.domain;
 
 import com.seatwise.booking.domain.Booking;
-import com.seatwise.common.domain.BaseEntity;
-import com.seatwise.common.exception.BusinessException;
-import com.seatwise.common.exception.ErrorCode;
+import com.seatwise.core.BusinessException;
+import com.seatwise.core.ErrorCode;
+import com.seatwise.core.jpa.BaseEntity;
 import com.seatwise.seat.domain.Seat;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
