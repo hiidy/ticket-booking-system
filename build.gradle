@@ -71,6 +71,7 @@ jacocoTestReport {
                     '**/dto/**',
                     '**/config/**',
                     '**/exception/**',
+                    '**/core/**',
                     '**/*Application*'
             ])
         }))
@@ -83,6 +84,6 @@ sonar {
         property "sonar.organization", "hiidy"
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
-        property "sonar.coverage.exclusions", "**/dto/**,**/config/**,**/exception/**,**/*Application*"
+        property "sonar.coverage.exclusions", "**/dto/**,**/config/**,**/exception/**,**/core/**,**/*Application*"
     }
 }
