@@ -58,9 +58,10 @@ public class BookingService {
 
     int totalAmount = tickets.stream().map(Ticket::getPrice).reduce(0, Integer::sum);
     Booking booking = new Booking(requestId, member, totalAmount);
-    tickets.forEach(
-        ticket -> ticket.assignBooking(booking, bookingRequestTime, Duration.ofMinutes(10)));
     Booking savedBooking = bookingRepository.save(booking);
+    tickets.forEach(
+        ticket ->
+            ticket.assignBooking(savedBooking.getId(), bookingRequestTime, Duration.ofMinutes(10)));
 
     return savedBooking.getId();
   }

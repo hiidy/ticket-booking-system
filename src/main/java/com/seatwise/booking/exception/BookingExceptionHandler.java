@@ -1,6 +1,7 @@
-package com.seatwise.core.web;
+package com.seatwise.booking.exception;
 
-import com.seatwise.core.BusinessException;
+import com.seatwise.booking.dto.BookingResult;
+import com.seatwise.core.web.ErrorCodeToStatusMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,12 +10,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class BookingExceptionHandler {
 
-  @ExceptionHandler(BusinessException.class)
-  public ResponseEntity<ErrorResponse> handleErrorCodeException(BusinessException e) {
+  @ExceptionHandler(BookingException.class)
+  public ResponseEntity<BookingResult> bookingResultHandler(BookingException e) {
     HttpStatus status = ErrorCodeToStatusMapper.getHttpStatus(e.getErrorCode());
     log.warn("Handled {} : {}", e.getClass().getSimpleName(), e.getErrorCode().name(), e);
-    return ResponseEntity.status(status).body(ErrorResponse.from(e));
+    return ResponseEntity.status(status).body(BookingResult.failed(e.getRequestId()));
   }
 }

@@ -1,6 +1,5 @@
 package com.seatwise.ticket.domain;
 
-import com.seatwise.booking.domain.Booking;
 import com.seatwise.core.BusinessException;
 import com.seatwise.core.ErrorCode;
 import com.seatwise.core.jpa.BaseEntity;
@@ -40,9 +39,7 @@ public class Ticket extends BaseEntity {
   @JoinColumn(name = "seat_id")
   private Seat seat;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "booking_id")
-  private Booking booking;
+  private Long bookingId;
 
   private Integer price;
 
@@ -55,7 +52,7 @@ public class Ticket extends BaseEntity {
     validatePrice(price);
     this.showTime = showTime;
     this.seat = seat;
-    this.booking = null;
+    this.bookingId = null;
     this.price = price;
     this.status = status;
   }
@@ -74,8 +71,8 @@ public class Ticket extends BaseEntity {
     return false;
   }
 
-  public void assignBooking(Booking booking, LocalDateTime requestTime, Duration duration) {
-    this.booking = booking;
+  public void assignBooking(Long bookingId, LocalDateTime requestTime, Duration duration) {
+    this.bookingId = bookingId;
     this.status = Status.PAYMENT_PENDING;
     this.expirationTime = requestTime.plus(duration);
   }

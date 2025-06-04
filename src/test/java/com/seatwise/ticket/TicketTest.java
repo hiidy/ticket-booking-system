@@ -21,7 +21,7 @@ class TicketTest {
     Booking booking = new Booking(null, null, 0);
 
     // when
-    ticket.assignBooking(booking, LocalDateTime.now(), Duration.ofMinutes(10));
+    ticket.assignBooking(booking.getId(), LocalDateTime.now(), Duration.ofMinutes(10));
 
     // then
     assertThat(ticket.getStatus()).isEqualTo(Status.PAYMENT_PENDING);
@@ -36,7 +36,7 @@ class TicketTest {
     Duration duration = Duration.ofMinutes(10);
 
     // when
-    ticket.assignBooking(booking, requestTime, duration);
+    ticket.assignBooking(booking.getId(), requestTime, duration);
 
     // then
     assertThat(ticket.getExpirationTime()).isEqualTo(requestTime.plus(duration));
@@ -51,10 +51,10 @@ class TicketTest {
     Duration duration = Duration.ofMinutes(10);
 
     // when
-    ticket.assignBooking(booking, requestTime, duration);
+    ticket.assignBooking(booking.getId(), requestTime, duration);
 
     // then
-    assertThat(ticket.getBooking()).isEqualTo(booking);
+    assertThat(ticket.getBookingId()).isEqualTo(booking.getId());
   }
 
   @Test
@@ -74,7 +74,7 @@ class TicketTest {
     Booking booking = new Booking(null, null, 0);
     LocalDateTime requestTime = LocalDateTime.of(2025, 1, 1, 12, 0);
     LocalDateTime newRequestTime = requestTime.plusMinutes(1);
-    ticket.assignBooking(booking, requestTime, Duration.ofMinutes(10));
+    ticket.assignBooking(booking.getId(), requestTime, Duration.ofMinutes(10));
 
     // expect
     assertThat(ticket.canAssignBooking(newRequestTime)).isFalse();
@@ -97,11 +97,13 @@ class TicketTest {
     Booking booking2 = new Booking(null, member2, 0);
 
     // when
-    ticket.assignBooking(booking1, LocalDateTime.of(2025, 1, 1, 12, 0), Duration.ofMinutes(10));
-    ticket.assignBooking(booking2, LocalDateTime.of(2025, 1, 1, 12, 10), Duration.ofMinutes(10));
+    ticket.assignBooking(
+        booking1.getId(), LocalDateTime.of(2025, 1, 1, 12, 0), Duration.ofMinutes(10));
+    ticket.assignBooking(
+        booking2.getId(), LocalDateTime.of(2025, 1, 1, 12, 10), Duration.ofMinutes(10));
 
     // then
-    assertThat(ticket.getBooking()).isEqualTo(booking2);
+    assertThat(ticket.getBookingId()).isEqualTo(booking2.getId());
   }
 
   @Test
