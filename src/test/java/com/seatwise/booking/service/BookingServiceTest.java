@@ -70,10 +70,10 @@ class BookingServiceTest {
     // given
     UUID requestId = UUID.randomUUID();
     List<Long> invalidTicketIds = List.of(999L);
+    Long memberId = member.getId();
 
     // when & then
-    assertThatThrownBy(
-            () -> bookingService.createBooking(requestId, member.getId(), invalidTicketIds))
+    assertThatThrownBy(() -> bookingService.createBooking(requestId, memberId, invalidTicketIds))
         .isInstanceOf(BookingException.class)
         .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SEAT_NOT_AVAILABLE);
   }
@@ -83,11 +83,12 @@ class BookingServiceTest {
     // given
     UUID duplicatedId = UUID.randomUUID();
     List<Long> ticketIds = List.of(ticketRepository.findAll().get(0).getId());
+    Long memberId = member.getId();
 
-    bookingService.createBooking(duplicatedId, member.getId(), ticketIds);
+    bookingService.createBooking(duplicatedId, memberId, ticketIds);
 
     // when & then
-    assertThatThrownBy(() -> bookingService.createBooking(duplicatedId, member.getId(), ticketIds))
+    assertThatThrownBy(() -> bookingService.createBooking(duplicatedId, memberId, ticketIds))
         .isInstanceOf(BookingException.class)
         .hasFieldOrPropertyWithValue("errorCode", ErrorCode.DUPLICATE_IDEMPOTENCY_KEY);
   }
@@ -97,16 +98,16 @@ class BookingServiceTest {
     // given
     Member other = new Member("new member", "test@gmail.com", "test");
     Long otherMemberId = memberRepository.save(other).getId();
-    Long ticketId = ticketRepository.findAll().get(0).getId();
+    List<Long> ticketIds = List.of(ticketRepository.findAll().get(0).getId());
 
     UUID firstRequestId = UUID.randomUUID();
     UUID secondRequestId = UUID.randomUUID();
 
-    bookingService.createBooking(firstRequestId, member.getId(), List.of(ticketId));
+    bookingService.createBooking(firstRequestId, member.getId(), ticketIds);
 
     // when & then
     assertThatThrownBy(
-            () -> bookingService.createBooking(secondRequestId, otherMemberId, List.of(ticketId)))
+            () -> bookingService.createBooking(secondRequestId, otherMemberId, ticketIds))
         .isInstanceOf(BookingException.class)
         .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SEAT_NOT_AVAILABLE);
   }

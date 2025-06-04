@@ -57,11 +57,11 @@ class BookingMessageConsumerTest {
     BookingMessage message = new BookingMessage(requestId.toString(), memberId, seatIds, 1L);
     when(bookingService.createBooking(requestId, memberId, seatIds)).thenReturn(bookingId);
 
-    ObjectRecord<String, BookingMessage> record =
+    ObjectRecord<String, BookingMessage> messageRecord =
         StreamRecords.newRecord().in(streamKey).ofObject(message);
 
     // when
-    consumer.onMessage(record);
+    consumer.onMessage(messageRecord);
 
     // then
     verify(bookingService).createBooking(requestId, memberId, seatIds);
@@ -83,11 +83,11 @@ class BookingMessageConsumerTest {
     when(bookingService.createBooking(requestId, memberId, seatIds))
         .thenThrow(new BookingException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY, requestId));
 
-    ObjectRecord<String, BookingMessage> record =
+    ObjectRecord<String, BookingMessage> messageRecord =
         StreamRecords.newRecord().in(streamKey).ofObject(message);
 
     // when
-    consumer.onMessage(record);
+    consumer.onMessage(messageRecord);
 
     // then
     verify(bookingService).createBooking(requestId, memberId, seatIds);

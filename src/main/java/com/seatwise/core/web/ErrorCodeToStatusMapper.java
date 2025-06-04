@@ -3,11 +3,14 @@ package com.seatwise.core.web;
 import com.seatwise.core.ErrorCode;
 import java.util.EnumMap;
 import java.util.Map;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ErrorCodeToStatusMapper {
 
-  public static final Map<ErrorCode, HttpStatus> MAP = new EnumMap<>(ErrorCode.class);
+  private static final Map<ErrorCode, HttpStatus> MAP = new EnumMap<>(ErrorCode.class);
 
   static {
     // 400
