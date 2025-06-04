@@ -1,4 +1,4 @@
-package com.seatwise.showtime.service;
+package com.seatwise.ticket;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -16,7 +16,6 @@ import com.seatwise.show.domain.Show;
 import com.seatwise.show.domain.ShowType;
 import com.seatwise.showtime.domain.ShowTime;
 import com.seatwise.showtime.dto.TicketPrice;
-import com.seatwise.ticket.TicketService;
 import com.seatwise.ticket.domain.Status;
 import com.seatwise.ticket.domain.Ticket;
 import com.seatwise.ticket.domain.TicketRepository;
@@ -32,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @ServiceTest
-class ShowTimeSeatServiceTest {
+class TicketServiceTest {
 
   @Autowired private TicketService ticketService;
   @Autowired private SeatRepository seatRepository;
@@ -65,7 +64,7 @@ class ShowTimeSeatServiceTest {
   }
 
   @Test
-  void givenValidShowIdAndSeatRequest_whenCreateTicket_thenCreatedSuccessfully() {
+  void shouldCreateTickets_whenValidShowTimeAndSeatRangeProvided() {
     // given
     Long startSeatId = seats.get(0).getId();
     Long endSeatId = seats.get(4).getId();
@@ -88,7 +87,7 @@ class ShowTimeSeatServiceTest {
   }
 
   @Test
-  void givenInvalidShowId_whenCreateTickets_thenThrowsException() {
+  void shouldThrowException_whenCreatingTicketsWithInvalidShowTimeId() {
     // given
     Long invalidId = 9999L;
     TicketPrice ticketPrice = new TicketPrice(seats.get(0).getId(), seats.get(4).getId(), 50000);
@@ -100,7 +99,7 @@ class ShowTimeSeatServiceTest {
   }
 
   @Test
-  void givenValidShowId_whenGetTickets_thenReturnsDetailedSeatInfo() {
+  void shouldReturnDetailedSeatInfo_whenFetchingTicketsByValidShowTimeId() {
     // given
     LocalDate date = LocalDate.of(2024, 1, 1);
     LocalTime startTime = LocalTime.of(15, 0);

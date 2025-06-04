@@ -15,9 +15,9 @@ class ShowTimeTest {
   @Nested
   @DisplayName("공연 시간이 겹치는 경우")
   class OverlappingScheduleTests {
+
     @Test
-    @DisplayName("기존 공연의 종료 시각이 새로운 공연의 시작 시각과 겹치면 중복이다")
-    void isOverlapping_WithEndTimeEqualToStartTime_ReturnsTrue() {
+    void shouldReturnTrue_whenNewStartTimeIsBeforeExistingEndTime() {
       // given
       ShowTime existingShowTime =
           new ShowTime(
@@ -31,8 +31,7 @@ class ShowTimeTest {
     }
 
     @Test
-    @DisplayName("기존 공연의 시작 시각이 새로운 공연의 종료 시각과 겹치면 중복이다")
-    void isOverlapping_WithStartTimeEqualToEndTime_ReturnsTrue() {
+    void shouldReturnTrue_whenNewEndTimeIsAfterExistingStartTime() {
       // given
       ShowTime existingShowTime =
           new ShowTime(
@@ -46,8 +45,7 @@ class ShowTimeTest {
     }
 
     @Test
-    @DisplayName("기존 공연의 시작 시각과 종료 시각이 새로운 공연과 모두 겹치면 중복이다")
-    void isOverlapping_WithinExistingSchedule_ReturnsTrue() {
+    void shouldReturnTrue_whenNewTimeIsInsideExistingShowTime() {
       // given
       ShowTime existingShowTime =
           new ShowTime(
@@ -61,8 +59,7 @@ class ShowTimeTest {
     }
 
     @Test
-    @DisplayName("새로운 공연 시간이 기존 공연 시간을 완전히 포함하면 중복이다")
-    void isOverlapping_WithExistingScheduleWithinNew_ReturnsTrue() {
+    void shouldReturnTrue_whenNewShowTimeFullyEnclosesExisting() {
       // given
       ShowTime existingShowTime =
           new ShowTime(
@@ -79,9 +76,9 @@ class ShowTimeTest {
   @Nested
   @DisplayName("공연 시간이 겹치지 않는 경우")
   class NonOverlappingScheduleTests {
+
     @Test
-    @DisplayName("기존 공연이 끝난 후 새로운 공연이 시작하면 중복이 아니다")
-    void isOverlapping_WithEndTimeBeforeStartTime_ReturnsFalse() {
+    void shouldReturnFalse_whenNewStartTimeIsAfterExistingEndTime() {
       // given
       ShowTime existingShowTime =
           new ShowTime(
@@ -95,8 +92,7 @@ class ShowTimeTest {
     }
 
     @Test
-    @DisplayName("기존 공연이 시작하기 전에 새로운 공연이 끝나면 중복이 아니다")
-    void isOverlapping_WithStartTimeAfterEndTime_ReturnsFalse() {
+    void shouldReturnFalse_whenNewEndTimeIsBeforeExistingStartTime() {
       // given
       ShowTime existingShowTime =
           new ShowTime(
@@ -110,8 +106,8 @@ class ShowTimeTest {
     }
 
     @Test
-    @DisplayName("시간이 겹쳐도 날짜가 다르면 중복이 아니다")
-    void isOverlapping_WithTimeOverlappingButNotSameDate_ReturnsFalse() {
+    @DisplayName("should return false when date is different even if time overlaps")
+    void shouldReturnFalse_whenDateIsDifferentEvenIfTimeOverlaps() {
       // given
       ShowTime existingShowTime =
           new ShowTime(
@@ -125,8 +121,7 @@ class ShowTimeTest {
     }
 
     @Test
-    @DisplayName("같은 날짜에 시간이 완전히 겹치지 않으면 중복이 아니다")
-    void isOverlapping_WithSameDateAndNotOverlappingTime_ReturnsFalse() {
+    void shouldReturnFalse_whenTimesDoNotOverlapOnSameDate() {
       // given
       ShowTime existingShowTime =
           new ShowTime(
@@ -143,9 +138,9 @@ class ShowTimeTest {
   @Nested
   @DisplayName("공연 시간 유효성 검사")
   class ValidationTests {
+
     @Test
-    @DisplayName("공연 종료 시각이 시작 시각보다 이르면 예외가 발생한다")
-    void validateTimes_WithEndTimeBeforeStartTime_ThrowsestException() {
+    void shouldThrowException_whenEndTimeIsBeforeStartTime() {
       // given
       LocalTime startTime = LocalTime.of(16, 0);
       LocalTime endTime = LocalTime.of(14, 0);

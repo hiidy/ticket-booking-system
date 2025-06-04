@@ -19,7 +19,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -43,8 +42,7 @@ class ShowTimeServiceTest {
   }
 
   @Test
-  @DisplayName("show를 만들때 시간이 겹치면 예외 반환")
-  void createShowTime_WithOverlappingTime_ThrowsException() {
+  void shouldThrowException_whenShowTimeOverlaps() {
     // given
     ShowTime existingShowTime =
         new ShowTime(
@@ -66,7 +64,7 @@ class ShowTimeServiceTest {
   }
 
   @Test
-  void shouldReturnOnlyShowDatesWithinSpecifiedMonth() {
+  void shouldReturnOnlyShowDates_whenQueryingByYearAndMonth() {
     // given
     LocalDate may31 = LocalDate.of(2025, 5, 31);
     LocalDate june15 = LocalDate.of(2025, 6, 15);
@@ -89,4 +87,5 @@ class ShowTimeServiceTest {
         .hasSize(2)
         .allSatisfy(resp -> assertThat(resp.date().getMonthValue()).isEqualTo(6));
   }
+
 }
