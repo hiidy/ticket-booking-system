@@ -1,4 +1,4 @@
-package com.seatwise.common.builder;
+package com.seatwise.support;
 
 import com.seatwise.venue.domain.Venue;
 import com.seatwise.venue.domain.VenueRepository;

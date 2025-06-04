@@ -1,4 +1,4 @@
-package com.seatwise.common.builder;
+package com.seatwise.support;
 
 import com.seatwise.show.domain.Show;
 import com.seatwise.showtime.domain.ShowTime;
