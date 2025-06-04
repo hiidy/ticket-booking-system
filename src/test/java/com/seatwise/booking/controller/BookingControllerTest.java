@@ -25,17 +25,18 @@ import org.springframework.web.context.request.async.DeferredResult;
 class BookingControllerTest {
 
   private static final UUID IDEMPOTENCY_KEY = UUID.randomUUID();
-  @Autowired MockMvc mockMvc;
+
+  @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
+
   @MockBean private BookingResultWaitService waitService;
   @MockBean private BookingService bookingService;
 
   @Test
-  void givenRequestWithIdempotencyKey_whenCreateBooking_thenReturnsOk() throws Exception {
+  void shouldReturn200Ok_whenCreateBookingWithValidIdempotencyKey() throws Exception {
     // given
     BookingRequest bookingRequest = new BookingRequest(1L, List.of(1001L), 200L);
     BookingResult result = BookingResult.success(999L, IDEMPOTENCY_KEY);
-
     DeferredResult<BookingResult> deferredResult = new DeferredResult<>();
     deferredResult.setResult(result);
 
@@ -49,6 +50,7 @@ class BookingControllerTest {
                 .header("Idempotency-Key", IDEMPOTENCY_KEY)
                 .content(objectMapper.writeValueAsString(bookingRequest)))
         .andExpect(status().isOk());
+
     verify(waitService).waitForResult(IDEMPOTENCY_KEY);
   }
 }

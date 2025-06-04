@@ -1,7 +1,6 @@
 package com.seatwise.booking.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 import com.seatwise.annotation.ServiceTest;
 import com.seatwise.booking.BookingService;
@@ -29,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 class BookingServiceTest {
 
   Member member;
+
   @Autowired private BookingService bookingService;
   @Autowired private TicketRepository ticketRepository;
   @Autowired private SeatRepository seatRepository;
@@ -40,12 +40,10 @@ class BookingServiceTest {
     LocalDate date = LocalDate.of(2025, 1, 1);
     LocalTime startTime = LocalTime.of(18, 0);
     LocalTime endTime = LocalTime.of(20, 0);
-
     ShowTime showTime = showTimeTestDataBuilder.withTime(startTime, endTime).withDate(date).build();
 
     Seat seat = Seat.builder().seatNumber(1).grade(SeatGrade.A).build();
     seatRepository.save(seat);
-
     ticketRepository.save(Ticket.createAvailable(showTime, seat, 40000));
 
     member = new Member("테스트유저", "abcd@gmail.com", "1234");
@@ -53,61 +51,62 @@ class BookingServiceTest {
   }
 
   @Test
-  void shouldCreateBookingSuccessfully() {
+  void shouldCreateBookingAndLockTicket() {
     // given
     UUID requestId = UUID.randomUUID();
-    Long showSeatId = ticketRepository.findAll().get(0).getId();
+    Long ticketId = ticketRepository.findAll().get(0).getId();
 
     // when
-    Long bookingId = bookingService.createBooking(requestId, member.getId(), List.of(showSeatId));
+    Long bookingId = bookingService.createBooking(requestId, member.getId(), List.of(ticketId));
 
     // then
     assertThat(bookingId).isPositive();
-    Status status = ticketRepository.findById(showSeatId).orElseThrow().getStatus();
+    Status status = ticketRepository.findById(ticketId).orElseThrow().getStatus();
     assertThat(status).isEqualTo(Status.PAYMENT_PENDING);
   }
 
   @Test
-  void shouldThrowExceptionWhenSeatNotFound() {
+  void shouldThrow_whenTicketDoesNotExist() {
     // given
-    Long memberId = member.getId();
     UUID requestId = UUID.randomUUID();
-    List<Long> invalidSeatId = List.of(999L);
+    List<Long> invalidTicketIds = List.of(999L);
 
-    // When & Then
-    assertThatThrownBy(() -> bookingService.createBooking(requestId, memberId, invalidSeatId))
+    // when & then
+    assertThatThrownBy(
+            () -> bookingService.createBooking(requestId, member.getId(), invalidTicketIds))
         .isInstanceOf(BookingException.class)
         .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SEAT_NOT_AVAILABLE);
   }
 
   @Test
-  void shouldThrowWhenDuplicateRequestId() {
+  void shouldThrow_whenDuplicateIdempotencyKeyUsed() {
     // given
-    Long memberId = member.getId();
     UUID duplicatedId = UUID.randomUUID();
     List<Long> ticketIds = List.of(ticketRepository.findAll().get(0).getId());
 
-    bookingService.createBooking(duplicatedId, memberId, ticketIds);
+    bookingService.createBooking(duplicatedId, member.getId(), ticketIds);
 
     // when & then
-    assertThatThrownBy(() -> bookingService.createBooking(duplicatedId, memberId, ticketIds))
+    assertThatThrownBy(() -> bookingService.createBooking(duplicatedId, member.getId(), ticketIds))
         .isInstanceOf(BookingException.class)
         .hasFieldOrPropertyWithValue("errorCode", ErrorCode.DUPLICATE_IDEMPOTENCY_KEY);
   }
 
   @Test
-  void canNotBeAssignedWhenTicketIsLocked() {
+  void shouldThrow_whenTicketAlreadyLockedByOtherMember() {
     // given
-    Long newMemberId =
-        memberRepository.save(new Member("new member", "test@gmail.com", "test")).getId();
-    List<Long> ticketIds = List.of(ticketRepository.findAll().get(0).getId());
+    Member other = new Member("new member", "test@gmail.com", "test");
+    Long otherMemberId = memberRepository.save(other).getId();
+    Long ticketId = ticketRepository.findAll().get(0).getId();
+
     UUID firstRequestId = UUID.randomUUID();
     UUID secondRequestId = UUID.randomUUID();
 
-    bookingService.createBooking(firstRequestId, member.getId(), ticketIds);
+    bookingService.createBooking(firstRequestId, member.getId(), List.of(ticketId));
 
     // when & then
-    assertThatThrownBy(() -> bookingService.createBooking(secondRequestId, newMemberId, ticketIds))
+    assertThatThrownBy(
+            () -> bookingService.createBooking(secondRequestId, otherMemberId, List.of(ticketId)))
         .isInstanceOf(BookingException.class)
         .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SEAT_NOT_AVAILABLE);
   }

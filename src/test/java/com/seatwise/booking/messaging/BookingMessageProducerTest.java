@@ -27,7 +27,7 @@ class BookingMessageProducerTest {
   @InjectMocks private BookingMessageProducer bookingMessageProducer;
 
   @Test
-  void sendMessage() {
+  void shouldSendBookingMessageToCorrectShardStream() {
     // given
     int totalShard = 5;
     Long sectionId = 1L;

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 class ShowTimeInventoryTest {
 
   @Test
-  void givenShowInventory_whenDecreaseStockOnce_thenStockDecreasedByOne() {
+  void shouldDecreaseAvailableCount_whenStockIsReduced() {
     // given
     int totalCount = 100;
     int decreaseCount = 1;
@@ -25,7 +25,7 @@ class ShowTimeInventoryTest {
   }
 
   @Test
-  void givenShowInventoryWithNoAvailableCount_whenDecreaseStock_thenThrowsException() {
+  void shouldThrowException_whenAvailableCountIsInsufficient() {
     // given
     int totalCount = 100;
     int availableCount = 0;

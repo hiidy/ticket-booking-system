@@ -1,4 +1,4 @@
-package com.seatwise.seat.service;
+package com.seatwise.seat;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.seatwise.annotation.ServiceTest;
 import com.seatwise.core.BusinessException;
 import com.seatwise.core.ErrorCode;
-import com.seatwise.seat.SeatService;
 import com.seatwise.seat.domain.Seat;
 import com.seatwise.seat.domain.SeatGrade;
 import com.seatwise.seat.domain.SeatRepository;
@@ -17,7 +16,6 @@ import com.seatwise.venue.domain.Venue;
 import com.seatwise.venue.domain.VenueRepository;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,9 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 class SeatServiceTest {
 
   @Autowired private SeatService seatService;
-
   @Autowired private VenueRepository venueRepository;
-
   @Autowired private SeatRepository seatRepository;
 
   private Venue venue;
@@ -39,9 +35,7 @@ class SeatServiceTest {
   }
 
   @Test
-  @DisplayName("단일 좌석 생성 테스트")
-  void createSeat_WithValidRequest_Success() {
-
+  void shouldCreateSingleSeat_whenValidRequestProvided() {
     // given
     SeatGradeRangeRequest seatGradeRangeRequest = new SeatGradeRangeRequest(1, 1, "S");
     SeatCreateRequest seatCreateRequest =
@@ -55,29 +49,27 @@ class SeatServiceTest {
   }
 
   @Test
-  @DisplayName("다중 좌석 생성 테스트")
-  void createSeats_WithValidRequest_Success() {
-    // Given
+  void shouldCreateMultipleSeats_whenMultipleValidRangesProvided() {
+    // given
     SeatGradeRangeRequest sSeatRequest = new SeatGradeRangeRequest(1, 10, "S");
     SeatGradeRangeRequest vipSeatRequest = new SeatGradeRangeRequest(11, 15, "VIP");
     SeatCreateRequest seatCreateRequest =
         new SeatCreateRequest(venue.getId(), List.of(sSeatRequest, vipSeatRequest));
 
-    // When
+    // when
     SeatCreateResponse seats = seatService.createSeat(seatCreateRequest);
 
-    // Then
+    // then
     assertThat(seats.seatsId()).hasSize(15);
   }
 
   @Test
-  @DisplayName("기존 venue에 중복된 좌석 번호를 생성하면 예외 발생")
-  void createSeat_WithDuplicateSeatNumber_ThrowsException() {
+  void shouldThrowException_whenDuplicateSeatNumberExistsInVenue() {
     // given
     SeatGradeRangeRequest seatRange = new SeatGradeRangeRequest(1, 20, "A");
     SeatCreateRequest request = new SeatCreateRequest(venue.getId(), List.of(seatRange));
-    Seat seat = Seat.builder().venue(venue).seatNumber(1).grade(SeatGrade.S).build();
-    seatRepository.save(seat);
+    Seat existingSeat = Seat.builder().venue(venue).seatNumber(1).grade(SeatGrade.S).build();
+    seatRepository.save(existingSeat);
 
     // when & then
     assertThatThrownBy(() -> seatService.createSeat(request))

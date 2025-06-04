@@ -1,6 +1,6 @@
 package com.seatwise.booking.service;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.seatwise.booking.BookingResultWaitService;
 import com.seatwise.booking.dto.BookingResult;
@@ -19,7 +19,7 @@ class BookingResultWaitServiceTest {
   }
 
   @Test
-  void givenValidRequest_whenWaitForResult_thenReturnNewDeferredResult() {
+  void shouldReturnDeferredResult_whenWaitingForResult() {
     // given
     UUID requestId = UUID.randomUUID();
 
@@ -32,13 +32,12 @@ class BookingResultWaitServiceTest {
   }
 
   @Test
-  void givenValidRequest_whenCompleteResult_thenSetDeferredResult() {
+  void shouldCompleteDeferredResult_whenResultIsProvided() {
     // given
     UUID requestId = UUID.randomUUID();
     DeferredResult<BookingResult> deferredResult =
         bookingResultWaitService.waitForResult(requestId);
-    Long bookingId = 1L;
-    BookingResult result = BookingResult.success(bookingId, requestId);
+    BookingResult result = BookingResult.success(1L, requestId);
 
     // when
     bookingResultWaitService.completeResult(requestId, result);

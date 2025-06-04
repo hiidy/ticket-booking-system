@@ -24,12 +24,13 @@ class ShowInventoryServiceTest {
   @InjectMocks private ShowInventoryService showInventoryService;
 
   @Test
-  void givenShowInventory_whenDecreaseShowInventoryStock_thenAvailableStockIsDecreased() {
+  void shouldDecreaseAvailableCount_whenInventoryExists() {
     // given
     ShowInventory vipInventory = new ShowInventory(1L, SeatGrade.VIP, 100, 100);
     int decreaseCount = 10;
 
     when(showInventoryRepository.findById(1L)).thenReturn(Optional.of(vipInventory));
+
     // when
     showInventoryService.decreaseShowInventoryStock(1L, decreaseCount);
 
@@ -40,16 +41,18 @@ class ShowInventoryServiceTest {
   }
 
   @Test
-  void givenNotExistsShowInventoryPk_whenDecreaseShowInventoryStock_thenThrowsException() {
+  void shouldThrowException_whenInventoryDoesNotExist() {
     // given
     Long inventoryId = 1L;
     int decreaseCount = 10;
 
     when(showInventoryRepository.findById(inventoryId)).thenReturn(Optional.empty());
+
     // when & then
     assertThatThrownBy(
             () -> showInventoryService.decreaseShowInventoryStock(inventoryId, decreaseCount))
         .isInstanceOf(BusinessException.class);
+
     verify(showInventoryRepository).findById(inventoryId);
   }
 }

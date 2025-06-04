@@ -1,9 +1,7 @@
 package com.seatwise.booking.messaging;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.seatwise.annotation.EmbeddedRedisTest;
 import com.seatwise.booking.BookingService;
@@ -30,6 +28,7 @@ class BookingMessageConsumerTest {
   @Autowired private BookingMessageConsumer consumer;
   @Autowired private RedisTemplate<String, Object> objectRedisTemplate;
   @MockBean private BookingService bookingService;
+
   private UUID requestId;
   private String streamKey;
 
@@ -50,58 +49,52 @@ class BookingMessageConsumerTest {
   }
 
   @Test
-  void givenValidMessage_whenInvokeOnMessage_thenSuccess() {
+  void shouldProcessValidMessageSuccessfully() {
     // given
     Long memberId = 1L;
-    List<Long> showSeats = List.of(1L, 2L);
-    Long sectionId = 1L;
+    List<Long> seatIds = List.of(1L, 2L);
     Long bookingId = 100L;
+    BookingMessage message = new BookingMessage(requestId.toString(), memberId, seatIds, 1L);
+    when(bookingService.createBooking(requestId, memberId, seatIds)).thenReturn(bookingId);
 
-    BookingMessage message =
-        new BookingMessage(requestId.toString(), memberId, showSeats, sectionId);
-
-    when(bookingService.createBooking(requestId, memberId, showSeats)).thenReturn(bookingId);
-    ObjectRecord<String, BookingMessage> objectRecord =
+    ObjectRecord<String, BookingMessage> record =
         StreamRecords.newRecord().in(streamKey).ofObject(message);
 
     // when
-    consumer.onMessage(objectRecord);
+    consumer.onMessage(record);
 
     // then
-    BookingResult result = BookingResult.success(bookingId, requestId);
+    verify(bookingService).createBooking(requestId, memberId, seatIds);
 
-    assertThat(result).isNotNull();
-    assertThat(result.success()).isTrue();
-    assertThat(result.bookingId()).isEqualTo(bookingId);
-    assertThat(result.requestId()).isEqualTo(requestId);
-    verify(bookingService, times(1)).createBooking(requestId, memberId, showSeats);
+    BookingResult expected = BookingResult.success(bookingId, requestId);
+    assertThat(expected).isNotNull();
+    assertThat(expected.success()).isTrue();
+    assertThat(expected.bookingId()).isEqualTo(bookingId);
+    assertThat(expected.requestId()).isEqualTo(requestId);
   }
 
   @Test
-  void givenInValidMessage_whenInvokeOnMessage_thenFailed() {
+  void shouldHandleDuplicateRequestGracefully() {
     // given
     Long memberId = 1L;
-    List<Long> showSeats = List.of(1L, 2L);
-    Long sectionId = 1L;
+    List<Long> seatIds = List.of(1L, 2L);
+    BookingMessage message = new BookingMessage(requestId.toString(), memberId, seatIds, 1L);
 
-    BookingMessage message =
-        new BookingMessage(requestId.toString(), memberId, showSeats, sectionId);
-
-    when(bookingService.createBooking(requestId, memberId, showSeats))
+    when(bookingService.createBooking(requestId, memberId, seatIds))
         .thenThrow(new BookingException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY, requestId));
-    ObjectRecord<String, BookingMessage> objectRecord =
+
+    ObjectRecord<String, BookingMessage> record =
         StreamRecords.newRecord().in(streamKey).ofObject(message);
 
     // when
-    consumer.onMessage(objectRecord);
+    consumer.onMessage(record);
 
     // then
-    BookingResult result = BookingResult.failed(requestId);
+    verify(bookingService).createBooking(requestId, memberId, seatIds);
 
-    assertThat(result).isNotNull();
+    BookingResult result = BookingResult.failed(requestId);
     assertThat(result.success()).isFalse();
     assertThat(result.bookingId()).isNull();
     assertThat(result.requestId()).isEqualTo(requestId);
-    verify(bookingService, times(1)).createBooking(requestId, memberId, showSeats);
   }
 }
