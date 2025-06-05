@@ -1,9 +1,8 @@
-package com.seatwise.booking.service;
+package com.seatwise.booking;
 
 import static org.assertj.core.api.Assertions.*;
 
 import com.seatwise.annotation.ServiceTest;
-import com.seatwise.booking.BookingService;
 import com.seatwise.booking.exception.BookingException;
 import com.seatwise.core.ErrorCode;
 import com.seatwise.member.Member;

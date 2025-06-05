@@ -1,4 +1,4 @@
-package com.seatwise.inventory.service;
+package com.seatwise.inventory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -6,7 +6,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.seatwise.core.BusinessException;
-import com.seatwise.inventory.ShowInventoryService;
 import com.seatwise.inventory.domain.ShowInventory;
 import com.seatwise.inventory.domain.ShowInventoryRepository;
 import com.seatwise.venue.domain.SeatGrade;

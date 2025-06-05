@@ -1,8 +1,7 @@
-package com.seatwise.booking.service;
+package com.seatwise.booking;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.seatwise.booking.BookingResultWaitService;
 import com.seatwise.booking.dto.BookingResult;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;

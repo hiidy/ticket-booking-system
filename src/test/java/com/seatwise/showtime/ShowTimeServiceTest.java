@@ -1,4 +1,4 @@
-package com.seatwise.showtime.service;
+package com.seatwise.showtime;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -8,7 +8,6 @@ import com.seatwise.core.ErrorCode;
 import com.seatwise.show.domain.Show;
 import com.seatwise.show.domain.ShowRepository;
 import com.seatwise.show.domain.ShowType;
-import com.seatwise.showtime.ShowTimeService;
 import com.seatwise.showtime.domain.ShowTime;
 import com.seatwise.showtime.domain.ShowTimeRepository;
 import com.seatwise.showtime.dto.request.ShowTimeCreateRequest;
@@ -87,5 +86,4 @@ class ShowTimeServiceTest {
         .hasSize(2)
         .allSatisfy(resp -> assertThat(resp.date().getMonthValue()).isEqualTo(6));
   }
-
 }

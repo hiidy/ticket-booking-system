@@ -1,7 +1,8 @@
-package com.seatwise.booking.messaging;
+package com.seatwise.booking;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.seatwise.booking.messaging.StreamKeyGenerator;
 import org.junit.jupiter.api.Test;
 
 class StreamKeyGeneratorTest {

@@ -1,4 +1,4 @@
-package com.seatwise.booking.controller;
+package com.seatwise.booking;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -6,9 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.seatwise.booking.BookingController;
-import com.seatwise.booking.BookingResultWaitService;
-import com.seatwise.booking.BookingService;
 import com.seatwise.booking.dto.BookingRequest;
 import com.seatwise.booking.dto.BookingResult;
 import java.util.List;

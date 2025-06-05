@@ -1,4 +1,4 @@
-package com.seatwise.inventory.entity;
+package com.seatwise.inventory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
