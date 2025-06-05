@@ -14,11 +14,11 @@ spring:
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
   data:
     redis:
       port: 6370

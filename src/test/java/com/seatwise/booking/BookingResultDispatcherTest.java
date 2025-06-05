@@ -8,13 +8,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.context.request.async.DeferredResult;
 
-class BookingResultWaitServiceTest {
+class BookingResultDispatcherTest {
 
-  private BookingResultWaitService bookingResultWaitService;
+  private BookingResultDispatcher bookingResultDispatcher;
 
   @BeforeEach
   void setUp() {
-    bookingResultWaitService = new BookingResultWaitService();
+    bookingResultDispatcher = new BookingResultDispatcher();
   }
 
   @Test
@@ -23,7 +23,7 @@ class BookingResultWaitServiceTest {
     UUID requestId = UUID.randomUUID();
 
     // when
-    DeferredResult<BookingResult> result = bookingResultWaitService.waitForResult(requestId);
+    DeferredResult<BookingResult> result = bookingResultDispatcher.waitForResult(requestId);
 
     // then
     assertThat(result).isNotNull();
@@ -34,12 +34,11 @@ class BookingResultWaitServiceTest {
   void shouldCompleteDeferredResult_whenResultIsProvided() {
     // given
     UUID requestId = UUID.randomUUID();
-    DeferredResult<BookingResult> deferredResult =
-        bookingResultWaitService.waitForResult(requestId);
+    DeferredResult<BookingResult> deferredResult = bookingResultDispatcher.waitForResult(requestId);
     BookingResult result = BookingResult.success(1L, requestId);
 
     // when
-    bookingResultWaitService.completeResult(requestId, result);
+    bookingResultDispatcher.completeResult(requestId, result);
 
     // then
     assertThat(deferredResult.hasResult()).isTrue();

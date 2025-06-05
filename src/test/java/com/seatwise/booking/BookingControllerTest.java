@@ -26,7 +26,7 @@ class BookingControllerTest {
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
 
-  @MockBean private BookingResultWaitService waitService;
+  @MockBean private BookingResultDispatcher waitService;
   @MockBean private BookingService bookingService;
 
   @Test

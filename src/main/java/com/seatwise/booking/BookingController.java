@@ -18,7 +18,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 public class BookingController {
 
   private final BookingService bookingService;
-  private final BookingResultWaitService waitService;
+  private final BookingResultDispatcher waitService;
 
   @PostMapping
   public DeferredResult<BookingResult> createBookingRequest(

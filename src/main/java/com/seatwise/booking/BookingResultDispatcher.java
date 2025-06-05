@@ -8,13 +8,13 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.async.DeferredResult;
 
-@Service
+@Component
 @RequiredArgsConstructor
 @Slf4j
-public class BookingResultWaitService {
+public class BookingResultDispatcher {
 
   private static final long WAIT_TIMEOUT = 10000L;
   private final Map<UUID, DeferredResult<BookingResult>> waiters = new ConcurrentHashMap<>();

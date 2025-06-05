@@ -1,6 +1,6 @@
 package com.seatwise.booking.messaging;
 
-import com.seatwise.booking.BookingResultWaitService;
+import com.seatwise.booking.BookingResultDispatcher;
 import com.seatwise.booking.BookingService;
 import com.seatwise.booking.dto.BookingMessage;
 import com.seatwise.booking.dto.BookingResult;
@@ -31,7 +31,7 @@ public class BookingMessageConsumer
   private final RedisTemplate<String, Object> redisTemplate;
   private final MessagingProperties properties;
   private final BookingService bookingService;
-  private final BookingResultWaitService waitService;
+  private final BookingResultDispatcher waitService;
   private final BookingMessageAckService bookingMessageAckService;
 
   @Value("${spring.application.instance-idx}")
