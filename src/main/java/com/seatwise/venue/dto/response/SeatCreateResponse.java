@@ -1,6 +1,6 @@
-package com.seatwise.seat.dto.response;
+package com.seatwise.venue.dto.response;
 
-import com.seatwise.seat.domain.Seat;
+import com.seatwise.venue.domain.Seat;
 import java.util.List;
 
 public record SeatCreateResponse(List<Long> seatsId) {

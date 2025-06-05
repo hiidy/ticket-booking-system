@@ -2,13 +2,13 @@ package com.seatwise.ticket;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.seatwise.seat.domain.Seat;
-import com.seatwise.seat.domain.SeatGrade;
-import com.seatwise.seat.domain.SeatRepository;
 import com.seatwise.showtime.domain.ShowTime;
 import com.seatwise.showtime.domain.ShowTimeRepository;
 import com.seatwise.ticket.domain.Ticket;
 import com.seatwise.ticket.domain.TicketRepository;
+import com.seatwise.venue.domain.Seat;
+import com.seatwise.venue.domain.SeatGrade;
+import com.seatwise.venue.domain.SeatRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;

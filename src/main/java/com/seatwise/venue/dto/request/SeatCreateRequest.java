@@ -1,4 +1,4 @@
-package com.seatwise.seat.dto.request;
+package com.seatwise.venue.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import java.util.List;

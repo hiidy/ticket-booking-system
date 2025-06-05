@@ -50,7 +50,7 @@ public class BookingService {
     }
 
     boolean anyUnavailable =
-        tickets.stream().anyMatch(seat -> !seat.canAssignBooking(bookingRequestTime));
+        tickets.stream().anyMatch(ticket -> !ticket.canAssignBooking(bookingRequestTime));
 
     if (anyUnavailable) {
       throw new BookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);

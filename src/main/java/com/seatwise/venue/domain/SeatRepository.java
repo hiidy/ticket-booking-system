@@ -1,4 +1,4 @@
-package com.seatwise.seat.domain;
+package com.seatwise.venue.domain;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

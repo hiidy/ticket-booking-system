@@ -1,15 +1,15 @@
-package com.seatwise.seat;
+package com.seatwise.venue;
 
 import com.seatwise.core.BusinessException;
 import com.seatwise.core.ErrorCode;
-import com.seatwise.seat.domain.Seat;
-import com.seatwise.seat.domain.SeatGrade;
-import com.seatwise.seat.domain.SeatRepository;
-import com.seatwise.seat.dto.request.SeatCreateRequest;
-import com.seatwise.seat.dto.request.SeatGradeRangeRequest;
-import com.seatwise.seat.dto.response.SeatCreateResponse;
+import com.seatwise.venue.domain.Seat;
+import com.seatwise.venue.domain.SeatGrade;
+import com.seatwise.venue.domain.SeatRepository;
 import com.seatwise.venue.domain.Venue;
 import com.seatwise.venue.domain.VenueRepository;
+import com.seatwise.venue.dto.request.SeatCreateRequest;
+import com.seatwise.venue.dto.request.SeatGradeRangeRequest;
+import com.seatwise.venue.dto.response.SeatCreateResponse;
 import java.util.List;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;

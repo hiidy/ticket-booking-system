@@ -1,4 +1,4 @@
-package com.seatwise.seat.domain;
+package com.seatwise.venue.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
