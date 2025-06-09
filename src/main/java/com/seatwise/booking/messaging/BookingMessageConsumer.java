@@ -2,6 +2,7 @@ package com.seatwise.booking.messaging;
 
 import com.seatwise.booking.BookingResultDispatcher;
 import com.seatwise.booking.BookingService;
+import com.seatwise.booking.domain.ShardLockRedisRepository;
 import com.seatwise.booking.dto.BookingMessage;
 import com.seatwise.booking.dto.BookingResult;
 import com.seatwise.booking.exception.BookingException;
@@ -34,10 +35,11 @@ public class BookingMessageConsumer
   private final StreamMessageListenerContainer<String, ObjectRecord<String, BookingMessage>>
       container;
   private final RedisTemplate<String, Object> redisTemplate;
+  private final ShardLockRedisRepository shardLockRedisRepository;
   private final StringRedisTemplate stringRedisTemplate;
   private final MessagingProperties properties;
   private final BookingService bookingService;
-  private final BookingResultDispatcher waitService;
+  private final BookingResultDispatcher dispatcher;
   private final BookingMessageAckService bookingMessageAckService;
   private final List<Subscription> activeSubscriptions = new ArrayList<>();
 
@@ -71,6 +73,7 @@ public class BookingMessageConsumer
   }
 
   private void configureSubscription(int instanceCount) {
+    List<String> streamKeys = getAssignedStreamKeys(instanceCount);
     for (Subscription s : activeSubscriptions) {
       s.cancel();
     }
@@ -99,6 +102,17 @@ public class BookingMessageConsumer
     }
   }
 
+  private List<String> getAssignedStreamKeys(int instanceCount) {
+    int shardCount = properties.getShardCount();
+    List<String> streamKeys = new ArrayList<>();
+    for (int shardId = 0; shardId < shardCount; shardId++) {
+      if (shardId % instanceCount == instanceIdx % instanceCount) {
+        streamKeys.add(StreamKeyGenerator.createStreamKey(shardId));
+      }
+    }
+    return streamKeys;
+  }
+
   @Override
   public void onMessage(ObjectRecord<String, BookingMessage> message) {
     BookingMessage request = message.getValue();
@@ -112,9 +126,9 @@ public class BookingMessageConsumer
       Long bookingId =
           bookingService.createBooking(requestId, request.memberId(), request.showSeatIds());
       BookingResult result = BookingResult.success(bookingId, requestId);
-      waitService.completeResult(requestId, result);
+      dispatcher.completeResult(requestId, result);
     } catch (BookingException e) {
-      waitService.completeWithFailure(requestId, e);
+      dispatcher.completeWithFailure(requestId, e);
     } finally {
       bookingMessageAckService.acknowledge(properties.getConsumerGroup(), message);
     }

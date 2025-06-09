@@ -68,7 +68,7 @@ public class RedisConfig {
   public StreamMessageListenerContainerOptions<String, ObjectRecord<String, BookingMessage>>
       streamOptions(RedisTemplate<String, Object> redisTemplate) {
     return StreamMessageListenerContainerOptions.builder()
-        .pollTimeout(Duration.ofMillis(100))
+        .pollTimeout(Duration.ofMillis(10))
         .hashValueSerializer(redisTemplate.getValueSerializer())
         .objectMapper(new Jackson2HashMapper(true))
         .targetType(BookingMessage.class)
