@@ -2,10 +2,7 @@ package com.seatwise.booking;
 
 import com.seatwise.booking.domain.Booking;
 import com.seatwise.booking.domain.BookingRepository;
-import com.seatwise.booking.dto.BookingMessage;
-import com.seatwise.booking.dto.BookingRequest;
 import com.seatwise.booking.exception.BookingException;
-import com.seatwise.booking.messaging.BookingMessageProducer;
 import com.seatwise.core.ErrorCode;
 import com.seatwise.member.Member;
 import com.seatwise.member.MemberRepository;
@@ -28,7 +25,6 @@ public class BookingService {
   private final BookingRepository bookingRepository;
   private final TicketRepository ticketRepository;
   private final MemberRepository memberRepository;
-  private final BookingMessageProducer producer;
 
   @Transactional
   public Long createBooking(UUID requestId, Long memberId, List<Long> ticketIds) {
@@ -64,12 +60,5 @@ public class BookingService {
             ticket.assignBooking(savedBooking.getId(), bookingRequestTime, Duration.ofMinutes(10)));
 
     return savedBooking.getId();
-  }
-
-  public void enqueueBooking(UUID requestId, BookingRequest request) {
-    BookingMessage message =
-        new BookingMessage(
-            requestId.toString(), request.memberId(), request.ticketIds(), request.sectionId());
-    producer.sendMessage(message);
   }
 }

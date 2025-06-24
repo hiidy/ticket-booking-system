@@ -17,14 +17,14 @@ import org.springframework.web.context.request.async.DeferredResult;
 @RequiredArgsConstructor
 public class BookingController {
 
-  private final BookingService bookingService;
+  private final BookingRequestService requestService;
   private final BookingResultDispatcher waitService;
 
   @PostMapping
   public DeferredResult<BookingResult> createBookingRequest(
       @RequestHeader("Idempotency-Key") UUID key, @Valid @RequestBody BookingRequest request) {
     DeferredResult<BookingResult> result = waitService.waitForResult(key);
-    bookingService.enqueueBooking(key, request);
+    requestService.enqueueBooking(key, request);
     return result;
   }
 }

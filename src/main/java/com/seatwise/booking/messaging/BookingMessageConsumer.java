@@ -1,13 +1,8 @@
 package com.seatwise.booking.messaging;
 
-import com.seatwise.booking.BookingResultDispatcher;
-import com.seatwise.booking.BookingService;
 import com.seatwise.booking.dto.BookingMessage;
-import com.seatwise.booking.dto.BookingResult;
-import com.seatwise.booking.exception.BookingException;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,10 +13,10 @@ import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 @Slf4j
-@Service
+@Component
 @RequiredArgsConstructor
 public class BookingMessageConsumer
     implements StreamListener<String, ObjectRecord<String, BookingMessage>> {
@@ -30,9 +25,8 @@ public class BookingMessageConsumer
       container;
   private final RedisTemplate<String, Object> redisTemplate;
   private final MessagingProperties properties;
-  private final BookingService bookingService;
-  private final BookingResultDispatcher waitService;
   private final BookingMessageAckService bookingMessageAckService;
+  private final BookingMessageHandler bookingMessageHandler;
 
   @Value("${spring.application.instance-idx}")
   private int instanceIdx;
@@ -72,19 +66,10 @@ public class BookingMessageConsumer
   @Override
   public void onMessage(ObjectRecord<String, BookingMessage> message) {
     BookingMessage request = message.getValue();
-    UUID requestId = UUID.fromString(request.requestId());
-    log.info(
-        "멤버Id: {}, 좌석Id: {}, 섹션Id: {}에 대한 요청 처리중",
-        request.memberId(),
-        request.showSeatIds(),
-        request.sectionId());
     try {
-      Long bookingId =
-          bookingService.createBooking(requestId, request.memberId(), request.showSeatIds());
-      BookingResult result = BookingResult.success(bookingId, requestId);
-      waitService.completeResult(requestId, result);
-    } catch (BookingException e) {
-      waitService.completeWithFailure(requestId, e);
+      bookingMessageHandler.handleBookingMessage(request);
+    } catch (Exception e) {
+      log.warn("예매 도중 예외가 발생함 : {}", e.getMessage());
     } finally {
       bookingMessageAckService.acknowledge(properties.getConsumerGroup(), message);
     }
