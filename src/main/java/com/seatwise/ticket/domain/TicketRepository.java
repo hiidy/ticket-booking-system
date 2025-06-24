@@ -42,4 +42,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
       "SELECT t FROM Ticket t WHERE t.id IN :ticketIds AND (t.expirationTime IS NULL OR t.expirationTime > :currentTime) AND t.status != 'BOOKED'")
   List<Ticket> findAllAvailableSeats(
       @Param("ticketIds") List<Long> ticketIds, @Param("currentTime") LocalDateTime currentTime);
+
+  List<Ticket> findTicketsByBookingId(Long id);
 }

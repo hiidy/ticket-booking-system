@@ -77,6 +77,12 @@ public class Ticket extends BaseEntity {
     this.expirationTime = requestTime.plus(duration);
   }
 
+  public void cancelBooking() {
+    this.bookingId = null;
+    this.status = Status.CANCELLED;
+    this.expirationTime = null;
+  }
+
   private void validatePrice(Integer price) {
     if (price < 0) {
       throw new BusinessException(ErrorCode.INVALID_SEAT_PRICE);

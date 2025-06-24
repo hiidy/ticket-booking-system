@@ -11,15 +11,13 @@ import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class BookingMessageConsumer
-    implements StreamListener<String, ObjectRecord<String, BookingMessage>> {
+public class BookingMessageConsumer {
 
   private final StreamMessageListenerContainer<String, ObjectRecord<String, BookingMessage>>
       container;
@@ -32,7 +30,7 @@ public class BookingMessageConsumer
   private int instanceIdx;
 
   @PostConstruct
-  protected void init() {
+  protected void listen() {
     int shardCount = properties.getShardCount();
     int instanceCount = properties.getInstanceCount();
     String group = properties.getConsumerGroup();
@@ -50,21 +48,20 @@ public class BookingMessageConsumer
         container.receive(
             Consumer.from(group, String.valueOf(instanceIdx)),
             StreamOffset.create(streamKey, ReadOffset.lastConsumed()),
-            this);
+            this::handleBookingMessage);
       }
     }
     container.start();
   }
 
   @PreDestroy
-  protected void destroy() {
+  protected void shutdown() {
     if (container != null) {
       container.stop();
     }
   }
 
-  @Override
-  public void onMessage(ObjectRecord<String, BookingMessage> message) {
+  private void handleBookingMessage(ObjectRecord<String, BookingMessage> message) {
     BookingMessage request = message.getValue();
     try {
       bookingMessageHandler.handleBookingMessage(request);

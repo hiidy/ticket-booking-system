@@ -29,6 +29,7 @@ class BookingControllerTest {
 
   @MockBean private BookingResponseManager waitService;
   @MockBean private BookingMessageProducer bookingMessageProducer;
+  @MockBean private BookingService bookingService;
 
   @Test
   void shouldReturn200Ok_whenCreateBookingWithValidIdempotencyKey() throws Exception {

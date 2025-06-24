@@ -61,4 +61,16 @@ public class BookingService {
 
     return savedBooking.getId();
   }
+
+  @Transactional
+  public void cancelBooking(Long memberId, Long bookingId) {
+    List<Ticket> tickets = ticketRepository.findTicketsByBookingId(bookingId);
+
+    if (tickets.isEmpty()) {
+      throw new IllegalArgumentException("없는 티켓을 취소하려고합니다");
+    }
+
+    tickets.forEach(Ticket::cancelBooking);
+    bookingRepository.deleteById(bookingId);
+  }
 }
