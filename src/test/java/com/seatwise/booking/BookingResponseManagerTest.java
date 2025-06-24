@@ -2,19 +2,19 @@ package com.seatwise.booking;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.seatwise.booking.dto.BookingResult;
+import com.seatwise.booking.dto.response.BookingResponse;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.context.request.async.DeferredResult;
 
-class BookingResultDispatcherTest {
+class BookingResponseManagerTest {
 
-  private BookingResultDispatcher bookingResultDispatcher;
+  private BookingResponseManager bookingResponseManager;
 
   @BeforeEach
   void setUp() {
-    bookingResultDispatcher = new BookingResultDispatcher();
+    bookingResponseManager = new BookingResponseManager();
   }
 
   @Test
@@ -23,7 +23,8 @@ class BookingResultDispatcherTest {
     UUID requestId = UUID.randomUUID();
 
     // when
-    DeferredResult<BookingResult> result = bookingResultDispatcher.waitForResult(requestId);
+    DeferredResult<BookingResponse> result =
+        bookingResponseManager.createPendingResponse(requestId);
 
     // then
     assertThat(result).isNotNull();
@@ -34,11 +35,12 @@ class BookingResultDispatcherTest {
   void shouldCompleteDeferredResult_whenResultIsProvided() {
     // given
     UUID requestId = UUID.randomUUID();
-    DeferredResult<BookingResult> deferredResult = bookingResultDispatcher.waitForResult(requestId);
-    BookingResult result = BookingResult.success(1L, requestId);
+    DeferredResult<BookingResponse> deferredResult =
+        bookingResponseManager.createPendingResponse(requestId);
+    BookingResponse result = BookingResponse.success(1L, requestId);
 
     // when
-    bookingResultDispatcher.completeResult(requestId, result);
+    bookingResponseManager.completeWithSuccess(requestId, result);
 
     // then
     assertThat(deferredResult.hasResult()).isTrue();

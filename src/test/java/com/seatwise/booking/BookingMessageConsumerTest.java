@@ -5,7 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.seatwise.annotation.EmbeddedRedisTest;
 import com.seatwise.booking.dto.BookingMessage;
-import com.seatwise.booking.dto.BookingResult;
+import com.seatwise.booking.dto.response.BookingResponse;
 import com.seatwise.booking.exception.BookingException;
 import com.seatwise.booking.messaging.BookingMessageConsumer;
 import com.seatwise.booking.messaging.StreamKeyGenerator;
@@ -67,7 +67,7 @@ class BookingMessageConsumerTest {
     // then
     verify(bookingService).createBooking(requestId, memberId, seatIds);
 
-    BookingResult expected = BookingResult.success(bookingId, requestId);
+    BookingResponse expected = BookingResponse.success(bookingId, requestId);
     assertThat(expected).isNotNull();
     assertThat(expected.success()).isTrue();
     assertThat(expected.bookingId()).isEqualTo(bookingId);
@@ -93,7 +93,7 @@ class BookingMessageConsumerTest {
     // then
     verify(bookingService).createBooking(requestId, memberId, seatIds);
 
-    BookingResult result = BookingResult.failed(requestId);
+    BookingResponse result = BookingResponse.failed(requestId);
     assertThat(result.success()).isFalse();
     assertThat(result.bookingId()).isNull();
     assertThat(result.requestId()).isEqualTo(requestId);

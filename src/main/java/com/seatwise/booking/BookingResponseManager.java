@@ -1,6 +1,6 @@
 package com.seatwise.booking;
 
-import com.seatwise.booking.dto.BookingResult;
+import com.seatwise.booking.dto.response.BookingResponse;
 import com.seatwise.booking.exception.BookingException;
 import com.seatwise.core.ErrorCode;
 import java.util.Map;
@@ -14,18 +14,19 @@ import org.springframework.web.context.request.async.DeferredResult;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class BookingResultDispatcher {
+public class BookingResponseManager {
 
   private static final long WAIT_TIMEOUT = 10000L;
-  private final Map<UUID, DeferredResult<BookingResult>> waiters = new ConcurrentHashMap<>();
+  private final Map<UUID, DeferredResult<BookingResponse>> pendingResponses =
+      new ConcurrentHashMap<>();
 
-  public DeferredResult<BookingResult> waitForResult(UUID requestId) {
-    DeferredResult<BookingResult> deferredResult = new DeferredResult<>(WAIT_TIMEOUT);
-    waiters.put(requestId, deferredResult);
+  public DeferredResult<BookingResponse> createPendingResponse(UUID requestId) {
+    DeferredResult<BookingResponse> deferredResult = new DeferredResult<>(WAIT_TIMEOUT);
+    pendingResponses.put(requestId, deferredResult);
 
     deferredResult.onTimeout(
         () -> {
-          waiters.remove(requestId);
+          pendingResponses.remove(requestId);
           log.warn("requestId {} - 타임아웃 발생", requestId);
           deferredResult.setErrorResult(new BookingException(ErrorCode.BOOKING_TIMEOUT, requestId));
         });
@@ -33,10 +34,10 @@ public class BookingResultDispatcher {
     return deferredResult;
   }
 
-  public void completeResult(UUID requestId, BookingResult result) {
-    DeferredResult<BookingResult> deferredResult = waiters.remove(requestId);
+  public void completeWithSuccess(UUID requestId, BookingResponse response) {
+    DeferredResult<BookingResponse> deferredResult = pendingResponses.remove(requestId);
     if (deferredResult != null) {
-      deferredResult.setResult(result);
+      deferredResult.setResult(response);
       log.info("requestId {} - 응답 완료", requestId);
     } else {
       log.warn("requestId {} - 대기 중인 요청이 없음", requestId);
@@ -44,7 +45,7 @@ public class BookingResultDispatcher {
   }
 
   public void completeWithFailure(UUID requestId, BookingException e) {
-    DeferredResult<BookingResult> deferredResult = waiters.remove(requestId);
+    DeferredResult<BookingResponse> deferredResult = pendingResponses.remove(requestId);
     if (deferredResult != null) {
       deferredResult.setErrorResult(e);
       log.warn("requestId {} - 예외로 응답 완료: {}", requestId, e.getErrorCode());

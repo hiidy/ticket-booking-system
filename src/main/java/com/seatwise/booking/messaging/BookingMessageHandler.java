@@ -1,9 +1,9 @@
 package com.seatwise.booking.messaging;
 
-import com.seatwise.booking.BookingResultDispatcher;
+import com.seatwise.booking.BookingResponseManager;
 import com.seatwise.booking.BookingService;
 import com.seatwise.booking.dto.BookingMessage;
-import com.seatwise.booking.dto.BookingResult;
+import com.seatwise.booking.dto.response.BookingResponse;
 import com.seatwise.booking.exception.BookingException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class BookingMessageHandler {
 
   private final BookingService bookingService;
-  private final BookingResultDispatcher dispatcher;
+  private final BookingResponseManager responseManager;
 
   public void handleBookingMessage(BookingMessage request) {
     UUID requestId = UUID.fromString(request.requestId());
@@ -28,10 +28,10 @@ public class BookingMessageHandler {
     try {
       Long bookingId =
           bookingService.createBooking(requestId, request.memberId(), request.showSeatIds());
-      BookingResult result = BookingResult.success(bookingId, requestId);
-      dispatcher.completeResult(requestId, result);
+      BookingResponse result = BookingResponse.success(bookingId, requestId);
+      responseManager.completeWithSuccess(requestId, result);
     } catch (BookingException e) {
-      dispatcher.completeWithFailure(requestId, e);
+      responseManager.completeWithFailure(requestId, e);
     }
   }
 }

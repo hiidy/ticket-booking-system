@@ -1,8 +1,8 @@
 package com.seatwise.booking;
 
 import com.seatwise.booking.dto.BookingMessage;
-import com.seatwise.booking.dto.BookingResult;
 import com.seatwise.booking.dto.request.BookingRequest;
+import com.seatwise.booking.dto.response.BookingResponse;
 import com.seatwise.booking.messaging.BookingMessageProducer;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -20,15 +20,15 @@ import org.springframework.web.context.request.async.DeferredResult;
 public class BookingController {
 
   private final BookingMessageProducer producer;
-  private final BookingResultDispatcher waitService;
+  private final BookingResponseManager responseManager;
 
   @PostMapping
-  public DeferredResult<BookingResult> createBookingRequest(
+  public DeferredResult<BookingResponse> createBookingRequest(
       @RequestHeader("Idempotency-Key") UUID key, @Valid @RequestBody BookingRequest request) {
-    DeferredResult<BookingResult> result = waitService.waitForResult(key);
+    DeferredResult<BookingResponse> response = responseManager.createPendingResponse(key);
     producer.enqueueBooking(
         new BookingMessage(
             key.toString(), request.memberId(), request.ticketIds(), request.sectionId()));
-    return result;
+    return response;
   }
 }

@@ -6,8 +6,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.seatwise.booking.dto.BookingResult;
 import com.seatwise.booking.dto.request.BookingRequest;
+import com.seatwise.booking.dto.response.BookingResponse;
 import com.seatwise.booking.messaging.BookingMessageProducer;
 import java.util.List;
 import java.util.UUID;
@@ -27,18 +27,18 @@ class BookingControllerTest {
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
 
-  @MockBean private BookingResultDispatcher waitService;
+  @MockBean private BookingResponseManager waitService;
   @MockBean private BookingMessageProducer bookingMessageProducer;
 
   @Test
   void shouldReturn200Ok_whenCreateBookingWithValidIdempotencyKey() throws Exception {
     // given
     BookingRequest bookingRequest = new BookingRequest(1L, List.of(1001L), 200L);
-    BookingResult result = BookingResult.success(999L, IDEMPOTENCY_KEY);
-    DeferredResult<BookingResult> deferredResult = new DeferredResult<>();
+    BookingResponse result = BookingResponse.success(999L, IDEMPOTENCY_KEY);
+    DeferredResult<BookingResponse> deferredResult = new DeferredResult<>();
     deferredResult.setResult(result);
 
-    given(waitService.waitForResult(IDEMPOTENCY_KEY)).willReturn(deferredResult);
+    given(waitService.createPendingResponse(IDEMPOTENCY_KEY)).willReturn(deferredResult);
 
     // when & then
     mockMvc
@@ -49,6 +49,6 @@ class BookingControllerTest {
                 .content(objectMapper.writeValueAsString(bookingRequest)))
         .andExpect(status().isOk());
 
-    verify(waitService).waitForResult(IDEMPOTENCY_KEY);
+    verify(waitService).createPendingResponse(IDEMPOTENCY_KEY);
   }
 }
