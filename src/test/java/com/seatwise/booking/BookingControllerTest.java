@@ -6,8 +6,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.seatwise.booking.dto.BookingRequest;
 import com.seatwise.booking.dto.BookingResult;
+import com.seatwise.booking.dto.request.BookingRequest;
+import com.seatwise.booking.messaging.BookingMessageProducer;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ class BookingControllerTest {
   @Autowired private ObjectMapper objectMapper;
 
   @MockBean private BookingResultDispatcher waitService;
-  @MockBean private BookingService bookingService;
+  @MockBean private BookingMessageProducer bookingMessageProducer;
 
   @Test
   void shouldReturn200Ok_whenCreateBookingWithValidIdempotencyKey() throws Exception {
