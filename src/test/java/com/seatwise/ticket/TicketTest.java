@@ -6,8 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.seatwise.booking.domain.Booking;
 import com.seatwise.core.BusinessException;
 import com.seatwise.member.Member;
-import com.seatwise.ticket.domain.Status;
 import com.seatwise.ticket.domain.Ticket;
+import com.seatwise.ticket.domain.TicketStatus;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ class TicketTest {
     ticket.assignBooking(booking.getId(), LocalDateTime.now(), Duration.ofMinutes(10));
 
     // then
-    assertThat(ticket.getStatus()).isEqualTo(Status.PAYMENT_PENDING);
+    assertThat(ticket.getStatus()).isEqualTo(TicketStatus.PAYMENT_PENDING);
   }
 
   @Test
@@ -107,11 +107,44 @@ class TicketTest {
   }
 
   @Test
+  void shouldUpdateStatus_whenCancelBooking() {
+    // given
+    Ticket ticket = Ticket.createAvailable(null, null, 40000);
+    Member member = new Member("철수", "abcd@gamil.com", "1234");
+    Booking booking = new Booking(null, member, 0);
+
+    // when
+    ticket.assignBooking(
+        booking.getId(), LocalDateTime.of(2025, 1, 1, 12, 0), Duration.ofMinutes(10));
+    ticket.cancelBooking();
+
+    // then
+    assertThat(ticket.getStatus()).isEqualTo(TicketStatus.CANCELLED);
+  }
+
+  @Test
+  void shouldResetExpirationTimeAndBookingId_whenCancelBooking() {
+    // given
+    Ticket ticket = Ticket.createAvailable(null, null, 40000);
+    Member member = new Member("철수", "abcd@gamil.com", "1234");
+    Booking booking = new Booking(null, member, 0);
+
+    // when
+    ticket.assignBooking(
+        booking.getId(), LocalDateTime.of(2025, 1, 1, 12, 0), Duration.ofMinutes(10));
+    ticket.cancelBooking();
+
+    // then
+    assertThat(ticket.getBookingId()).isNull();
+    assertThat(ticket.getExpirationTime()).isNull();
+  }
+
+  @Test
   void shouldInitializeTicketWithAvailableStatus() {
     // when
     Ticket ticket = Ticket.createAvailable(null, null, 40000);
 
     // then
-    assertThat(ticket.getStatus()).isEqualTo(Status.AVAILABLE);
+    assertThat(ticket.getStatus()).isEqualTo(TicketStatus.AVAILABLE);
   }
 }

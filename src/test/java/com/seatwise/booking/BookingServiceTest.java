@@ -9,9 +9,9 @@ import com.seatwise.member.Member;
 import com.seatwise.member.MemberRepository;
 import com.seatwise.showtime.domain.ShowTime;
 import com.seatwise.support.ShowTimeTestDataBuilder;
-import com.seatwise.ticket.domain.Status;
 import com.seatwise.ticket.domain.Ticket;
 import com.seatwise.ticket.domain.TicketRepository;
+import com.seatwise.ticket.domain.TicketStatus;
 import com.seatwise.venue.domain.Seat;
 import com.seatwise.venue.domain.SeatGrade;
 import com.seatwise.venue.domain.SeatRepository;
@@ -60,8 +60,8 @@ class BookingServiceTest {
 
     // then
     assertThat(bookingId).isPositive();
-    Status status = ticketRepository.findById(ticketId).orElseThrow().getStatus();
-    assertThat(status).isEqualTo(Status.PAYMENT_PENDING);
+    TicketStatus status = ticketRepository.findById(ticketId).orElseThrow().getStatus();
+    assertThat(status).isEqualTo(TicketStatus.PAYMENT_PENDING);
   }
 
   @Test

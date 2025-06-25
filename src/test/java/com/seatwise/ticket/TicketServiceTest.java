@@ -13,9 +13,9 @@ import com.seatwise.showtime.dto.TicketPrice;
 import com.seatwise.support.ShowTestDataBuilder;
 import com.seatwise.support.ShowTimeTestDataBuilder;
 import com.seatwise.support.VenueTestDataBuilder;
-import com.seatwise.ticket.domain.Status;
 import com.seatwise.ticket.domain.Ticket;
 import com.seatwise.ticket.domain.TicketRepository;
+import com.seatwise.ticket.domain.TicketStatus;
 import com.seatwise.ticket.dto.TicketCreateRequest;
 import com.seatwise.ticket.dto.TicketResponse;
 import com.seatwise.venue.domain.Seat;
@@ -82,7 +82,7 @@ class TicketServiceTest {
         .allSatisfy(
             ticket -> {
               assertThat(ticket.getPrice()).isEqualTo(50000);
-              assertThat(ticket.getStatus()).isEqualTo(Status.AVAILABLE);
+              assertThat(ticket.getStatus()).isEqualTo(TicketStatus.AVAILABLE);
             });
   }
 
