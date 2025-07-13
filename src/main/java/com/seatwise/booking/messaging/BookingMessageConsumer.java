@@ -47,12 +47,6 @@ public class BookingMessageConsumer
       if (shardId % instanceCount == instanceIdx % instanceCount) {
         String streamKey = StreamKeyGenerator.createStreamKey(shardId);
 
-        try {
-          redisTemplate.opsForStream().createGroup(streamKey, group);
-        } catch (Exception e) {
-          log.info("해당 스트림키에 대해서 그룹이 이미 존재합니다 : {}", streamKey);
-        }
-
         container.receive(
             Consumer.from(group, String.valueOf(instanceIdx)),
             StreamOffset.create(streamKey, ReadOffset.lastConsumed()),

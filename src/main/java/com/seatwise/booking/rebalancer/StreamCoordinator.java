@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class StreamProcessor {
+public class StreamCoordinator {
 
   private final MessagingProperties properties;
   private final RedissonClient redissonClient;

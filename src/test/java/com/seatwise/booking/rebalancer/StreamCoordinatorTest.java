@@ -17,7 +17,7 @@ import org.testcontainers.utility.DockerImageName;
 
 @Testcontainers
 @SpringBootTest
-class StreamProcessorTest {
+class StreamCoordinatorTest {
 
   @Container @ServiceConnection
   static final GenericContainer<?> REDIS_CONTAINER =
