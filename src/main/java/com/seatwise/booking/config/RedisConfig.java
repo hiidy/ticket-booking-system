@@ -1,10 +1,5 @@
 package com.seatwise.booking.config;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.seatwise.booking.dto.BookingMessage;
 import java.time.Duration;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
@@ -15,7 +10,7 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.hash.Jackson2HashMapper;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer.StreamMessageListenerContainerOptions;
@@ -28,27 +23,13 @@ public class RedisConfig {
     return new LettuceConnectionFactory(redisProperties.getHost(), redisProperties.getPort());
   }
 
-  private ObjectMapper createObjectMapper() {
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.registerModule(new JavaTimeModule());
-    objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-    objectMapper.activateDefaultTyping(
-        objectMapper.getPolymorphicTypeValidator(),
-        ObjectMapper.DefaultTyping.NON_FINAL,
-        As.PROPERTY);
-    return objectMapper;
-  }
+  @Bean
+  public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+    RedisTemplate<String, Object> template = new RedisTemplate<>();
 
-  private <T> RedisTemplate<String, T> createRedisTemplate(
-      RedisConnectionFactory factory, Class<T> targetClass) {
-
-    RedisTemplate<String, T> template = new RedisTemplate<>();
     template.setConnectionFactory(factory);
 
-    ObjectMapper objectMapper = createObjectMapper();
-
-    Jackson2JsonRedisSerializer<T> serializer =
-        new Jackson2JsonRedisSerializer<>(objectMapper, targetClass);
+    GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer();
 
     template.setValueSerializer(serializer);
     template.setHashValueSerializer(serializer);
@@ -57,11 +38,6 @@ public class RedisConfig {
 
     template.afterPropertiesSet();
     return template;
-  }
-
-  @Bean
-  public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
-    return createRedisTemplate(factory, Object.class);
   }
 
   @Bean

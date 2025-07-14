@@ -3,7 +3,8 @@ package com.seatwise.booking.rebalancer;
 import com.seatwise.booking.messaging.MessagingProperties;
 import com.seatwise.booking.messaging.StreamKeyGenerator;
 import jakarta.annotation.PostConstruct;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
@@ -14,11 +15,14 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class StreamCoordinator {
+public class StreamConsumer {
 
+  private static final String ADMIN_LOCK_KEY = "lock:admin";
+  private final String id = UUID.randomUUID().toString();
   private final MessagingProperties properties;
   private final RedissonClient redissonClient;
   private final RedisTemplate<String, Object> redisTemplate;
+  private final StreamConsumerStateRepository consumerStateRepository;
   private boolean isLeader = false;
 
   @PostConstruct
@@ -26,17 +30,20 @@ public class StreamCoordinator {
     lockAndCreateConsumerGroups();
   }
 
-  private void lockAndCreateConsumerGroups() {
-    String lockKey = "lock:admin";
-    RLock lock = redissonClient.getLock(lockKey);
+  private void rebalance(String consumerId) {
+    RLock adminLock = redissonClient.getLock(ADMIN_LOCK_KEY);
 
-    try {
-      if (lock.tryLock(30, 120, TimeUnit.SECONDS)) {
-        createConsumerGroups();
-      }
-    } catch (InterruptedException e) {
-      lock.unlock();
+    // 레디스로부터 현재 활동중인 컨슈머 ID 불러오기
+    Map<String, StreamConsumerState> consumerStates =
+        consumerStateRepository.getAllConsumerStates();
+
+    if (consumerStates.keySet().stream().anyMatch(key -> key.equals(consumerId))) {
+      return;
     }
+  }
+
+  private void lockAndCreateConsumerGroups() {
+    createConsumerGroups();
   }
 
   private void createConsumerGroups() {
