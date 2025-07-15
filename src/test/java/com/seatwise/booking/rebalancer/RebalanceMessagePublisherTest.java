@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import com.seatwise.annotation.EmbeddedRedisTest;
 import com.seatwise.booking.messaging.rebalancer.RebalanceEventPublisher;
-import com.seatwise.booking.messaging.rebalancer.RebalanceRequest;
+import com.seatwise.booking.messaging.rebalancer.RebalanceMessage;
 import com.seatwise.booking.messaging.rebalancer.RebalanceType;
 import java.util.List;
 import java.util.Map;
@@ -24,10 +24,10 @@ class RebalanceMessagePublisherTest {
   @Test
   void publishUpdate_shouldWriteToRedisStream() {
     // given
-    RebalanceRequest request = new RebalanceRequest(RebalanceType.JOIN, "consumer-1");
+    RebalanceMessage message = new RebalanceMessage(RebalanceType.JOIN, "consumer-1");
 
     // when
-    publisher.publishUpdate(request);
+    publisher.publishUpdate(message);
 
     // then
     List<MapRecord<String, Object, Object>> records =

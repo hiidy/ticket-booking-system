@@ -11,13 +11,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class RebalanceCoordinator {
+public class RebalanceCoordinator
+    implements StreamListener<String, ObjectRecord<String, RebalanceMessage>> {
 
   private static final String ADMIN_LOCK_KEY = "lock:admin";
   private final String id = UUID.randomUUID().toString();
@@ -34,20 +37,20 @@ public class RebalanceCoordinator {
     lockAndCreateConsumerGroups();
   }
 
-  private void rebalance(RebalanceRequest request) {
+  private void rebalance(RebalanceMessage message) {
     RLock adminLock = redissonClient.getLock(ADMIN_LOCK_KEY);
 
     // 레디스로부터 현재 활동중인 컨슈머 ID 불러오기
     states.clear();
     states.putAll(consumerStateRepository.getAllConsumerStates());
 
-    if (request.rebalanceType().equals(RebalanceType.JOIN)) {}
+    if (message.rebalanceType().equals(RebalanceType.JOIN)) {}
 
-    if (request.rebalanceType().equals(RebalanceType.LEAVE)) {}
+    if (message.rebalanceType().equals(RebalanceType.LEAVE)) {}
 
     rebuildPartitionAssignments();
 
-    publisher.publishUpdate(request);
+    publisher.publishUpdate(message);
   }
 
   private void rebuildPartitionAssignments() {}
@@ -69,4 +72,7 @@ public class RebalanceCoordinator {
       }
     }
   }
+
+  @Override
+  public void onMessage(ObjectRecord<String, RebalanceMessage> message) {}
 }

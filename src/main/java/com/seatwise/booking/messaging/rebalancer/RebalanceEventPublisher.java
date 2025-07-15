@@ -15,9 +15,9 @@ public class RebalanceEventPublisher {
   private final RedisTemplate<String, Object> redisTemplate;
   private static final String PUBLISH_KEY = "stream:consumer:updates";
 
-  public void publishUpdate(RebalanceRequest request) {
-    ObjectRecord<String, RebalanceRequest> objectRecord =
-        StreamRecords.newRecord().in(PUBLISH_KEY).ofObject(request);
+  public void publishUpdate(RebalanceMessage message) {
+    ObjectRecord<String, RebalanceMessage> objectRecord =
+        StreamRecords.newRecord().in(PUBLISH_KEY).ofObject(message);
     redisTemplate
         .opsForStream(new Jackson2HashMapper(true))
         .add(objectRecord, XAddOptions.maxlen(1000).approximateTrimming(true));
