@@ -4,6 +4,7 @@ import com.seatwise.booking.messaging.BookingMessageConsumer;
 import com.seatwise.booking.messaging.MessagingProperties;
 import com.seatwise.booking.messaging.StreamKeyGenerator;
 import jakarta.annotation.PostConstruct;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -44,13 +45,28 @@ public class RebalanceCoordinator
     states.clear();
     states.putAll(consumerStateRepository.getAllConsumerStates());
 
-    if (message.rebalanceType().equals(RebalanceType.JOIN)) {}
+    if (message.rebalanceType().equals(RebalanceType.JOIN)) {
+      joinConsumer(message);
+    }
 
-    if (message.rebalanceType().equals(RebalanceType.LEAVE)) {}
+    if (message.rebalanceType().equals(RebalanceType.LEAVE)) {
+      leaveConsumer(message);
+    }
 
     rebuildPartitionAssignments();
-
     publisher.publishUpdate(message);
+  }
+
+  private void joinConsumer(RebalanceMessage message) {
+    if (!states.containsKey(message.requestedBy())) {
+      states.put(
+          message.requestedBy(),
+          new StreamConsumerState(message.requestedBy(), Collections.emptyList()));
+    }
+  }
+
+  private void leaveConsumer(RebalanceMessage message) {
+    states.remove(message.requestedBy());
   }
 
   private void rebuildPartitionAssignments() {}
@@ -74,5 +90,8 @@ public class RebalanceCoordinator
   }
 
   @Override
-  public void onMessage(ObjectRecord<String, RebalanceMessage> message) {}
+  public void onMessage(ObjectRecord<String, RebalanceMessage> message) {
+    RebalanceMessage rebalanceMessage = message.getValue();
+    rebalance(rebalanceMessage);
+  }
 }
