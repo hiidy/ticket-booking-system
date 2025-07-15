@@ -6,6 +6,7 @@ import com.seatwise.booking.messaging.StreamKeyGenerator;
 import jakarta.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,10 @@ public class RebalanceCoordinator
   }
 
   private void rebalance(RebalanceMessage message) {
+    if (message.requestedBy().equals(id)) {
+      return;
+    }
+
     RLock adminLock = redissonClient.getLock(ADMIN_LOCK_KEY);
 
     // 레디스로부터 현재 활동중인 컨슈머 ID 불러오기
@@ -54,6 +59,9 @@ public class RebalanceCoordinator
     }
 
     rebuildPartitionAssignments();
+
+    consumerStateRepository.saveAllConsumerStates(states);
+
     publisher.publishUpdate(message);
   }
 
@@ -93,5 +101,9 @@ public class RebalanceCoordinator
   public void onMessage(ObjectRecord<String, RebalanceMessage> message) {
     RebalanceMessage rebalanceMessage = message.getValue();
     rebalance(rebalanceMessage);
+
+    List<Integer> partitions = states.get(id).partitions();
+
+    bookingMessageConsumer.updatePartitions(partitions);
   }
 }
