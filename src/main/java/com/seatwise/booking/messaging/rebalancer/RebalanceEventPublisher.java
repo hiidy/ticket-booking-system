@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class StreamConsumerStatePublisher {
+public class RebalanceEventPublisher {
 
   private final RedisTemplate<String, Object> redisTemplate;
   private static final String PUBLISH_KEY = "stream:consumer:updates";

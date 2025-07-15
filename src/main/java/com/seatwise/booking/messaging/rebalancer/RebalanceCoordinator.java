@@ -24,7 +24,7 @@ public class RebalanceCoordinator {
   private final MessagingProperties properties;
   private final RedissonClient redissonClient;
   private final RedisTemplate<String, Object> redisTemplate;
-  private final StreamConsumerStatePublisher publisher;
+  private final RebalanceEventPublisher publisher;
   private final StreamConsumerStateRepository consumerStateRepository;
   private final Map<String, StreamConsumerState> states = new HashMap<>();
   private final BookingMessageConsumer bookingMessageConsumer;

@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 
 @EmbeddedRedisTest
-class RebalanceCoordinatorStateRepositoryTest {
+class StreamConsumerStateRepositoryTest {
 
   private final String STATE_KEY = "consumer:states";
   @Autowired private StreamConsumerStateRepository repository;
