@@ -1,4 +1,4 @@
-package com.seatwise.booking.rebalancer;
+package com.seatwise.booking.messaging.rebalancer;
 
 import java.util.HashMap;
 import java.util.Map;

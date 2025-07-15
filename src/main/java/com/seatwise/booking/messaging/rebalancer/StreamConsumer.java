@@ -1,5 +1,6 @@
-package com.seatwise.booking.rebalancer;
+package com.seatwise.booking.messaging.rebalancer;
 
+import com.seatwise.booking.messaging.BookingMessageConsumer;
 import com.seatwise.booking.messaging.MessagingProperties;
 import com.seatwise.booking.messaging.StreamKeyGenerator;
 import jakarta.annotation.PostConstruct;
@@ -26,6 +27,7 @@ public class StreamConsumer {
   private final StreamConsumerStatePublisher publisher;
   private final StreamConsumerStateRepository consumerStateRepository;
   private final Map<String, StreamConsumerState> states = new HashMap<>();
+  private final BookingMessageConsumer bookingMessageConsumer;
 
   @PostConstruct
   public void initialize() {

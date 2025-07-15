@@ -3,6 +3,9 @@ package com.seatwise.booking.rebalancer;
 import static org.assertj.core.api.Assertions.*;
 
 import com.seatwise.annotation.EmbeddedRedisTest;
+import com.seatwise.booking.messaging.rebalancer.RebalanceRequest;
+import com.seatwise.booking.messaging.rebalancer.RebalanceType;
+import com.seatwise.booking.messaging.rebalancer.StreamConsumerStatePublisher;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package com.seatwise.booking.rebalancer;
+package com.seatwise.booking.messaging.rebalancer;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
