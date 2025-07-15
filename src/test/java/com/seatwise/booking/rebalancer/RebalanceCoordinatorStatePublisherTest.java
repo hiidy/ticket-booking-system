@@ -15,7 +15,7 @@ import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.core.RedisTemplate;
 
 @EmbeddedRedisTest
-class StreamConsumerStatePublisherTest {
+class RebalanceCoordinatorStatePublisherTest {
 
   private static final String STREAM_KEY = "stream:consumer:updates";
   @Autowired private StreamConsumerStatePublisher publisher;

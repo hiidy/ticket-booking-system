@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class StreamConsumer {
+public class RebalanceCoordinator {
 
   private static final String ADMIN_LOCK_KEY = "lock:admin";
   private final String id = UUID.randomUUID().toString();
