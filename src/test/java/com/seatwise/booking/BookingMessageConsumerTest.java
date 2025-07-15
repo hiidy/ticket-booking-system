@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -28,6 +30,7 @@ class BookingMessageConsumerTest {
 
   @Autowired private BookingMessageConsumer consumer;
   @Autowired private RedisTemplate<String, Object> objectRedisTemplate;
+  @Autowired private RedissonClient redissonClient;
   @MockBean private BookingService bookingService;
 
   private UUID requestId;
@@ -50,7 +53,7 @@ class BookingMessageConsumerTest {
   }
 
   @Test
-  void shouldProcessValidMessageSuccessfully() {
+  void processValidMessage_shouldCreateBooking() {
     // given
     Long memberId = 1L;
     List<Long> seatIds = List.of(1L, 2L);
@@ -75,7 +78,7 @@ class BookingMessageConsumerTest {
   }
 
   @Test
-  void shouldHandleDuplicateRequestGracefully() {
+  void processDuplicateMessage_shouldSkipBooking() {
     // given
     Long memberId = 1L;
     List<Long> seatIds = List.of(1L, 2L);
@@ -97,5 +100,34 @@ class BookingMessageConsumerTest {
     assertThat(result.success()).isFalse();
     assertThat(result.bookingId()).isNull();
     assertThat(result.requestId()).isEqualTo(requestId);
+  }
+
+  @Test
+  void updatePartitions_shouldAcquireLock() {
+    // given
+    List<Integer> partitionIds = List.of(1);
+
+    // when
+    consumer.updatePartitions(partitionIds);
+
+    // then
+    RLock lock0 = redissonClient.getFairLock(StreamKeyGenerator.createStreamKey(1));
+
+    assertThat(lock0.isLocked()).isTrue();
+  }
+
+  @Test
+  void updatePartitionsWithoutIds_shouldReleaseLock() {
+    // given
+    List<Integer> partitionIds = List.of(1);
+
+    // when
+    consumer.updatePartitions(partitionIds);
+    consumer.updatePartitions(List.of());
+
+    // then
+    RLock lock0 = redissonClient.getFairLock(StreamKeyGenerator.createStreamKey(1));
+
+    assertThat(lock0.isLocked()).isFalse();
   }
 }

@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
@@ -33,6 +34,7 @@ public class BookingMessageConsumer
 
   private final StreamMessageListenerContainer<String, ObjectRecord<String, BookingMessage>>
       container;
+  private final RedissonClient redissonClient;
   private final MessagingProperties properties;
   private final BookingService bookingService;
   private final BookingResultDispatcher waitService;
@@ -49,6 +51,16 @@ public class BookingMessageConsumer
     HashSet<Integer> target = new HashSet<>(newPartitions);
 
     current.stream().filter(p -> !target.contains(p)).forEach(this::releasePartition);
+    target.stream().filter(p -> !current.contains(p)).forEach(this::acquirePartition);
+  }
+
+  private void acquirePartition(Integer partitionId) {
+    RLock acquireLock = redissonClient.getFairLock(StreamKeyGenerator.createStreamKey(partitionId));
+    if (acquireLock.tryLock()) {
+      log.info("파티션 락 시도 : {}", partitionId);
+      locks.put(partitionId, acquireLock);
+      addSubscription(partitionId);
+    }
   }
 
   private void releasePartition(Integer partitionId) {
@@ -66,8 +78,20 @@ public class BookingMessageConsumer
     }
   }
 
+  private void addSubscription(Integer partitionId) {
+    String streamKey = StreamKeyGenerator.createStreamKey(partitionId);
+    String group = properties.getConsumerGroup();
+    Subscription subscription =
+        container.receive(
+            Consumer.from(group, String.valueOf(instanceIdx)),
+            StreamOffset.create(streamKey, ReadOffset.lastConsumed()),
+            this);
+    activeSubscriptions.put(partitionId, subscription);
+  }
+
   private void removeSubscription(Integer partitionId) {
-    container.remove(activeSubscriptions.get(partitionId));
+    Subscription subscription = activeSubscriptions.remove(partitionId);
+    container.remove(subscription);
   }
 
   @PostConstruct
