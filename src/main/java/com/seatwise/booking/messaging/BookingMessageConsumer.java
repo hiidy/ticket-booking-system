@@ -7,17 +7,22 @@ import com.seatwise.booking.dto.BookingResult;
 import com.seatwise.booking.exception.BookingException;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.StreamOffset;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
+import org.springframework.data.redis.stream.Subscription;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -28,14 +33,42 @@ public class BookingMessageConsumer
 
   private final StreamMessageListenerContainer<String, ObjectRecord<String, BookingMessage>>
       container;
-  private final RedisTemplate<String, Object> redisTemplate;
   private final MessagingProperties properties;
   private final BookingService bookingService;
   private final BookingResultDispatcher waitService;
   private final BookingMessageAckService bookingMessageAckService;
+  private final Map<Integer, Subscription> activeSubscriptions = new ConcurrentHashMap<>();
+  private final Map<Integer, RLock> locks = new ConcurrentHashMap<>();
 
   @Value("${spring.application.instance-idx}")
   private int instanceIdx;
+
+  public void updatePartitions(List<Integer> newPartitions) {
+    log.info("컨슈머 재구독 시작: {} -> {}", activeSubscriptions.keySet(), newPartitions);
+    HashSet<Integer> current = new HashSet<>(activeSubscriptions.keySet());
+    HashSet<Integer> target = new HashSet<>(newPartitions);
+
+    current.stream().filter(p -> !target.contains(p)).forEach(this::releasePartition);
+  }
+
+  private void releasePartition(Integer partitionId) {
+    RLock lock = locks.remove(partitionId);
+    if (lock != null) {
+      try {
+        if (lock.isHeldByCurrentThread()) {
+          removeSubscription(partitionId);
+          lock.unlock();
+          log.info("다음 파티션 락 해제 : {}", partitionId);
+        }
+      } catch (Exception e) {
+        log.error("파티션 락 해제 중 오류 발생: {}", partitionId, e);
+      }
+    }
+  }
+
+  private void removeSubscription(Integer partitionId) {
+    container.remove(activeSubscriptions.get(partitionId));
+  }
 
   @PostConstruct
   protected void init() {
