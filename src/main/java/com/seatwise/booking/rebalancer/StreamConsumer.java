@@ -3,9 +3,7 @@ package com.seatwise.booking.rebalancer;
 import com.seatwise.booking.messaging.MessagingProperties;
 import com.seatwise.booking.messaging.StreamKeyGenerator;
 import jakarta.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -25,33 +23,32 @@ public class StreamConsumer {
   private final MessagingProperties properties;
   private final RedissonClient redissonClient;
   private final RedisTemplate<String, Object> redisTemplate;
+  private final StreamConsumerStatePublisher publisher;
   private final StreamConsumerStateRepository consumerStateRepository;
-  private final Map<String, List<Integer>> partitionAssignments = new HashMap<>();
+  private final Map<String, StreamConsumerState> states = new HashMap<>();
 
   @PostConstruct
   public void initialize() {
     lockAndCreateConsumerGroups();
   }
 
-  private void rebalance(RebalanceRequest request, String consumerId) {
+  private void rebalance(RebalanceRequest request) {
     RLock adminLock = redissonClient.getLock(ADMIN_LOCK_KEY);
 
     // 레디스로부터 현재 활동중인 컨슈머 ID 불러오기
-    Map<String, StreamConsumerState> consumerStates =
-        consumerStateRepository.getAllConsumerStates();
+    states.clear();
+    states.putAll(consumerStateRepository.getAllConsumerStates());
 
-    if (consumerStates.keySet().stream().anyMatch(key -> key.equals(consumerId))) {
-      return;
-    }
+    if (request.rebalanceType().equals(RebalanceType.JOIN)) {}
 
-    if (request.rebalanceType().equals(RebalanceType.JOIN)) {
-      partitionAssignments.putIfAbsent(request.requestedBy(), new ArrayList<>());
-    }
+    if (request.rebalanceType().equals(RebalanceType.LEAVE)) {}
 
-    if (request.rebalanceType().equals(RebalanceType.LEAVE)) {
-      partitionAssignments.remove(request.requestedBy());
-    }
+    rebuildPartitionAssignments();
+
+    publisher.publishUpdate(request);
   }
+
+  private void rebuildPartitionAssignments() {}
 
   private void lockAndCreateConsumerGroups() {
     createConsumerGroups();

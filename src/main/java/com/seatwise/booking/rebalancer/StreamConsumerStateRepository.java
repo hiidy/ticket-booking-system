@@ -10,8 +10,12 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class StreamConsumerStateRepository {
 
-  private static final String CONSUMER_KEY = "consumer:booking";
+  private static final String CONSUMER_KEY = "consumer:states";
   private final RedisTemplate<String, Object> redisTemplate;
+
+  public void saveAllConsumerStates(Map<String, StreamConsumerState> consumerStates) {
+    redisTemplate.opsForHash().putAll(CONSUMER_KEY, consumerStates);
+  }
 
   public Map<String, StreamConsumerState> getAllConsumerStates() {
     Map<Object, Object> entries = redisTemplate.opsForHash().entries(CONSUMER_KEY);
@@ -21,7 +25,6 @@ public class StreamConsumerStateRepository {
       StreamConsumerState state = (StreamConsumerState) entry.getValue();
       result.put(key, state);
     }
-
     return result;
   }
 }
