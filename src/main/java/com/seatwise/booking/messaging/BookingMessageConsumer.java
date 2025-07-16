@@ -96,20 +96,6 @@ public class BookingMessageConsumer
 
   @PostConstruct
   protected void init() {
-    int shardCount = properties.getShardCount();
-    int instanceCount = properties.getInstanceCount();
-    String group = properties.getConsumerGroup();
-
-    for (int shardId = 0; shardId < shardCount; shardId++) {
-      if (shardId % instanceCount == instanceIdx % instanceCount) {
-        String streamKey = StreamKeyGenerator.createStreamKey(shardId);
-
-        container.receive(
-            Consumer.from(group, String.valueOf(instanceIdx)),
-            StreamOffset.create(streamKey, ReadOffset.lastConsumed()),
-            this);
-      }
-    }
     container.start();
   }
 

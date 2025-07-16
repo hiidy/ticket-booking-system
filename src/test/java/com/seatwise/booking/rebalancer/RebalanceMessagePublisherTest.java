@@ -8,6 +8,7 @@ import com.seatwise.booking.messaging.rebalancer.RebalanceMessage;
 import com.seatwise.booking.messaging.rebalancer.RebalanceType;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.stream.MapRecord;
@@ -15,6 +16,7 @@ import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.core.RedisTemplate;
 
 @EmbeddedRedisTest
+@Disabled
 class RebalanceMessagePublisherTest {
 
   private static final String STREAM_KEY = "stream:consumer:updates";

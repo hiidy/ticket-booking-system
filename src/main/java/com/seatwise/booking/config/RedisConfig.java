@@ -1,6 +1,7 @@
 package com.seatwise.booking.config;
 
 import com.seatwise.booking.dto.BookingMessage;
+import com.seatwise.booking.messaging.rebalancer.RebalanceMessage;
 import java.time.Duration;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
@@ -49,6 +50,26 @@ public class RedisConfig {
         .objectMapper(new Jackson2HashMapper(true))
         .targetType(BookingMessage.class)
         .build();
+  }
+
+  @Bean
+  public StreamMessageListenerContainerOptions<String, ObjectRecord<String, RebalanceMessage>>
+      rebalanceStreamOptions(RedisTemplate<String, Object> redisTemplate) {
+    return StreamMessageListenerContainerOptions.builder()
+        .pollTimeout(Duration.ofMillis(100))
+        .hashValueSerializer(redisTemplate.getValueSerializer())
+        .objectMapper(new Jackson2HashMapper(true))
+        .targetType(RebalanceMessage.class)
+        .build();
+  }
+
+  @Bean
+  public StreamMessageListenerContainer<String, ObjectRecord<String, RebalanceMessage>>
+      rebalanceStreamContainer(
+          RedisConnectionFactory redisConnectionFactory,
+          StreamMessageListenerContainerOptions<String, ObjectRecord<String, RebalanceMessage>>
+              options) {
+    return StreamMessageListenerContainer.create(redisConnectionFactory, options);
   }
 
   @Bean

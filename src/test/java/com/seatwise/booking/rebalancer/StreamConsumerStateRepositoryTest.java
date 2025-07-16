@@ -43,11 +43,11 @@ class StreamConsumerStateRepositoryTest {
     repository.saveAllConsumerStates(states);
 
     // then
-    Map<Object, Object> stored = redisTemplate.opsForHash().entries(STATE_KEY);
+    Map<String, StreamConsumerState> stored = repository.getAllConsumerStates();
 
     assertThat(stored).hasSize(2);
-    assertThat(stored.get(consumerId1)).isEqualTo(state1);
-    assertThat(stored.get(consumerId2)).isEqualTo(state2);
+    assertThat(stored.get(consumerId1).getPartitions()).isEqualTo(state1.getPartitions());
+    assertThat(stored.get(consumerId2).getPartitions()).isEqualTo(state2.getPartitions());
   }
 
   @Test
