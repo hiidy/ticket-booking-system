@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.connection.stream.ReadOffset;
+import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
@@ -41,10 +43,13 @@ public class RebalanceCoordinator
       container;
 
   @PostConstruct
-  public void initialize() {
+  public void initialize() throws InterruptedException {
     log.info("consumer {} 시작", id);
-    container.start();
     lockAndCreateConsumerGroups();
+
+    container.receive(StreamOffset.create("stream:consumer:updates", ReadOffset.latest()), this);
+    container.start();
+
     joinConsumer(id);
   }
 

@@ -41,6 +41,7 @@ public class BookingMessageConsumer
   private final BookingMessageAckService bookingMessageAckService;
   private final Map<Integer, Subscription> activeSubscriptions = new ConcurrentHashMap<>();
   private final Map<Integer, RLock> locks = new ConcurrentHashMap<>();
+  private static final String LOCK_KEY = "lock:stream:";
 
   @Value("${spring.application.instance-idx}")
   private int instanceIdx;
@@ -55,7 +56,7 @@ public class BookingMessageConsumer
   }
 
   private void acquirePartition(Integer partitionId) {
-    RLock acquireLock = redissonClient.getFairLock(StreamKeyGenerator.createStreamKey(partitionId));
+    RLock acquireLock = redissonClient.getFairLock(LOCK_KEY + partitionId);
     if (acquireLock.tryLock()) {
       log.info("파티션 락 시도 : {}", partitionId);
       locks.put(partitionId, acquireLock);

@@ -1,5 +1,8 @@
 package com.seatwise.booking.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.seatwise.booking.dto.BookingMessage;
 import com.seatwise.booking.messaging.rebalancer.RebalanceMessage;
 import java.time.Duration;
@@ -27,26 +30,36 @@ public class RedisConfig {
   @Bean
   public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
     RedisTemplate<String, Object> template = new RedisTemplate<>();
-
     template.setConnectionFactory(factory);
 
     GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer();
 
-    template.setValueSerializer(serializer);
-    template.setHashValueSerializer(serializer);
     template.setKeySerializer(new StringRedisSerializer());
     template.setHashKeySerializer(new StringRedisSerializer());
+    template.setValueSerializer(serializer);
+    template.setHashValueSerializer(serializer);
+    template.setDefaultSerializer(serializer);
 
     template.afterPropertiesSet();
     return template;
   }
 
   @Bean
+  public ObjectMapper redisObjectMapper() {
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule());
+    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    return objectMapper;
+  }
+
+  @Bean
   public StreamMessageListenerContainerOptions<String, ObjectRecord<String, BookingMessage>>
-      streamOptions(RedisTemplate<String, Object> redisTemplate) {
+      streamOptions(ObjectMapper redisObjectMapper) {
     return StreamMessageListenerContainerOptions.builder()
         .pollTimeout(Duration.ofMillis(100))
-        .hashValueSerializer(redisTemplate.getValueSerializer())
+        .keySerializer(new StringRedisSerializer())
+        .hashKeySerializer(new StringRedisSerializer())
+        .hashValueSerializer(new GenericJackson2JsonRedisSerializer(redisObjectMapper))
         .objectMapper(new Jackson2HashMapper(true))
         .targetType(BookingMessage.class)
         .build();
@@ -54,10 +67,12 @@ public class RedisConfig {
 
   @Bean
   public StreamMessageListenerContainerOptions<String, ObjectRecord<String, RebalanceMessage>>
-      rebalanceStreamOptions(RedisTemplate<String, Object> redisTemplate) {
+      rebalanceStreamOptions(ObjectMapper redisObjectMapper) {
     return StreamMessageListenerContainerOptions.builder()
         .pollTimeout(Duration.ofMillis(100))
-        .hashValueSerializer(redisTemplate.getValueSerializer())
+        .keySerializer(new StringRedisSerializer())
+        .hashKeySerializer(new StringRedisSerializer())
+        .hashValueSerializer(new GenericJackson2JsonRedisSerializer(redisObjectMapper))
         .objectMapper(new Jackson2HashMapper(true))
         .targetType(RebalanceMessage.class)
         .build();

@@ -8,8 +8,12 @@ import java.util.List;
 
 public class StreamConsumerState {
 
-  private final String consumerId;
+  private String consumerId;
   private final List<Integer> partitions;
+
+  public StreamConsumerState() {
+    this.partitions = new ArrayList<>();
+  }
 
   @JsonCreator
   public StreamConsumerState(
