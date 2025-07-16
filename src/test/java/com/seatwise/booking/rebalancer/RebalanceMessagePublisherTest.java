@@ -3,8 +3,8 @@ package com.seatwise.booking.rebalancer;
 import static org.assertj.core.api.Assertions.*;
 
 import com.seatwise.annotation.EmbeddedRedisTest;
-import com.seatwise.booking.messaging.rebalancer.RebalanceEventPublisher;
 import com.seatwise.booking.messaging.rebalancer.RebalanceMessage;
+import com.seatwise.booking.messaging.rebalancer.RebalanceMessagePublisher;
 import com.seatwise.booking.messaging.rebalancer.RebalanceType;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +20,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 class RebalanceMessagePublisherTest {
 
   private static final String STREAM_KEY = "stream:consumer:updates";
-  @Autowired private RebalanceEventPublisher publisher;
+  @Autowired private RebalanceMessagePublisher publisher;
   @Autowired private RedisTemplate<String, Object> redisTemplate;
 
   @Test
