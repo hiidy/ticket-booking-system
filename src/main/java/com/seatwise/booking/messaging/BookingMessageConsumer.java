@@ -43,8 +43,8 @@ public class BookingMessageConsumer
   private final Map<Integer, RLock> locks = new ConcurrentHashMap<>();
   private static final String LOCK_KEY = "lock:stream:";
 
-  @Value("${spring.application.instance-idx}")
-  private int instanceIdx;
+  @Value("${spring.application.instance-id}")
+  private String instanceId;
 
   public void updatePartitions(List<Integer> newPartitions) {
     log.info("컨슈머 재구독 시작: {} -> {}", activeSubscriptions.keySet(), newPartitions);
@@ -84,7 +84,7 @@ public class BookingMessageConsumer
     String group = properties.getConsumerGroup();
     Subscription subscription =
         container.receive(
-            Consumer.from(group, String.valueOf(instanceIdx)),
+            Consumer.from(group, instanceId),
             StreamOffset.create(streamKey, ReadOffset.lastConsumed()),
             this);
     activeSubscriptions.put(partitionId, subscription);

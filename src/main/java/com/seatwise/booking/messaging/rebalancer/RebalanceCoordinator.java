@@ -10,12 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.StreamOffset;
@@ -31,7 +31,10 @@ public class RebalanceCoordinator
     implements StreamListener<String, ObjectRecord<String, RebalanceMessage>> {
 
   private static final String ADMIN_LOCK_KEY = "lock:admin";
-  private final String id = UUID.randomUUID().toString();
+
+  @Value("${spring.application.instance-id:${random.uuid}}")
+  private String instanceId;
+
   private final MessagingProperties properties;
   private final RedissonClient redissonClient;
   private final RedisTemplate<String, Object> redisTemplate;
@@ -43,14 +46,14 @@ public class RebalanceCoordinator
       container;
 
   @PostConstruct
-  public void initialize() throws InterruptedException {
-    log.info("consumer {} 시작", id);
+  public void initialize() {
+    log.info("consumer {} 시작", instanceId);
     lockAndCreateConsumerGroups();
 
     container.receive(StreamOffset.create("stream:consumer:updates", ReadOffset.latest()), this);
     container.start();
 
-    joinConsumer(id);
+    joinConsumer(instanceId);
   }
 
   public void joinConsumer(String consumerId) {
@@ -157,7 +160,7 @@ public class RebalanceCoordinator
     log.info("RebalanceMessage 수신 : {}", rebalanceMessage);
     states.clear();
     states.putAll(consumerStateRepository.getAllConsumerStates());
-    List<Integer> partitions = states.get(id).getPartitions();
+    List<Integer> partitions = states.get(instanceId).getPartitions();
 
     bookingMessageConsumer.updatePartitions(partitions);
   }
