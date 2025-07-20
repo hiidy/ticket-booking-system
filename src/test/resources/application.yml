@@ -8,7 +8,7 @@ spring:
     activate:
       on-profile: local
   application:
-    instance-idx: 0
+    instance-id: ${HOSTNAME:localhost}-${server.port:8080}
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
@@ -47,6 +47,6 @@ spring:
       mode: always
       schema-locations: classpath:sql/test-schema.sql
 queue:
-  shard-count: 1
+  shard-count: 4
   consumer-group: 'bookingGroup'
   instance-count: 1

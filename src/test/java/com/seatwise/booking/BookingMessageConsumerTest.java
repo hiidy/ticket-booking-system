@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -100,34 +99,5 @@ class BookingMessageConsumerTest {
     assertThat(result.success()).isFalse();
     assertThat(result.bookingId()).isNull();
     assertThat(result.requestId()).isEqualTo(requestId);
-  }
-
-  @Test
-  void updatePartitions_shouldAcquireLock() {
-    // given
-    List<Integer> partitionIds = List.of(1);
-
-    // when
-    consumer.updatePartitions(partitionIds);
-
-    // then
-    RLock lock0 = redissonClient.getFairLock(StreamKeyGenerator.createStreamKey(1));
-
-    assertThat(lock0.isLocked()).isTrue();
-  }
-
-  @Test
-  void updatePartitionsWithoutIds_shouldReleaseLock() {
-    // given
-    List<Integer> partitionIds = List.of(1);
-
-    // when
-    consumer.updatePartitions(partitionIds);
-    consumer.updatePartitions(List.of());
-
-    // then
-    RLock lock0 = redissonClient.getFairLock(StreamKeyGenerator.createStreamKey(1));
-
-    assertThat(lock0.isLocked()).isFalse();
   }
 }
