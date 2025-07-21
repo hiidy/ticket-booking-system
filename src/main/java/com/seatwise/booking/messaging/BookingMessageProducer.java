@@ -26,8 +26,10 @@ public class BookingMessageProducer {
     String streamKey =
         StreamKeyGenerator.forSectionShard(
             message.sectionId(), messagingProperties.getShardCount());
+
     ObjectRecord<String, BookingMessage> objectRecord =
         StreamRecords.newRecord().in(streamKey).ofObject(message);
+
     redisTemplate
         .opsForStream(new Jackson2HashMapper(true))
         .add(objectRecord, XAddOptions.maxlen(1000).approximateTrimming(true));

@@ -6,5 +6,6 @@ import lombok.Getter;
 public enum MessageStatus {
   PENDING,
   COMPLETED,
-  FAILED
+  FAILED,
+  CANCELLED
 }

@@ -1,9 +1,9 @@
 package com.seatwise.booking.messaging;
 
-import com.seatwise.booking.BookingResultDispatcher;
+import com.seatwise.booking.BookingResponseManager;
 import com.seatwise.booking.BookingService;
 import com.seatwise.booking.dto.BookingMessage;
-import com.seatwise.booking.dto.BookingResult;
+import com.seatwise.booking.dto.response.BookingResponse;
 import com.seatwise.booking.exception.BookingException;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -37,7 +37,7 @@ public class BookingMessageConsumer
   private final RedissonClient redissonClient;
   private final MessagingProperties properties;
   private final BookingService bookingService;
-  private final BookingResultDispatcher waitService;
+  private final BookingResponseManager responseManager;
   private final BookingMessageAckService bookingMessageAckService;
   private final Map<Integer, Subscription> activeSubscriptions = new ConcurrentHashMap<>();
   private final Map<Integer, RLock> locks = new ConcurrentHashMap<>();
@@ -119,10 +119,10 @@ public class BookingMessageConsumer
     try {
       Long bookingId =
           bookingService.createBooking(requestId, request.memberId(), request.showSeatIds());
-      BookingResult result = BookingResult.success(bookingId, requestId);
-      waitService.completeResult(requestId, result);
+      BookingResponse result = BookingResponse.success(bookingId, requestId);
+      responseManager.completeWithSuccess(requestId, result);
     } catch (BookingException e) {
-      waitService.completeWithFailure(requestId, e);
+      responseManager.completeWithFailure(requestId, e);
     } finally {
       bookingMessageAckService.acknowledge(properties.getConsumerGroup(), message);
     }
