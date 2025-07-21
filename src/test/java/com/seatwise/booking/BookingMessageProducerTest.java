@@ -45,7 +45,7 @@ class BookingMessageProducerTest {
     when(redisTemplate.opsForStream(any(Jackson2HashMapper.class))).thenReturn(streamOperations);
 
     // when
-    bookingMessageProducer.sendMessage(request);
+    bookingMessageProducer.enqueueBooking(request);
 
     // then
     verify(streamOperations).add(any(ObjectRecord.class), any(XAddOptions.class));

@@ -44,11 +44,11 @@ public class Ticket extends BaseEntity {
   private Integer price;
 
   @Enumerated(EnumType.STRING)
-  private Status status;
+  private TicketStatus status;
 
   private LocalDateTime expirationTime;
 
-  private Ticket(ShowTime showTime, Seat seat, Integer price, Status status) {
+  private Ticket(ShowTime showTime, Seat seat, Integer price, TicketStatus status) {
     validatePrice(price);
     this.showTime = showTime;
     this.seat = seat;
@@ -58,14 +58,14 @@ public class Ticket extends BaseEntity {
   }
 
   public static Ticket createAvailable(ShowTime showTime, Seat seat, Integer price) {
-    return new Ticket(showTime, seat, price, Status.AVAILABLE);
+    return new Ticket(showTime, seat, price, TicketStatus.AVAILABLE);
   }
 
   public boolean canAssignBooking(LocalDateTime now) {
-    if (status == Status.AVAILABLE) {
+    if (status == TicketStatus.AVAILABLE) {
       return expirationTime == null;
     }
-    if (status == Status.PAYMENT_PENDING) {
+    if (status == TicketStatus.PAYMENT_PENDING) {
       return expirationTime != null && expirationTime.isBefore(now);
     }
     return false;
@@ -73,8 +73,14 @@ public class Ticket extends BaseEntity {
 
   public void assignBooking(Long bookingId, LocalDateTime requestTime, Duration duration) {
     this.bookingId = bookingId;
-    this.status = Status.PAYMENT_PENDING;
+    this.status = TicketStatus.PAYMENT_PENDING;
     this.expirationTime = requestTime.plus(duration);
+  }
+
+  public void cancelBooking() {
+    this.bookingId = null;
+    this.status = TicketStatus.CANCELLED;
+    this.expirationTime = null;
   }
 
   private void validatePrice(Integer price) {

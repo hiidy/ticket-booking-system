@@ -22,12 +22,14 @@ public class BookingMessageProducer {
   private final RedisTemplate<String, Object> redisTemplate;
 
   @Retryable(retryFor = RedisConnectionFailureException.class, backoff = @Backoff(delay = 1000))
-  public void sendMessage(BookingMessage message) {
+  public void enqueueBooking(BookingMessage message) {
     String streamKey =
         StreamKeyGenerator.forSectionShard(
             message.sectionId(), messagingProperties.getShardCount());
+
     ObjectRecord<String, BookingMessage> objectRecord =
         StreamRecords.newRecord().in(streamKey).ofObject(message);
+
     redisTemplate
         .opsForStream(new Jackson2HashMapper(true))
         .add(objectRecord, XAddOptions.maxlen(1000).approximateTrimming(true));
