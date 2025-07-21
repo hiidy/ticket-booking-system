@@ -22,7 +22,7 @@ public class BookingMessageProducer {
   private final RedisTemplate<String, Object> redisTemplate;
 
   @Retryable(retryFor = RedisConnectionFailureException.class, backoff = @Backoff(delay = 1000))
-  public void enqueueBooking(BookingMessage message) {
+  public void sendMessage(BookingMessage message) {
     String streamKey =
         StreamKeyGenerator.forSectionShard(
             message.sectionId(), messagingProperties.getShardCount());

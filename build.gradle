@@ -33,6 +33,7 @@ dependencies {
     implementation 'org.springframework.data:spring-data-redis:3.5.0'
     implementation 'io.lettuce:lettuce-core:6.6.0.RELEASE'
     implementation 'org.springframework.retry:spring-retry:2.0.11'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.50.0'
 
     compileOnly 'org.projectlombok:lombok'
 
@@ -44,6 +45,9 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'com.github.codemonstur:embedded-redis:1.4.3'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.testcontainers:mysql'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testRuntimeOnly 'com.mysql:mysql-connector-j'
 }

@@ -1,72 +1,128 @@
 package com.seatwise.booking.messaging;
 
+import com.seatwise.booking.BookingResponseManager;
+import com.seatwise.booking.BookingService;
 import com.seatwise.booking.dto.BookingMessage;
+import com.seatwise.booking.dto.response.BookingResponse;
+import com.seatwise.booking.exception.BookingException;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.stream.Consumer;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.StreamOffset;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
-import org.springframework.stereotype.Component;
+import org.springframework.data.redis.stream.Subscription;
+import org.springframework.stereotype.Service;
 
 @Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
-public class BookingMessageConsumer {
+public class BookingMessageConsumer
+    implements StreamListener<String, ObjectRecord<String, BookingMessage>> {
 
   private final StreamMessageListenerContainer<String, ObjectRecord<String, BookingMessage>>
       container;
-  private final RedisTemplate<String, Object> redisTemplate;
+  private final RedissonClient redissonClient;
   private final MessagingProperties properties;
+  private final BookingService bookingService;
+  private final BookingResponseManager responseManager;
   private final BookingMessageAckService bookingMessageAckService;
-  private final BookingMessageHandler bookingMessageHandler;
+  private final Map<Integer, Subscription> activeSubscriptions = new ConcurrentHashMap<>();
+  private final Map<Integer, RLock> locks = new ConcurrentHashMap<>();
+  private static final String LOCK_KEY = "lock:stream:";
 
-  @Value("${spring.application.instance-idx}")
-  private int instanceIdx;
+  @Value("${spring.application.instance-id}")
+  private String instanceId;
 
-  @PostConstruct
-  protected void listen() {
-    int shardCount = properties.getShardCount();
-    int instanceCount = properties.getInstanceCount();
-    String group = properties.getConsumerGroup();
+  public void updatePartitions(List<Integer> newPartitions) {
+    log.info("컨슈머 재구독 시작: {} -> {}", activeSubscriptions.keySet(), newPartitions);
+    HashSet<Integer> current = new HashSet<>(activeSubscriptions.keySet());
+    HashSet<Integer> target = new HashSet<>(newPartitions);
 
-    for (int shardId = 0; shardId < shardCount; shardId++) {
-      if (shardId % instanceCount == instanceIdx % instanceCount) {
-        String streamKey = StreamKeyGenerator.createStreamKey(shardId);
+    current.stream().filter(p -> !target.contains(p)).forEach(this::releasePartition);
+    target.stream().filter(p -> !current.contains(p)).forEach(this::acquirePartition);
+  }
 
-        try {
-          redisTemplate.opsForStream().createGroup(streamKey, group);
-        } catch (Exception e) {
-          log.info("해당 스트림키에 대해서 그룹이 이미 존재합니다 : {}", streamKey);
+  private void acquirePartition(Integer partitionId) {
+    RLock acquireLock = redissonClient.getFairLock(LOCK_KEY + partitionId);
+    if (acquireLock.tryLock()) {
+      log.info("파티션 락 시도 : {}", partitionId);
+      locks.put(partitionId, acquireLock);
+      addSubscription(partitionId);
+    }
+  }
+
+  private void releasePartition(Integer partitionId) {
+    RLock lock = locks.remove(partitionId);
+    if (lock != null) {
+      try {
+        if (lock.isHeldByCurrentThread()) {
+          removeSubscription(partitionId);
+          lock.unlock();
+          log.info("다음 파티션 락 해제 : {}", partitionId);
         }
-
-        container.receive(
-            Consumer.from(group, String.valueOf(instanceIdx)),
-            StreamOffset.create(streamKey, ReadOffset.lastConsumed()),
-            this::handleBookingMessage);
+      } catch (Exception e) {
+        log.error("파티션 락 해제 중 오류 발생: {}", partitionId, e);
       }
     }
+  }
+
+  private void addSubscription(Integer partitionId) {
+    String streamKey = StreamKeyGenerator.createStreamKey(partitionId);
+    String group = properties.getConsumerGroup();
+    Subscription subscription =
+        container.receive(
+            Consumer.from(group, instanceId),
+            StreamOffset.create(streamKey, ReadOffset.lastConsumed()),
+            this);
+    activeSubscriptions.put(partitionId, subscription);
+  }
+
+  private void removeSubscription(Integer partitionId) {
+    Subscription subscription = activeSubscriptions.remove(partitionId);
+    container.remove(subscription);
+  }
+
+  @PostConstruct
+  protected void init() {
     container.start();
   }
 
   @PreDestroy
-  protected void shutdown() {
+  protected void destroy() {
     if (container != null) {
       container.stop();
     }
   }
 
-  private void handleBookingMessage(ObjectRecord<String, BookingMessage> message) {
+  @Override
+  public void onMessage(ObjectRecord<String, BookingMessage> message) {
     BookingMessage request = message.getValue();
+    UUID requestId = UUID.fromString(request.requestId());
+    log.info(
+        "멤버Id: {}, 좌석Id: {}, 섹션Id: {}에 대한 요청 처리중",
+        request.memberId(),
+        request.showSeatIds(),
+        request.sectionId());
     try {
-      bookingMessageHandler.handleBookingMessage(request);
-    } catch (Exception e) {
-      log.warn("예매 도중 예외가 발생함 : {}", e.getMessage());
+      Long bookingId =
+          bookingService.createBooking(requestId, request.memberId(), request.showSeatIds());
+      BookingResponse result = BookingResponse.success(bookingId, requestId);
+      responseManager.completeWithSuccess(requestId, result);
+    } catch (BookingException e) {
+      responseManager.completeWithFailure(requestId, e);
     } finally {
       bookingMessageAckService.acknowledge(properties.getConsumerGroup(), message);
     }

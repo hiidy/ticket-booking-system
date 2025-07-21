@@ -7,7 +7,7 @@ spring:
       host: localhost
   application:
     name: ticket-booking-system
-    instance-idx: ${INSTANCE_ID}
+    instance-id: ${HOSTNAME:localhost}-${server.port}
   datasource:
     url: jdbc:mysql://localhost:3306/booking_system?serverTimezone=UTC&socketTimeout=10000&tcpKeepAlive=true
     username: ${DB_USERNAME}

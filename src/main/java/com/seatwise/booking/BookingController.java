@@ -30,7 +30,7 @@ public class BookingController {
   public DeferredResult<BookingResponse> createBookingRequest(
       @RequestHeader("Idempotency-Key") UUID key, @Valid @RequestBody BookingRequest request) {
     DeferredResult<BookingResponse> response = responseManager.createPendingResponse(key);
-    producer.enqueueBooking(
+    producer.sendMessage(
         new BookingMessage(
             key.toString(), request.memberId(), request.ticketIds(), request.sectionId()));
     return response;
