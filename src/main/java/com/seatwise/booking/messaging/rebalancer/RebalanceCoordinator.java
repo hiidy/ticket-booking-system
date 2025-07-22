@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.StreamOffset;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.stereotype.Component;
@@ -37,20 +36,21 @@ public class RebalanceCoordinator
 
   private final MessagingProperties properties;
   private final RedissonClient redissonClient;
-  private final RedisTemplate<String, Object> redisTemplate;
   private final RebalanceMessageProducer producer;
   private final StreamConsumerStateRepository consumerStateRepository;
   private final Map<String, StreamConsumerState> states = new HashMap<>();
   private final BookingMessageConsumer bookingMessageConsumer;
   private final StreamMessageListenerContainer<String, ObjectRecord<String, RebalanceMessage>>
       container;
+  private final ConsumerGroupInitializer groupInitializer;
 
   @PostConstruct
   public void initialize() {
     log.info("consumer {} 시작", instanceId);
-    lockAndCreateConsumerGroups();
 
-    container.receive(StreamOffset.create("stream:consumer:updates", ReadOffset.latest()), this);
+    groupInitializer.initializeConsumerGroups();
+    container.receive(
+        StreamOffset.create(StreamKeyGenerator.getRebalanceUpdateKey(), ReadOffset.latest()), this);
     container.start();
 
     joinConsumer(instanceId);
@@ -133,24 +133,6 @@ public class RebalanceCoordinator
       String consumerId = entry.getKey();
       List<Integer> partitions = entry.getValue().getPartitions();
       log.info("컨슈머 {} -> 파티션 {}", consumerId, partitions);
-    }
-  }
-
-  private void lockAndCreateConsumerGroups() {
-    createConsumerGroups();
-  }
-
-  private void createConsumerGroups() {
-    int partitionCount = properties.getPartitionCount();
-    String group = properties.getConsumerGroup();
-
-    for (int partitionId = 0; partitionId < partitionCount; partitionId++) {
-      String streamKey = StreamKeyGenerator.createStreamKey(partitionId);
-      try {
-        redisTemplate.opsForStream().createGroup(streamKey, group);
-      } catch (Exception e) {
-        log.info("해당 스트림키에 대해서 그룹이 이미 존재합니다 : {}", streamKey);
-      }
     }
   }
 

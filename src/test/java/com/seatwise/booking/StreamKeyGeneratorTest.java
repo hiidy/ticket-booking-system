@@ -2,6 +2,7 @@ package com.seatwise.booking;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.seatwise.booking.messaging.PartitionCalculator;
 import com.seatwise.booking.messaging.StreamKeyGenerator;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +15,9 @@ class StreamKeyGeneratorTest {
     int totalPartition = 5;
 
     // when
-    String streamKey = StreamKeyGenerator.forSectionPartition(sectionId, totalPartition);
+    String streamKey =
+        StreamKeyGenerator.createStreamKey(
+            PartitionCalculator.calculatePartition(sectionId, totalPartition));
 
     // then
     assertThat(streamKey).isEqualTo("booking:partition:4");
