@@ -38,7 +38,7 @@ public class RebalanceCoordinator
   private final MessagingProperties properties;
   private final RedissonClient redissonClient;
   private final RedisTemplate<String, Object> redisTemplate;
-  private final RebalanceMessagePublisher publisher;
+  private final RebalanceMessageProducer producer;
   private final StreamConsumerStateRepository consumerStateRepository;
   private final Map<String, StreamConsumerState> states = new HashMap<>();
   private final BookingMessageConsumer bookingMessageConsumer;
@@ -90,7 +90,7 @@ public class RebalanceCoordinator
 
         consumerStateRepository.saveAllConsumerStates(states);
 
-        publisher.publishUpdate(message);
+        producer.sendRebalanceMessage(message);
       }
 
     } catch (InterruptedException e) {

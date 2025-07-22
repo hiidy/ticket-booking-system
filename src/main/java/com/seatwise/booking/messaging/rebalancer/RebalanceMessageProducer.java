@@ -10,14 +10,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class RebalanceMessagePublisher {
+public class RebalanceMessageProducer {
 
   private final RedisTemplate<String, Object> redisTemplate;
-  private static final String PUBLISH_KEY = "stream:consumer:updates";
+  private static final String REBALANCE_STREAM_KEY = "rebalance:updates";
 
-  public void publishUpdate(RebalanceMessage message) {
+  public void sendRebalanceMessage(RebalanceMessage message) {
     ObjectRecord<String, RebalanceMessage> objectRecord =
-        StreamRecords.newRecord().in(PUBLISH_KEY).ofObject(message);
+        StreamRecords.newRecord().in(REBALANCE_STREAM_KEY).ofObject(message);
     redisTemplate
         .opsForStream(new Jackson2HashMapper(true))
         .add(objectRecord, XAddOptions.maxlen(1000).approximateTrimming(true));

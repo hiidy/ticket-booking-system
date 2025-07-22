@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import com.seatwise.annotation.EmbeddedRedisTest;
 import com.seatwise.booking.messaging.rebalancer.RebalanceMessage;
-import com.seatwise.booking.messaging.rebalancer.RebalanceMessagePublisher;
+import com.seatwise.booking.messaging.rebalancer.RebalanceMessageProducer;
 import com.seatwise.booking.messaging.rebalancer.RebalanceType;
 import java.util.List;
 import java.util.Map;
@@ -17,19 +17,19 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 @EmbeddedRedisTest
 @Disabled
-class RebalanceMessagePublisherTest {
+class RebalanceMessageProducerTest {
 
-  private static final String STREAM_KEY = "stream:consumer:updates";
-  @Autowired private RebalanceMessagePublisher publisher;
+  private static final String STREAM_KEY = "rebalance:updates";
+  @Autowired private RebalanceMessageProducer producer;
   @Autowired private RedisTemplate<String, Object> redisTemplate;
 
   @Test
-  void publishUpdate_shouldWriteToRedisStream() {
+  void sendRebalanceMessage_shouldWriteToRedisStream() {
     // given
     RebalanceMessage message = new RebalanceMessage(RebalanceType.JOIN, "consumer-1");
 
     // when
-    publisher.publishUpdate(message);
+    producer.sendRebalanceMessage(message);
 
     // then
     List<MapRecord<String, Object, Object>> records =
