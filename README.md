@@ -38,7 +38,8 @@
 
 ## System Architecture
 
-<img width="1000" alt="image" src="https://github.com/user-attachments/assets/b0b45c9a-760a-4ff1-8c4c-46eccd7a0612"/>
+<img width="800" height="2087" alt="image" src="https://github.com/user-attachments/assets/12b1365c-aedc-4584-b01e-4717c29c92ed" />
+
 
 ```
 1. 섹션별 샤딩을 통해 Redis Stream과 API 서버의 수평적 확장성 확보
