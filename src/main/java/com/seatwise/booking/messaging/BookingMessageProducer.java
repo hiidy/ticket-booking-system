@@ -24,8 +24,8 @@ public class BookingMessageProducer {
   @Retryable(retryFor = RedisConnectionFailureException.class, backoff = @Backoff(delay = 1000))
   public void sendMessage(BookingMessage message) {
     String streamKey =
-        StreamKeyGenerator.forSectionShard(
-            message.sectionId(), messagingProperties.getShardCount());
+        StreamKeyGenerator.forSectionPartition(
+            message.sectionId(), messagingProperties.getPartitionCount());
 
     ObjectRecord<String, BookingMessage> objectRecord =
         StreamRecords.newRecord().in(streamKey).ofObject(message);

@@ -102,7 +102,7 @@ public class RebalanceCoordinator
 
   private void rebuildPartitionAssignments() {
     Set<String> keys = states.keySet();
-    int shardCount = properties.getShardCount();
+    int partitionCount = properties.getPartitionCount();
     ConsistentHash<String> ch = new ConsistentHash<>(100, keys);
 
     Map<String, List<Integer>> newAssignments = new HashMap<>();
@@ -111,7 +111,7 @@ public class RebalanceCoordinator
       newAssignments.put(consumerId, new ArrayList<>());
     }
 
-    for (int i = 0; i < shardCount; i++) {
+    for (int i = 0; i < partitionCount; i++) {
       String consumerId = ch.get(i);
       newAssignments.get(consumerId).add(i);
     }
@@ -141,11 +141,11 @@ public class RebalanceCoordinator
   }
 
   private void createConsumerGroups() {
-    int shardCount = properties.getShardCount();
+    int partitionCount = properties.getPartitionCount();
     String group = properties.getConsumerGroup();
 
-    for (int shardId = 0; shardId < shardCount; shardId++) {
-      String streamKey = StreamKeyGenerator.createStreamKey(shardId);
+    for (int partitionId = 0; partitionId < partitionCount; partitionId++) {
+      String streamKey = StreamKeyGenerator.createStreamKey(partitionId);
       try {
         redisTemplate.opsForStream().createGroup(streamKey, group);
       } catch (Exception e) {

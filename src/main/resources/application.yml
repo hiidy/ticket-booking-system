@@ -25,7 +25,7 @@ spring:
     open-in-view: false
 
 queue:
-  shard-count: 32
   consumer-group: 'bookingGroup'
   instance-count: 1
+  partition-count: 32
 

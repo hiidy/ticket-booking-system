@@ -39,8 +39,8 @@ class BookingMessageConsumerTest {
   void setUp() {
     flushRedisDb();
     requestId = UUID.randomUUID();
-    int shardId = 0;
-    streamKey = StreamKeyGenerator.createStreamKey(shardId);
+    int partitionId = 0;
+    streamKey = StreamKeyGenerator.createStreamKey(partitionId);
   }
 
   private void flushRedisDb() {

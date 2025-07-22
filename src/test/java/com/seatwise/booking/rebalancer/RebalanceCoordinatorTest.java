@@ -28,11 +28,11 @@ class RebalanceCoordinatorTest {
 
   @Test
   void shouldCreateConsumerGroupsOnStartUp() {
-    int shardCount = properties.getShardCount();
+    int partitionCount = properties.getPartitionCount();
     String consumerGroup = properties.getConsumerGroup();
 
-    for (int shardId = 0; shardId < shardCount; shardId++) {
-      String streamKey = StreamKeyGenerator.createStreamKey(shardId);
+    for (int partitionId = 0; partitionId < partitionCount; partitionId++) {
+      String streamKey = StreamKeyGenerator.createStreamKey(partitionId);
       StreamInfo.XInfoGroups groups = redisTemplate.opsForStream().groups(streamKey);
       assertThat(groups).hasSize(1);
       assertThat(groups.get(0).groupName()).isEqualTo(consumerGroup);

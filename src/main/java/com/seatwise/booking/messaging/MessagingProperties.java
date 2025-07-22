@@ -12,7 +12,7 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 public class MessagingProperties {
 
   @Min(value = 1, message = "샤드 수는 최소 1 이상이어야 합니다.")
-  private final int shardCount;
+  private final int partitionCount;
 
   @Min(value = 1, message = "인스턴스 수는 최소 1 이상이어야 합니다.")
   private final int instanceCount;
@@ -22,10 +22,10 @@ public class MessagingProperties {
 
   @ConstructorBinding
   public MessagingProperties(
-      @DefaultValue("1") int shardCount,
+      @DefaultValue("32") int partitionCount,
       @DefaultValue("1") int instanceCount,
       @DefaultValue("booking-group") String consumerGroup) {
-    this.shardCount = shardCount;
+    this.partitionCount = partitionCount;
     this.instanceCount = instanceCount;
     this.consumerGroup = consumerGroup;
   }

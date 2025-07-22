@@ -8,15 +8,15 @@ import org.junit.jupiter.api.Test;
 class StreamKeyGeneratorTest {
 
   @Test
-  void shouldReturnCorrectShardStreamKey_whenGivenLargeSectionIdAndShardCount() {
+  void shouldReturnCorrectStreamKey_whenGivenLargeSectionIdAndPartitionCount() {
     // given
     Long sectionId = 1233232323223456789L;
-    int totalShard = 5;
+    int totalPartition = 5;
 
     // when
-    String streamKey = StreamKeyGenerator.forSectionShard(sectionId, totalShard);
+    String streamKey = StreamKeyGenerator.forSectionPartition(sectionId, totalPartition);
 
     // then
-    assertThat(streamKey).isEqualTo("section:shard:4:stream");
+    assertThat(streamKey).isEqualTo("booking:partition:4");
   }
 }
