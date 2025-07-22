@@ -61,7 +61,8 @@
 
 ## Rebalancing Strategy
 
-<img width="1000" alt="image" src="https://github.com/user-attachments/assets/f183ab6a-7e2e-47fb-ae9d-05933953304f" />
+
+<img width="1949" height="1467" alt="image" src="https://github.com/user-attachments/assets/46613eb2-0439-478a-a263-d26c35f029eb" />
 
 
 ### 리밸런싱 과정
