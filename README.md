@@ -38,7 +38,7 @@
 
 ## System Architecture
 
-<img width="953" alt="image" src="https://github.com/user-attachments/assets/b0b45c9a-760a-4ff1-8c4c-46eccd7a0612" width="500"/>
+<img width="1000" alt="image" src="https://github.com/user-attachments/assets/b0b45c9a-760a-4ff1-8c4c-46eccd7a0612"/>
 
 ```
 1. 섹션별 샤딩을 통해 Redis Stream과 API 서버의 수평적 확장성 확보
@@ -60,7 +60,8 @@
 
 ## Rebalancing Strategy
 
-<img width="1933" height="1467" alt="image" src="https://github.com/user-attachments/assets/1945d17b-b0a0-425e-903e-047662c35bd0" width="500"/>
+<img width="1000" alt="image" src="https://github.com/user-attachments/assets/f183ab6a-7e2e-47fb-ae9d-05933953304f" />
+
 
 ### 리밸런싱 과정
 
