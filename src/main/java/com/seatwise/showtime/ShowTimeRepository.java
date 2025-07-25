@@ -29,7 +29,7 @@ public interface ShowTimeRepository
               where s.type = :type and st.date > :date
               order by st.date asc
           """)
-  Slice<ShowSummaryQueryDto> findShowSummaryByTypeAndDate(
+  Slice<ShowSummaryQueryDto> findUpcomingShowTimes(
       @Param("type") ShowType type, @Param("date") LocalDate date, Pageable pageable);
 
   List<ShowTime> findByShowIdAndDateGreaterThanEqualAndDateLessThan(

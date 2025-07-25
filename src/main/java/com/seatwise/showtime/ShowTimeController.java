@@ -30,7 +30,7 @@ public class ShowTimeController {
   @GetMapping
   public ResponseEntity<List<ShowSummaryResponse>> searchShowTimes(
       @ModelAttribute ShowSearchCondition condition, Pageable pageable) {
-    List<ShowSummaryResponse> responses = showTimeService.getShows(condition, pageable);
+    List<ShowSummaryResponse> responses = showTimeService.searchShowTimes(condition, pageable);
     return ResponseEntity.ok(responses);
   }
 

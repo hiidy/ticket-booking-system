@@ -67,10 +67,10 @@ public class ShowTimeService {
     return showTimes.stream().map(ShowTimeSummaryResponse::from).toList();
   }
 
-  public List<ShowSummaryResponse> getShows(
+  public List<ShowSummaryResponse> searchShowTimes(
       ShowSearchCondition searchCondition, Pageable pageable) {
     Slice<ShowSummaryQueryDto> result =
-        showTimeRepository.findShowSummaryByTypeAndDate(
+        showTimeRepository.findUpcomingShowTimes(
             searchCondition.type(), searchCondition.date(), pageable);
     return result.getContent().stream().map(ShowSummaryResponse::from).toList();
   }
