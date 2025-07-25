@@ -2,8 +2,8 @@ package com.seatwise.venue;
 
 import com.seatwise.core.BusinessException;
 import com.seatwise.core.ErrorCode;
-import com.seatwise.venue.domain.Venue;
-import com.seatwise.venue.domain.VenueRepository;
+import com.seatwise.venue.entity.Venue;
+import com.seatwise.venue.entity.VenueRepository;
 import com.seatwise.venue.dto.request.VenueCreateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

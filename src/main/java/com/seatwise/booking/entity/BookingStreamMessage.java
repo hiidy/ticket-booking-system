@@ -1,4 +1,4 @@
-package com.seatwise.booking.domain;
+package com.seatwise.booking.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

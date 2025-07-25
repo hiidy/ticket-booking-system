@@ -3,11 +3,9 @@ package com.seatwise.ticket;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.seatwise.booking.domain.Booking;
+import com.seatwise.booking.entity.Booking;
 import com.seatwise.core.BusinessException;
 import com.seatwise.member.Member;
-import com.seatwise.ticket.domain.Ticket;
-import com.seatwise.ticket.domain.TicketStatus;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;

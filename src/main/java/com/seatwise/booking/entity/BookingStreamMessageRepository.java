@@ -1,4 +1,4 @@
-package com.seatwise.booking.domain;
+package com.seatwise.booking.entity;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

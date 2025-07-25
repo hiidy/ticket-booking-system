@@ -1,6 +1,6 @@
 package com.seatwise.showtime.dto.response;
 
-import com.seatwise.showtime.domain.ShowTime;
+import com.seatwise.showtime.ShowTime;
 
 public record ShowTimeCreateResponse(Long id, Long eventId) {
 

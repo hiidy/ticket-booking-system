@@ -1,7 +1,7 @@
 package com.seatwise.ticket.dto;
 
-import com.seatwise.ticket.domain.Ticket;
-import com.seatwise.venue.domain.SeatGrade;
+import com.seatwise.ticket.Ticket;
+import com.seatwise.venue.entity.SeatGrade;
 import java.time.LocalDateTime;
 
 public record TicketResponse(

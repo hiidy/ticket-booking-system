@@ -1,6 +1,6 @@
 package com.seatwise.showtime.dto.response;
 
-import com.seatwise.showtime.domain.ShowTime;
+import com.seatwise.showtime.ShowTime;
 import java.time.LocalDate;
 import java.time.LocalTime;
 

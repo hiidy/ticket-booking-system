@@ -1,10 +1,10 @@
-package com.seatwise.ticket.domain;
+package com.seatwise.ticket;
 
 import com.seatwise.core.BusinessException;
 import com.seatwise.core.ErrorCode;
 import com.seatwise.core.jpa.BaseEntity;
-import com.seatwise.showtime.domain.ShowTime;
-import com.seatwise.venue.domain.Seat;
+import com.seatwise.showtime.ShowTime;
+import com.seatwise.venue.entity.Seat;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

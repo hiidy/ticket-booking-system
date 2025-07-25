@@ -5,8 +5,6 @@ import com.seatwise.core.ErrorCode;
 import com.seatwise.show.dto.request.ShowRequest;
 import com.seatwise.show.dto.response.ShowCreateResponse;
 import com.seatwise.show.dto.response.ShowResponse;
-import com.seatwise.show.domain.Show;
-import com.seatwise.show.domain.ShowRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

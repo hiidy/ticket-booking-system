@@ -1,4 +1,4 @@
-package com.seatwise.inventory.domain;
+package com.seatwise.inventory;
 
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

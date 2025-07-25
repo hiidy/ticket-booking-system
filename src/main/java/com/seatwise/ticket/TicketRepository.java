@@ -1,4 +1,4 @@
-package com.seatwise.ticket.domain;
+package com.seatwise.ticket;
 
 import com.seatwise.showtime.dto.response.SeatAvailabilityResponse;
 import io.lettuce.core.dynamic.annotation.Param;

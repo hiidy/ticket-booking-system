@@ -2,14 +2,12 @@ package com.seatwise.ticket;
 
 import com.seatwise.core.BusinessException;
 import com.seatwise.core.ErrorCode;
-import com.seatwise.showtime.domain.ShowTime;
-import com.seatwise.showtime.domain.ShowTimeRepository;
+import com.seatwise.showtime.ShowTime;
+import com.seatwise.showtime.ShowTimeRepository;
 import com.seatwise.showtime.dto.response.SeatAvailabilityResponse;
-import com.seatwise.ticket.domain.Ticket;
-import com.seatwise.ticket.domain.TicketRepository;
 import com.seatwise.ticket.dto.TicketCreateRequest;
 import com.seatwise.ticket.dto.TicketResponse;
-import com.seatwise.venue.domain.SeatRepository;
+import com.seatwise.venue.entity.SeatRepository;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;

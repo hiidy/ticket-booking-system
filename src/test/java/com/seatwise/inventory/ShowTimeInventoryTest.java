@@ -4,8 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.seatwise.core.BusinessException;
-import com.seatwise.inventory.domain.ShowInventory;
-import com.seatwise.venue.domain.SeatGrade;
+import com.seatwise.venue.entity.SeatGrade;
 import org.junit.jupiter.api.Test;
 
 class ShowTimeInventoryTest {

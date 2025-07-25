@@ -1,6 +1,6 @@
 package com.seatwise.show.dto.response;
 
-import com.seatwise.show.domain.Show;
+import com.seatwise.show.Show;
 
 public record ShowCreateResponse(Long id) {
 
