@@ -69,7 +69,11 @@ public class ShowTimeService {
   public Slice<ShowSummaryResponse> searchShowTimes(
       ShowSearchCondition searchCondition, Pageable pageable) {
     return showTimeRepository
-        .findUpcomingShowTimes(searchCondition.type(), searchCondition.date(), pageable)
+        .findUpcomingShowTimes(
+            searchCondition.type(),
+            searchCondition.startDate(),
+            searchCondition.endDate(),
+            pageable)
         .map(ShowSummaryResponse::from);
   }
 }

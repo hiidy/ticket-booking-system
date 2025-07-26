@@ -26,10 +26,13 @@ public interface ShowTimeRepository
               from ShowTime st
               join st.show s
               join st.venue v
-              where s.type = :type and st.date > :date
+              where s.type = :type and st.date > :startDate and  st.date <= :endDate
           """)
   Slice<ShowSummaryQueryDto> findUpcomingShowTimes(
-      @Param("type") ShowType type, @Param("date") LocalDate date, Pageable pageable);
+      @Param("type") ShowType type,
+      @Param("startDate") LocalDate startDate,
+      @Param("endDate") LocalDate endDate,
+      Pageable pageable);
 
   List<ShowTime> findByShowIdAndDateGreaterThanEqualAndDateLessThan(
       Long showId, LocalDate startDate, LocalDate endDate);
