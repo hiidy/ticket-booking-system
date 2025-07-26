@@ -6,7 +6,6 @@ import com.seatwise.show.Show;
 import com.seatwise.show.ShowRepository;
 import com.seatwise.showtime.dto.request.ShowSearchCondition;
 import com.seatwise.showtime.dto.request.ShowTimeCreateRequest;
-import com.seatwise.showtime.dto.response.ShowSummaryQueryDto;
 import com.seatwise.showtime.dto.response.ShowSummaryResponse;
 import com.seatwise.showtime.dto.response.ShowTimeCreateResponse;
 import com.seatwise.showtime.dto.response.ShowTimeSummaryResponse;
@@ -67,11 +66,10 @@ public class ShowTimeService {
     return showTimes.stream().map(ShowTimeSummaryResponse::from).toList();
   }
 
-  public List<ShowSummaryResponse> searchShowTimes(
+  public Slice<ShowSummaryResponse> searchShowTimes(
       ShowSearchCondition searchCondition, Pageable pageable) {
-    Slice<ShowSummaryQueryDto> result =
-        showTimeRepository.findUpcomingShowTimes(
-            searchCondition.type(), searchCondition.date(), pageable);
-    return result.getContent().stream().map(ShowSummaryResponse::from).toList();
+    return showTimeRepository
+        .findUpcomingShowTimes(searchCondition.type(), searchCondition.date(), pageable)
+        .map(ShowSummaryResponse::from);
   }
 }

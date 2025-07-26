@@ -10,6 +10,7 @@ import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,9 +29,9 @@ public class ShowTimeController {
   }
 
   @GetMapping
-  public ResponseEntity<List<ShowSummaryResponse>> searchShowTimes(
+  public ResponseEntity<Slice<ShowSummaryResponse>> searchShowTimes(
       @ModelAttribute ShowSearchCondition condition, Pageable pageable) {
-    List<ShowSummaryResponse> responses = showTimeService.searchShowTimes(condition, pageable);
+    Slice<ShowSummaryResponse> responses = showTimeService.searchShowTimes(condition, pageable);
     return ResponseEntity.ok(responses);
   }
 

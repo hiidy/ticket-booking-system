@@ -27,7 +27,6 @@ public interface ShowTimeRepository
               join st.show s
               join st.venue v
               where s.type = :type and st.date > :date
-              order by st.date asc
           """)
   Slice<ShowSummaryQueryDto> findUpcomingShowTimes(
       @Param("type") ShowType type, @Param("date") LocalDate date, Pageable pageable);
