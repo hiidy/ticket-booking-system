@@ -1,9 +1,8 @@
 package com.seatwise.booking.messaging;
 
-import com.seatwise.booking.BookingResponseManager;
 import com.seatwise.booking.BookingService;
 import com.seatwise.booking.dto.BookingMessage;
-import com.seatwise.booking.dto.response.BookingResponse;
+import com.seatwise.booking.dto.BookingMessageType;
 import com.seatwise.booking.exception.BookingException;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -37,7 +36,6 @@ public class BookingMessageConsumer
   private final RedissonClient redissonClient;
   private final MessagingProperties properties;
   private final BookingService bookingService;
-  private final BookingResponseManager responseManager;
   private final BookingMessageAckService bookingMessageAckService;
   private final Map<Integer, Subscription> activeSubscriptions = new ConcurrentHashMap<>();
   private final Map<Integer, RLock> locks = new ConcurrentHashMap<>();
@@ -116,15 +114,23 @@ public class BookingMessageConsumer
         request.memberId(),
         request.showSeatIds(),
         request.sectionId());
-    try {
-      Long bookingId =
-          bookingService.createBooking(requestId, request.memberId(), request.showSeatIds());
-      BookingResponse result = BookingResponse.success(bookingId, requestId);
-      responseManager.completeWithSuccess(requestId, result);
-    } catch (BookingException e) {
-      responseManager.completeWithFailure(requestId, e);
-    } finally {
-      bookingMessageAckService.acknowledge(properties.getConsumerGroup(), message);
+
+    if (request.type() == BookingMessageType.BOOKING) {
+      try {
+        bookingService.createBooking(requestId, request.memberId(), request.showSeatIds());
+      } catch (BookingException e) {
+        log.warn(
+            "예약 실패: requestId={}, error={}, memberId={}",
+            requestId,
+            e.getErrorCode(),
+            request.memberId());
+      } finally {
+        bookingMessageAckService.acknowledge(properties.getConsumerGroup(), message);
+      }
+    }
+
+    if (request.type() == BookingMessageType.CLIENT_TIMEOUT_CANCEL) {
+      bookingService.cancelBookingWithoutRefund(requestId);
     }
   }
 }

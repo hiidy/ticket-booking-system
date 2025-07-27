@@ -1,21 +1,22 @@
 package com.seatwise.booking;
 
-import com.seatwise.booking.dto.BookingCancelRequest;
 import com.seatwise.booking.dto.BookingMessage;
+import com.seatwise.booking.dto.BookingMessageType;
+import com.seatwise.booking.dto.BookingTimeoutRequest;
 import com.seatwise.booking.dto.request.BookingRequest;
-import com.seatwise.booking.dto.response.BookingResponse;
+import com.seatwise.booking.dto.response.BookingStatusResponse;
 import com.seatwise.booking.messaging.BookingMessageProducer;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.async.DeferredResult;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -23,22 +24,37 @@ import org.springframework.web.context.request.async.DeferredResult;
 public class BookingController {
 
   private final BookingMessageProducer producer;
-  private final BookingResponseManager responseManager;
   private final BookingService bookingService;
 
   @PostMapping
-  public DeferredResult<BookingResponse> createBookingRequest(
+  public ResponseEntity<Void> createBookingRequest(
       @RequestHeader("Idempotency-Key") UUID key, @Valid @RequestBody BookingRequest request) {
-    DeferredResult<BookingResponse> response = responseManager.createPendingResponse(key);
     producer.sendMessage(
         new BookingMessage(
-            key.toString(), request.memberId(), request.ticketIds(), request.sectionId()));
-    return response;
+            BookingMessageType.BOOKING,
+            key.toString(),
+            request.memberId(),
+            request.ticketIds(),
+            request.sectionId()));
+    return ResponseEntity.accepted().build();
   }
 
-  @DeleteMapping
-  public ResponseEntity<Void> deleteBooking(@Valid @RequestBody BookingCancelRequest request) {
-    bookingService.cancelBooking(request.memberId(), request.bookingId());
-    return ResponseEntity.noContent().build();
+  @GetMapping("/{requestId}/status")
+  public ResponseEntity<BookingStatusResponse> getBookingStatus(@PathVariable UUID requestId) {
+    BookingStatusResponse response = bookingService.getBookingStatus(requestId);
+    return ResponseEntity.ok(response);
+  }
+
+  @PostMapping("/{requestId}/timeout")
+  public ResponseEntity<Void> timeoutBookingRequest(
+      @PathVariable UUID requestId, @Valid @RequestBody BookingTimeoutRequest request) {
+    producer.sendMessage(
+        new BookingMessage(
+            BookingMessageType.CLIENT_TIMEOUT_CANCEL,
+            requestId.toString(),
+            request.memberId(),
+            null,
+            request.sectionId()));
+    return ResponseEntity.accepted().build();
   }
 }

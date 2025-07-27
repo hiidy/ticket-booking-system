@@ -1,5 +1,6 @@
 package com.seatwise.booking;
 
+import com.seatwise.booking.dto.response.BookingStatusResponse;
 import com.seatwise.booking.entity.Booking;
 import com.seatwise.booking.entity.BookingRepository;
 import com.seatwise.booking.exception.BookingException;
@@ -11,6 +12,7 @@ import com.seatwise.ticket.TicketRepository;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,5 +74,32 @@ public class BookingService {
 
     tickets.forEach(Ticket::cancelBooking);
     bookingRepository.deleteById(bookingId);
+  }
+
+  @Transactional
+  public void cancelBookingWithoutRefund(UUID requestId) {
+    Optional<Booking> bookingOpt = bookingRepository.findByRequestId(requestId);
+
+    if (bookingOpt.isEmpty()) {
+      log.debug("정리할 예약이 없음: requestId={}", requestId);
+      return;
+    }
+
+    Booking booking = bookingOpt.get();
+    List<Ticket> tickets = ticketRepository.findTicketsByBookingId(booking.getId());
+
+    tickets.forEach(Ticket::cancelBooking);
+    bookingRepository.deleteById(booking.getId());
+
+    log.info("만료된 예약 정리: requestId={}, bookingId={}", requestId, booking.getId());
+  }
+
+  public BookingStatusResponse getBookingStatus(UUID requestId) {
+    Optional<Booking> bookingOpt = bookingRepository.findByRequestId(requestId);
+
+    if (bookingOpt.isPresent()) {
+      return BookingStatusResponse.success(bookingOpt.get().getId(), requestId);
+    }
+    return BookingStatusResponse.pending(requestId);
   }
 }

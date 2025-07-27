@@ -5,7 +5,8 @@ import static org.mockito.Mockito.*;
 
 import com.seatwise.annotation.EmbeddedRedisTest;
 import com.seatwise.booking.dto.BookingMessage;
-import com.seatwise.booking.dto.response.BookingResponse;
+import com.seatwise.booking.dto.BookingMessageType;
+import com.seatwise.booking.dto.response.BookingStatusResponse;
 import com.seatwise.booking.exception.BookingException;
 import com.seatwise.booking.messaging.BookingMessageConsumer;
 import com.seatwise.booking.messaging.StreamKeyGenerator;
@@ -57,7 +58,8 @@ class BookingMessageConsumerTest {
     Long memberId = 1L;
     List<Long> seatIds = List.of(1L, 2L);
     Long bookingId = 100L;
-    BookingMessage message = new BookingMessage(requestId.toString(), memberId, seatIds, 1L);
+    BookingMessage message =
+        new BookingMessage(BookingMessageType.BOOKING, requestId.toString(), memberId, seatIds, 1L);
     when(bookingService.createBooking(requestId, memberId, seatIds)).thenReturn(bookingId);
 
     ObjectRecord<String, BookingMessage> messageRecord =
@@ -69,7 +71,7 @@ class BookingMessageConsumerTest {
     // then
     verify(bookingService).createBooking(requestId, memberId, seatIds);
 
-    BookingResponse expected = BookingResponse.success(bookingId, requestId);
+    BookingStatusResponse expected = BookingStatusResponse.success(bookingId, requestId);
     assertThat(expected).isNotNull();
     assertThat(expected.success()).isTrue();
     assertThat(expected.bookingId()).isEqualTo(bookingId);
@@ -81,7 +83,8 @@ class BookingMessageConsumerTest {
     // given
     Long memberId = 1L;
     List<Long> seatIds = List.of(1L, 2L);
-    BookingMessage message = new BookingMessage(requestId.toString(), memberId, seatIds, 1L);
+    BookingMessage message =
+        new BookingMessage(BookingMessageType.BOOKING, requestId.toString(), memberId, seatIds, 1L);
 
     when(bookingService.createBooking(requestId, memberId, seatIds))
         .thenThrow(new BookingException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY, requestId));
@@ -95,7 +98,7 @@ class BookingMessageConsumerTest {
     // then
     verify(bookingService).createBooking(requestId, memberId, seatIds);
 
-    BookingResponse result = BookingResponse.failed(requestId);
+    BookingStatusResponse result = BookingStatusResponse.pending(requestId);
     assertThat(result.success()).isFalse();
     assertThat(result.bookingId()).isNull();
     assertThat(result.requestId()).isEqualTo(requestId);

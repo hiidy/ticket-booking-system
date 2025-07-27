@@ -5,6 +5,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.seatwise.booking.dto.BookingMessage;
+import com.seatwise.booking.dto.BookingMessageType;
 import com.seatwise.booking.messaging.BookingMessageProducer;
 import com.seatwise.booking.messaging.MessagingProperties;
 import java.util.List;
@@ -37,7 +38,8 @@ class BookingMessageProducerTest {
     UUID requestId = UUID.randomUUID();
     List<Long> showSeatIds = List.of(1L, 2L);
     BookingMessage request =
-        new BookingMessage(requestId.toString(), memberId, showSeatIds, sectionId);
+        new BookingMessage(
+            BookingMessageType.BOOKING, requestId.toString(), memberId, showSeatIds, sectionId);
     when(messagingProperties.getPartitionCount()).thenReturn(totalPartition);
 
     StreamOperations<String, String, Object> streamOperations =
