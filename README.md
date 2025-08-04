@@ -1,8 +1,8 @@
 # 공연 예매 시스템
 
-> 뮤지컬, 공연, 콘서트 등 다양한 이벤트의 좌석을 예매할 수 있는 서비스입니다.  
-**대량의 트래픽에서도 좌석 중복/경합 없이 안정적으로 처리되는 구조**를 구현하기 위해 시작했습니다.  
-특히 Redis Stream 기반 Lock-Free 구조와 자체 Rebalancing 시스템을 통해 **확장성과 처리 안정성**을 확보했습니다.
+> 뮤지컬, 공연, 콘서트 등 다양한 이벤트의 좌석을 예매할 수 있는 서비스입니다.
+대량의 트래픽에서도 좌석 중복/경합 없이 안정적으로 처리되는 구조를 구현하기 위해 시작했습니다.
+특히 Redis Stream 기반 Lock-Free 구조와 자체 Rebalancing 시스템을 통해 확장성과 처리 안정성을 확보했습니다.
 
 
 ## Installation & Requirements
@@ -28,7 +28,9 @@
 - Consumer Group 없이 순서 보장된 메시지 처리
 - 리밸런싱 시스템 자체 구현 (Consistent Hashing 기반)
 - Idempotency-Key를 통한 중복 예매 방지
-- Spring DeferredResult 기반 비동기 응답 처리
+- DB Polling 기반 비동기 응답 처리
+
+
 
 
 ## ERD
@@ -38,7 +40,7 @@
 
 ## System Architecture
 
-<img width="800" height="2087" alt="image" src="https://github.com/user-attachments/assets/12b1365c-aedc-4584-b01e-4717c29c92ed" />
+<img width="800" height="2087" alt="image" src="https://github.com/user-attachments/assets/951f06ef-0d69-41dd-86a0-9e261994cafa" />
 
 
 ```
@@ -49,20 +51,22 @@
 3. Lock-Free 방식으로 DB 병목 현상 최소화 및 처리 성능 향상
 ```
 
-### 🔁 메시지 처리 흐름
+### 메시지 처리 흐름
 
 1. 사용자가 좌석 예매 요청을 보냄 (POST /bookings)
 2. API 서버는 요청을 Redis Stream에 비동기 저장
 3. BookingConsumer가 해당 섹션의 메시지를 단일 스레드로 소비
-4. DB에 중복 검사 → 예매 처리 → 결과를 BookingResonseManager로 전달
-5. 사용자에게 비동기 응답 전송 (DeferredResult)
+4. DB에 중복 검사 → 예매 처리
+5. 사용자는 예매 결과를 별도 조회 API로 확인 (GET /bookings/{requestId})
+
+> 예매 상태는 DB에 저장되므로 서버 재시작, 장애 상황에서도 유실 없이 관리됩니다.
 
 ---
 
 ## Rebalancing Strategy
 
 
-<img width="1949" height="1467" alt="image" src="https://github.com/user-attachments/assets/46613eb2-0439-478a-a263-d26c35f029eb" />
+<img width="1989" height="1453" alt="image" src="https://github.com/user-attachments/assets/74c6016e-64cd-47ff-ba45-fbcd0f6fd137" />
 
 
 ### 리밸런싱 과정
