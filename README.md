@@ -24,7 +24,7 @@
 
 - 실시간 좌석 예매 처리 (Lock-Free 메시징 기반)
 - Redis Stream 기반 비동기 메시지 처리 구조
-- 섹션 단위 샤딩으로 수평 확장성 확보
+- 섹션 단위 파티셔닝으로 수평 확장성 확보
 - Consumer Group 없이 순서 보장된 메시지 처리
 - 리밸런싱 시스템 자체 구현 (Consistent Hashing 기반)
 - Idempotency-Key를 통한 중복 예매 방지
