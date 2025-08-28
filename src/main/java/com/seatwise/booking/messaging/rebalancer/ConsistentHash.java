@@ -5,13 +5,14 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.Map.Entry;
+import java.util.NavigableMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 public class ConsistentHash<T> {
 
   private final int virtualNodes;
-  private final SortedMap<Long, T> circle = new TreeMap<>();
+  private final NavigableMap<Long, T> circle = new ConcurrentSkipListMap<>();
 
   public ConsistentHash(int virtualNodes, Collection<T> nodes) {
     this.virtualNodes = virtualNodes;
@@ -39,11 +40,11 @@ public class ConsistentHash<T> {
       return null;
     }
     long hash = hash(key.toString());
-    if (!circle.containsKey(hash)) {
-      SortedMap<Long, T> tailMap = circle.tailMap(hash);
-      hash = tailMap.isEmpty() ? circle.firstKey() : tailMap.firstKey();
+    Entry<Long, T> ceilingEntry = circle.ceilingEntry(hash);
+    if (ceilingEntry == null) {
+      ceilingEntry = circle.firstEntry();
     }
-    return circle.get(hash);
+    return ceilingEntry.getValue();
   }
 
   private long hash(String key) {
