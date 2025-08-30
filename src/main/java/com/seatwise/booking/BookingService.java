@@ -1,5 +1,6 @@
 package com.seatwise.booking;
 
+import com.seatwise.booking.dto.BookingCreatedEvent;
 import com.seatwise.booking.dto.response.BookingStatusResponse;
 import com.seatwise.booking.entity.Booking;
 import com.seatwise.booking.entity.BookingRepository;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class BookingService {
 
+  private final ApplicationEventPublisher eventPublisher;
   private final BookingRepository bookingRepository;
   private final TicketRepository ticketRepository;
   private final MemberRepository memberRepository;
@@ -61,6 +64,7 @@ public class BookingService {
         ticket ->
             ticket.assignBooking(savedBooking.getId(), bookingRequestTime, Duration.ofMinutes(10)));
 
+    eventPublisher.publishEvent(new BookingCreatedEvent(ticketIds, memberId));
     return savedBooking.getId();
   }
 
