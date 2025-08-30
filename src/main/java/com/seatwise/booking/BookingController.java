@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,12 +26,11 @@ public class BookingController {
   private final BookingService bookingService;
 
   @PostMapping
-  public ResponseEntity<Void> createBookingRequest(
-      @RequestHeader("Idempotency-Key") UUID key, @Valid @RequestBody BookingRequest request) {
+  public ResponseEntity<Void> createBookingRequest(@Valid @RequestBody BookingRequest request) {
     producer.sendMessage(
         new BookingMessage(
             BookingMessageType.BOOKING,
-            key.toString(),
+            UUID.randomUUID().toString(),
             request.memberId(),
             request.ticketIds(),
             request.sectionId()));
