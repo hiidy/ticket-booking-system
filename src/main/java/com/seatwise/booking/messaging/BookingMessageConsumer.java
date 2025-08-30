@@ -112,12 +112,12 @@ public class BookingMessageConsumer
     log.info(
         "멤버Id: {}, 좌석Id: {}, 섹션Id: {}에 대한 요청 처리중",
         request.memberId(),
-        request.showSeatIds(),
+        request.ticketIds(),
         request.sectionId());
 
     if (request.type() == BookingMessageType.BOOKING) {
       try {
-        bookingService.createBooking(requestId, request.memberId(), request.showSeatIds());
+        bookingService.createBooking(requestId, request.memberId(), request.ticketIds());
       } catch (BookingException e) {
         log.warn(
             "예약 실패: requestId={}, error={}, memberId={}",

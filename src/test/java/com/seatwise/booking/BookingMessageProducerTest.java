@@ -8,6 +8,7 @@ import com.seatwise.booking.dto.BookingMessage;
 import com.seatwise.booking.dto.BookingMessageType;
 import com.seatwise.booking.messaging.BookingMessageProducer;
 import com.seatwise.booking.messaging.MessagingProperties;
+import com.seatwise.ticket.TicketCacheService;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ class BookingMessageProducerTest {
 
   @Mock private RedisTemplate<String, Object> redisTemplate;
   @Mock private MessagingProperties messagingProperties;
+  @Mock private TicketCacheService cacheService;
   @InjectMocks private BookingMessageProducer bookingMessageProducer;
 
   @Test

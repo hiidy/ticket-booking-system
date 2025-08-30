@@ -6,5 +6,5 @@ public record BookingMessage(
     BookingMessageType type,
     String requestId,
     Long memberId,
-    List<Long> showSeatIds,
+    List<Long> ticketIds,
     Long sectionId) {}

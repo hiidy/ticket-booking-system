@@ -14,6 +14,6 @@ public class TicketEventListener {
 
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void handleBookingCreated(BookingCreatedEvent event) {
-    cacheService.cacheTicketBooking(event.ticketIds(), event.memberId());
+    cacheService.holdTickets(event.ticketIds(), event.memberId());
   }
 }
