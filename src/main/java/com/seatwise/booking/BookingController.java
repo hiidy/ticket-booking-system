@@ -1,9 +1,10 @@
 package com.seatwise.booking;
 
+import com.seatwise.booking.dto.BookingCreateCommand;
 import com.seatwise.booking.dto.BookingMessage;
 import com.seatwise.booking.dto.BookingMessageType;
-import com.seatwise.booking.dto.BookingTimeoutRequest;
 import com.seatwise.booking.dto.request.BookingRequest;
+import com.seatwise.booking.dto.request.BookingTimeoutRequest;
 import com.seatwise.booking.dto.response.BookingResponse;
 import com.seatwise.booking.dto.response.BookingStatusResponse;
 import com.seatwise.booking.messaging.BookingMessageProducer;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -26,24 +28,21 @@ public class BookingController {
 
   private final BookingMessageProducer producer;
   private final BookingService bookingService;
+  private final BookingRequestService bookingRequestService;
 
   @PostMapping
   public ResponseEntity<BookingResponse> createBookingRequest(
+      @RequestHeader("Idempotency-Key") UUID idempotencyKey,
       @Valid @RequestBody BookingRequest request) {
-    String requestId = UUID.randomUUID().toString();
+    BookingCreateCommand createCommand =
+        BookingCreateCommand.of(request.memberId(), request.ticketIds(), request.sectionId());
+
+    String requestId = bookingRequestService.createBookingRequest(idempotencyKey, createCommand);
     String pollingUrl =
         ServletUriComponentsBuilder.fromCurrentRequestUri()
             .pathSegment(requestId, "status")
             .build()
             .toUriString();
-
-    producer.sendMessage(
-        new BookingMessage(
-            BookingMessageType.BOOKING,
-            requestId,
-            request.memberId(),
-            request.ticketIds(),
-            request.sectionId()));
 
     BookingResponse response = new BookingResponse(pollingUrl, requestId);
     return ResponseEntity.accepted().body(response);
