@@ -4,6 +4,7 @@ import com.seatwise.booking.dto.BookingMessage;
 import com.seatwise.booking.dto.BookingMessageType;
 import com.seatwise.booking.dto.BookingTimeoutRequest;
 import com.seatwise.booking.dto.request.BookingRequest;
+import com.seatwise.booking.dto.response.BookingResponse;
 import com.seatwise.booking.dto.response.BookingStatusResponse;
 import com.seatwise.booking.messaging.BookingMessageProducer;
 import jakarta.validation.Valid;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -26,15 +28,25 @@ public class BookingController {
   private final BookingService bookingService;
 
   @PostMapping
-  public ResponseEntity<Void> createBookingRequest(@Valid @RequestBody BookingRequest request) {
+  public ResponseEntity<BookingResponse> createBookingRequest(
+      @Valid @RequestBody BookingRequest request) {
+    String requestId = UUID.randomUUID().toString();
+    String pollingUrl =
+        ServletUriComponentsBuilder.fromCurrentRequestUri()
+            .pathSegment(requestId, "status")
+            .build()
+            .toUriString();
+
     producer.sendMessage(
         new BookingMessage(
             BookingMessageType.BOOKING,
-            UUID.randomUUID().toString(),
+            requestId,
             request.memberId(),
             request.ticketIds(),
             request.sectionId()));
-    return ResponseEntity.accepted().build();
+
+    BookingResponse response = new BookingResponse(pollingUrl, requestId);
+    return ResponseEntity.accepted().body(response);
   }
 
   @GetMapping("/{requestId}/status")
