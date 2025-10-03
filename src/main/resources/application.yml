@@ -1,22 +1,9 @@
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
+
 spring:
-  data:
-    redis:
-      port: 6379
-      host: localhost
   application:
     name: ticket-booking-system
-    instance-id: ${HOSTNAME:localhost}-${server.port}
-  datasource:
-    url: jdbc:mysql://localhost:3306/booking_system?serverTimezone=UTC&socketTimeout=10000&tcpKeepAlive=true
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      auto-commit: false
-      connection-timeout: 30000
-      idle-timeout: 600000
   jpa:
     show-sql: false
     properties:
@@ -25,7 +12,40 @@ spring:
     open-in-view: false
 
 queue:
-  consumer-group: 'bookingGroup'
-  instance-count: 1
-  partition-count: 32
+  consumer-group: ${QUEUE_CONSUMER_GROUP:bookingGroup}
+  instance-count: ${QUEUE_INSTANCE_COUNT:1}
+  partition-count: ${QUEUE_PARTITION_COUNT:32}
 
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  datasource:
+    url: jdbc:mysql://localhost:3306/booking_system?serverTimezone=UTC&tcpKeepAlive=true
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      auto-commit: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  datasource:
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT:3306}/booking_system?serverTimezone=UTC&tcpKeepAlive=true
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      auto-commit: false
