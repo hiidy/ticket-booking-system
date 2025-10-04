@@ -4,6 +4,7 @@ server:
 spring:
   application:
     name: ticket-booking-system
+    instance-id: ${HOSTNAME:localhost}-${server.port:8080}
   jpa:
     show-sql: false
     properties:
