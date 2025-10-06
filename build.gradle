@@ -34,6 +34,7 @@ dependencies {
     implementation 'io.lettuce:lettuce-core:6.6.0.RELEASE'
     implementation 'org.springframework.retry:spring-retry:2.0.11'
     implementation 'org.redisson:redisson-spring-boot-starter:3.50.0'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     compileOnly 'org.projectlombok:lombok'
 

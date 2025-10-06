@@ -17,6 +17,25 @@ queue:
   instance-count: ${QUEUE_INSTANCE_COUNT:1}
   partition-count: ${QUEUE_PARTITION_COUNT:32}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,prometheus"
+  endpoint:
+    health:
+      show-components: always
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      instance: ${spring.application.instance-id}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
 ---
 spring:
   config:
