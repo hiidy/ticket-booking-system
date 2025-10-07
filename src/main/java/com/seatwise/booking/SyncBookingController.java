@@ -24,13 +24,8 @@ public class SyncBookingController {
   @PostMapping("/sync")
   public ResponseEntity<BookingStatusResponse> createBookingSync(
       @RequestHeader("Idempotency-Key") UUID key, @Valid @RequestBody BookingRequest request) {
-    try {
-      Long bookingId =
-          syncBookingService.createBookingSync(key, request.memberId(), request.ticketIds());
-      return ResponseEntity.ok(BookingStatusResponse.success(bookingId, key));
-    } catch (Exception e) {
-      log.error("동기 예매 실패 - requestId: {}, error: {}", key, e.getMessage(), e);
-      return ResponseEntity.ok(BookingStatusResponse.pending(key));
-    }
+    Long bookingId =
+        syncBookingService.createBookingSync(key, request.memberId(), request.ticketIds());
+    return ResponseEntity.ok(BookingStatusResponse.success(bookingId, key));
   }
 }
