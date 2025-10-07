@@ -34,8 +34,12 @@ public class SyncBookingService {
 
     LocalDateTime bookingRequestTime = LocalDateTime.now();
 
-    List<Ticket> tickets =
-        ticketRepository.findAllAvailableSeatsWithLock(ticketIds, bookingRequestTime);
+    List<Ticket> tickets;
+    try {
+      tickets = ticketRepository.findAllAvailableSeatsWithLock(ticketIds, bookingRequestTime);
+    } catch (org.springframework.dao.PessimisticLockingFailureException e) {
+      throw new RecoverableBookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
+    }
 
     if (tickets.size() != ticketIds.size()) {
       throw new RecoverableBookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
