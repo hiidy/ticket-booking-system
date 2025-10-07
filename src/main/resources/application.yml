@@ -21,20 +21,20 @@ management:
   endpoints:
     web:
       exposure:
-        include: "health,info,metrics,prometheus"
+        include: health,info,metrics,prometheus
+
   endpoint:
     health:
       show-components: always
       probes:
         enabled: true
+
   metrics:
     tags:
       application: ${spring.application.name}
-      instance: ${spring.application.instance-id}
-  prometheus:
-    metrics:
-      export:
-        enabled: true
+      environment: ${SPRING_PROFILES_ACTIVE:unknown}
+      instance: ${HOSTNAME:unknown}-${server.port}
+      region: ${AWS_REGION:ap-northeast-2}
 
 ---
 spring:
