@@ -11,4 +11,8 @@ public record BookingStatusResponse(boolean success, Long bookingId, UUID reques
   public static BookingStatusResponse pending(UUID requestId) {
     return new BookingStatusResponse(false, null, requestId);
   }
+
+  public static BookingStatusResponse failed(UUID requestId) {
+    return new BookingStatusResponse(false, null, requestId);
+  }
 }

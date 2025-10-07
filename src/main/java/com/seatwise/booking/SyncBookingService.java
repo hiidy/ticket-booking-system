@@ -2,7 +2,8 @@ package com.seatwise.booking;
 
 import com.seatwise.booking.entity.Booking;
 import com.seatwise.booking.entity.BookingRepository;
-import com.seatwise.booking.exception.BookingException;
+import com.seatwise.booking.exception.FatalBookingException;
+import com.seatwise.booking.exception.RecoverableBookingException;
 import com.seatwise.core.ErrorCode;
 import com.seatwise.member.Member;
 import com.seatwise.member.MemberRepository;
@@ -29,7 +30,7 @@ public class SyncBookingService {
     Member member =
         memberRepository
             .findById(memberId)
-            .orElseThrow(() -> new BookingException(ErrorCode.MEMBER_NOT_FOUND, requestId));
+            .orElseThrow(() -> new FatalBookingException(ErrorCode.MEMBER_NOT_FOUND, requestId));
 
     LocalDateTime bookingRequestTime = LocalDateTime.now();
 
@@ -37,14 +38,14 @@ public class SyncBookingService {
         ticketRepository.findAllAvailableSeatsWithLock(ticketIds, bookingRequestTime);
 
     if (tickets.size() != ticketIds.size()) {
-      throw new BookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
+      throw new RecoverableBookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
     }
 
     boolean anyUnavailable =
         tickets.stream().anyMatch(ticket -> !ticket.canAssignBooking(bookingRequestTime));
 
     if (anyUnavailable) {
-      throw new BookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
+      throw new RecoverableBookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
     }
 
     int totalAmount = tickets.stream().map(Ticket::getPrice).reduce(0, Integer::sum);
