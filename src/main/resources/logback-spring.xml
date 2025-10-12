@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+  <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+  <appender name="CONSOLE_WITH_FILTER" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+      <evaluator class="ch.qos.logback.classic.boolex.JaninoEventEvaluator">
+        <expression>
+          return logger.equals("org.hibernate.engine.jdbc.spi.SqlExceptionHelper") &amp;&amp;
+          (message.contains("SQL Error: 3572") ||
+          formattedMessage.toLowerCase().contains("nowait"));
+        </expression>
+      </evaluator>
+      <onMatch>DENY</onMatch>
+      <onMismatch>NEUTRAL</onMismatch>
+    </filter>
+  </appender>
+
+  <root level="INFO">
+    <appender-ref ref="CONSOLE_WITH_FILTER"/>
+  </root>
+
+</configuration>

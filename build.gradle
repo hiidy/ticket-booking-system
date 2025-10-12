@@ -35,6 +35,7 @@ dependencies {
     implementation 'org.springframework.retry:spring-retry:2.0.11'
     implementation 'org.redisson:redisson-spring-boot-starter:3.50.0'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.codehaus.janino:janino'
 
     compileOnly 'org.projectlombok:lombok'
 
