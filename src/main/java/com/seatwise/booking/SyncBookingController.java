@@ -28,4 +28,12 @@ public class SyncBookingController {
         syncBookingService.createBookingSync(key, request.memberId(), request.ticketIds());
     return ResponseEntity.ok(BookingStatusResponse.success(bookingId, key));
   }
+
+  @PostMapping("/redislock")
+  public ResponseEntity<BookingStatusResponse> createBookingWithRedisLock(
+      @RequestHeader("Idempotency-Key") UUID key, @Valid @RequestBody BookingRequest request) {
+    Long bookingId =
+        syncBookingService.createBookingSyncWithLock(key, request.memberId(), request.ticketIds());
+    return ResponseEntity.ok(BookingStatusResponse.success(bookingId, key));
+  }
 }
