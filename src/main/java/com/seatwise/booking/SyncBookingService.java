@@ -15,13 +15,13 @@ import org.springframework.stereotype.Service;
 public class SyncBookingService {
 
   private final TicketCacheService cacheService;
-  private final BookingTransactionalService transactionalService;
+  private final BookingService bookingService;
 
   public Long createBookingSync(UUID requestId, Long memberId, List<Long> ticketIds) {
     if (cacheService.hasUnavailableTickets(ticketIds, memberId)) {
       throw new RecoverableBookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
     }
 
-    return transactionalService.createBookingInTransaction(requestId, memberId, ticketIds);
+    return bookingService.createBookingWithLock(requestId, memberId, ticketIds);
   }
 }

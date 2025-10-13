@@ -70,6 +70,39 @@ public class BookingService {
   }
 
   @Transactional
+  public Long createBookingWithLock(UUID requestId, Long memberId, List<Long> ticketIds) {
+    Member member =
+        memberRepository
+            .findById(memberId)
+            .orElseThrow(() -> new FatalBookingException(ErrorCode.MEMBER_NOT_FOUND, requestId));
+
+    LocalDateTime bookingRequestTime = LocalDateTime.now();
+
+    List<Ticket> tickets;
+    try {
+      tickets = ticketRepository.findAllAvailableSeatsWithLock(ticketIds, bookingRequestTime);
+    } catch (org.springframework.dao.PessimisticLockingFailureException e) {
+      throw new RecoverableBookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
+    }
+
+    if (tickets.size() != ticketIds.size()
+        || tickets.stream().anyMatch(t -> !t.canAssignBooking(bookingRequestTime))) {
+      throw new RecoverableBookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
+    }
+
+    int totalAmount = tickets.stream().mapToInt(Ticket::getPrice).sum();
+    Booking booking = new Booking(requestId, member, totalAmount);
+    Booking savedBooking = bookingRepository.save(booking);
+
+    tickets.forEach(
+        t -> t.assignBooking(savedBooking.getId(), bookingRequestTime, Duration.ofMinutes(10)));
+
+    eventPublisher.publishEvent(new BookingCreatedEvent(ticketIds, memberId));
+
+    return savedBooking.getId();
+  }
+
+  @Transactional
   public void cancelBooking(Long memberId, Long bookingId) {
     List<Ticket> tickets = ticketRepository.findTicketsByBookingId(bookingId);
 
