@@ -34,6 +34,9 @@ public class ErrorCodeToStatusMapper {
 
     // 502
     MAP.put(ErrorCode.BOOKING_TIMEOUT, HttpStatus.GATEWAY_TIMEOUT);
+
+    // 503
+    MAP.put(ErrorCode.LOCK_ACQUISITION_TIMEOUT, HttpStatus.SERVICE_UNAVAILABLE);
   }
 
   public static HttpStatus getHttpStatus(ErrorCode code) {

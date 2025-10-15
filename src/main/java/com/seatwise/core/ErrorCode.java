@@ -25,7 +25,10 @@ public enum ErrorCode {
   DUPLICATE_IDEMPOTENCY_KEY("이미 처리된 요청입니다. 같은 Idempotency-Key로는 중복 요청이 불가능합니다."),
 
   // 502 Bad Gateway
-  BOOKING_TIMEOUT("좌석 예약 요청이 시간 초과로 실패했습니다.");
+  BOOKING_TIMEOUT("좌석 예약 요청이 시간 초과로 실패했습니다."),
+
+  // 503
+  LOCK_ACQUISITION_TIMEOUT("락 획득 타임아웃 잠시 후 다시 시도해주세요");
 
   private final String message;
 
