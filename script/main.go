@@ -11,7 +11,9 @@ import (
 	"math/rand"
 	"net"
 	"net/http"
+	"os"
 	"runtime"
+	"runtime/pprof"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -21,9 +23,11 @@ import (
 	"golang.org/x/net/http2"
 )
 
+var cpuprofile = flag.String("cpuprofile", "", "CPU 프로파일 출력 파일")
+var memprofile = flag.String("memprofile", "", "메모리 프로파일 출력 파일")
+
 var (
-	// CLI 플래그
-	baseURL          = flag.String("url", "http://localhost:8080/healthz", "타겟 URL")
+	baseURL          = flag.String("url", "internal-alb-1198072083.ap-northeast-2.elb.amazonaws.com/healthz", "타겟 URL")
 	httpMethod       = flag.String("method", "POST", "HTTP 메서드 (GET, POST)")
 	totalRequests    = flag.Int("requests", 100, "총 요청 수")
 	numWorkers       = flag.Int("workers", 5000, "워커 수 (동시성)")
@@ -340,6 +344,15 @@ func printFinalResults(stats *Stats, totalDuration, generationDuration time.Dura
 
 func main() {
 	flag.Parse()
+
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
 
 	method := strings.ToUpper(*httpMethod)
 	if method != "GET" && method != "POST" {
