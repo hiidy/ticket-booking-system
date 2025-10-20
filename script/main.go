@@ -27,6 +27,8 @@ var cpuprofile = flag.String("cpuprofile", "", "CPU 프로파일 출력 파일")
 var memprofile = flag.String("memprofile", "", "메모리 프로파일 출력 파일")
 var blockprofile = flag.String("blockprofile", "", "블로킹 프로파일 출력 파일")
 var mutexprofile = flag.String("mutexprofile", "", "뮤텍스 프로파일 출력 파일")
+var goroutineprofile = flag.String("goroutineprofile", "", "고루틴 프로파일 출력 파일")
+var traceprofile = flag.String("traceprofile", "", "실행 추적 출력 파일")
 
 var (
 	baseURL          = flag.String("url", "http://localhost:8080/healthz", "타겟 URL")
@@ -194,7 +196,6 @@ func sendRequest(id int, client *http.Client, payload []byte, stats *Stats, wg *
 	atomic.AddInt64(&stats.success, 1)
 	atomic.AddInt64(&stats.sumLatency, latency)
 
-	// min/max 레이턴시 업데이트
 	for {
 		oldMin := atomic.LoadInt64(&stats.minLatency)
 		if oldMin == 0 || latency < oldMin {
@@ -275,6 +276,12 @@ func printConfig(method string) {
 	}
 	if *mutexprofile != "" {
 		fmt.Printf("  뮤텍스 프로파일:     %s\n", *mutexprofile)
+	}
+	if *goroutineprofile != "" {
+		fmt.Printf("  고루틴 프로파일:     %s\n", *goroutineprofile)
+	}
+	if *traceprofile != "" {
+		fmt.Printf("  실행 추적:           %s\n", *traceprofile)
 	}
 
 	fmt.Printf("%s\n\n", separator)
@@ -454,7 +461,7 @@ func main() {
 			log.Fatal("메모리 프로파일 생성 실패:", err)
 		}
 		defer f.Close()
-		runtime.GC()
+		runtime.GC() // 최신 메모리 상태 반영
 		if err := pprof.WriteHeapProfile(f); err != nil {
 			log.Fatal("메모리 프로파일 작성 실패:", err)
 		}
@@ -483,5 +490,17 @@ func main() {
 			log.Fatal("뮤텍스 프로파일 작성 실패:", err)
 		}
 		fmt.Printf("✓ 뮤텍스 프로파일 저장 완료: %s\n", *mutexprofile)
+	}
+
+	if *goroutineprofile != "" {
+		f, err := os.Create(*goroutineprofile)
+		if err != nil {
+			log.Fatal("고루틴 프로파일 생성 실패:", err)
+		}
+		defer f.Close()
+		if err := pprof.Lookup("goroutine").WriteTo(f, 0); err != nil {
+			log.Fatal("고루틴 프로파일 작성 실패:", err)
+		}
+		fmt.Printf("✓ 고루틴 프로파일 저장 완료: %s\n", *goroutineprofile)
 	}
 }
