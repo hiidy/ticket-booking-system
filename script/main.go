@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"math/rand"
 	"net"
@@ -31,7 +32,7 @@ var goroutineprofile = flag.String("goroutineprofile", "", "고루틴 프로파�
 var traceprofile = flag.String("traceprofile", "", "실행 추적 출력 파일")
 
 var (
-	baseURL          = flag.String("url", "http://localhost:8080/healthz", "타겟 URL")
+	baseURL          = flag.String("url", "https://internal-alb-2004079858.ap-northeast-2.elb.amazonaws.com/api/bookings/sync", "타겟 URL")
 	httpMethod       = flag.String("method", "GET", "HTTP 메서드 (GET, POST)")
 	totalRequests    = flag.Int("requests", 100, "총 요청 수")
 	maxConns         = flag.Int("conns", 2000, "호스트당 최대 연결 수")
@@ -39,6 +40,9 @@ var (
 	maxMemberID      = flag.Int("members", 9000, "최대 멤버 ID")
 	showProgress     = flag.Bool("progress", true, "실시간 진행률 표시")
 	progressInterval = flag.Duration("interval", 1*time.Second, "진행률 출력 간격")
+	enableWarmup     = flag.Bool("warmup", true, "워밍업 활성화")
+	warmupRequests   = flag.Int("warmup-requests", 100, "워밍업 요청 수")
+	numClients       = flag.Int("clients", 10, "HTTP 클라이언트 개수 (mutex 경합 감소)")
 )
 
 var (
@@ -49,6 +53,18 @@ var (
 	}
 	CUMULATIVE_WEIGHTS []float64
 )
+
+var rngPool = sync.Pool{
+	New: func() any {
+		return rand.New(rand.NewSource(time.Now().UnixNano()))
+	},
+}
+
+func withRNG(f func(r *rand.Rand)) {
+	r := rngPool.Get().(*rand.Rand)
+	f(r)
+	rngPool.Put(r)
+}
 
 type BookingRequest struct {
 	MemberID  int   `json:"memberId"`
@@ -81,10 +97,10 @@ func init() {
 	}
 }
 
-func pickSection() int {
-	r := rand.Float64()
+func pickSection(r *rand.Rand) int {
+	v := r.Float64()
 	for i, cw := range CUMULATIVE_WEIGHTS {
-		if r <= cw {
+		if v <= cw {
 			return i + 1
 		}
 	}
@@ -92,22 +108,27 @@ func pickSection() int {
 }
 
 func createPayload(maxMember int) ([]byte, error) {
-	sectionID := pickSection()
-	sectionRange := SECTION_RANGES[sectionID-1]
+	var payload []byte
 
-	seatCount := rand.Intn(4) + 1
-	seatIDs := make([]int, seatCount)
-	for i := 0; i < seatCount; i++ {
-		seatIDs[i] = rand.Intn(sectionRange[1]-sectionRange[0]+1) + sectionRange[0]
-	}
+	withRNG(func(r *rand.Rand) {
+		sectionID := pickSection(r)
+		sectionRange := SECTION_RANGES[sectionID-1]
 
-	req := BookingRequest{
-		MemberID:  rand.Intn(maxMember) + 1,
-		TicketIDs: seatIDs,
-		SectionID: sectionID,
-	}
+		seatCount := r.Intn(4) + 1
+		seatIDs := make([]int, seatCount)
+		for i := 0; i < seatCount; i++ {
+			seatIDs[i] = r.Intn(sectionRange[1]-sectionRange[0]+1) + sectionRange[0]
+		}
 
-	return json.Marshal(req)
+		req := BookingRequest{
+			MemberID:  r.Intn(maxMember) + 1,
+			TicketIDs: seatIDs,
+			SectionID: sectionID,
+		}
+		payload, _ = json.Marshal(req)
+	})
+
+	return payload, nil
 }
 
 func createOptimizedHTTP2Client(maxConnsPerHost int, requestTimeout time.Duration) *http.Client {
@@ -154,8 +175,67 @@ func createOptimizedHTTP2Client(maxConnsPerHost int, requestTimeout time.Duratio
 	}
 }
 
-func sendRequest(id int, client *http.Client, payload []byte, stats *Stats, wg *sync.WaitGroup, url string, method string) {
+func warmupConnections(clients []*http.Client, url string, method string, count int) {
+	fmt.Printf("\n🔥 워밍업 시작: %d개의 연결 미리 생성 중 (%d개 클라이언트 사용)...\n", count, len(clients))
+	warmupStart := time.Now()
+
+	var wg sync.WaitGroup
+	successCount := int64(0)
+
+	for i := 0; i < count; i++ {
+		wg.Add(1)
+		go func(id int) {
+			defer wg.Done()
+
+			client := clients[id%len(clients)]
+
+			var req *http.Request
+			var err error
+
+			if method == "GET" {
+				req, err = http.NewRequest("GET", url, nil)
+			} else {
+				payload, _ := createPayload(*maxMemberID)
+				req, err = http.NewRequest("POST", url, bytes.NewBuffer(payload))
+				if err == nil {
+					req.Header.Set("Content-Type", "application/json")
+					req.Header.Set("Idempotency-Key", uuid.New().String())
+				}
+			}
+
+			if err != nil {
+				return
+			}
+
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			req = req.WithContext(ctx)
+
+			resp, err := client.Do(req)
+			if err == nil {
+				io.Copy(io.Discard, resp.Body)
+				resp.Body.Close()
+				atomic.AddInt64(&successCount, 1)
+			}
+		}(i)
+	}
+
+	wg.Wait()
+	warmupDuration := time.Since(warmupStart)
+
+	fmt.Printf("✓ 워밍업 완료: %d개 연결 생성 (성공: %d/%d, 소요시간: %v)\n",
+		count, successCount, count, warmupDuration)
+	fmt.Printf("  평균 연결 생성 시간: %.2fms\n",
+		float64(warmupDuration.Milliseconds())/float64(count))
+	fmt.Printf("  클라이언트당 연결: ~%d개\n\n", count/len(clients))
+
+	time.Sleep(500 * time.Millisecond)
+}
+
+func sendRequest(id int, clients []*http.Client, payload []byte, stats *Stats, wg *sync.WaitGroup, url string, method string) {
 	defer wg.Done()
+
+	client := clients[id%len(clients)]
 
 	startTime := time.Now()
 
@@ -190,7 +270,7 @@ func sendRequest(id int, client *http.Client, payload []byte, stats *Stats, wg *
 		atomic.AddInt64(&stats.fail, 1)
 		return
 	}
-
+	io.Copy(io.Discard, resp.Body)
 	resp.Body.Close()
 
 	atomic.AddInt64(&stats.success, 1)
@@ -251,15 +331,23 @@ func printProgress(stats *Stats, elapsed time.Duration, total int) {
 func printConfig(method string) {
 	separator := strings.Repeat("=", 75)
 	fmt.Printf("%s\n", separator)
-	fmt.Printf(" HTTP/2 부하 테스트 시작 (고루틴 직접 생성 방식)\n")
+	fmt.Printf(" HTTP/2 부하 테스트 시작 (다중 클라이언트)\n")
 	fmt.Printf("%s\n", separator)
 	fmt.Printf("설정:\n")
 	fmt.Printf("  HTTP 메서드:         %s\n", method)
 	fmt.Printf("  타겟 URL:            %s\n", *baseURL)
 	fmt.Printf("  총 요청 수:          %s\n", formatNumber(*totalRequests))
 	fmt.Printf("  동시 고루틴 수:      %s\n", formatNumber(*totalRequests))
-	fmt.Printf("  최대 연결 수:        %s (per host)\n", formatNumber(*maxConns))
+	fmt.Printf("  HTTP 클라이언트 수:  %d개 (mutex 경합 감소)\n", *numClients)
+	fmt.Printf("  최대 연결 수:        %s (per host, per client)\n", formatNumber(*maxConns))
+	fmt.Printf("  총 연결 풀 크기:     %s (= %d clients × %d conns)\n",
+		formatNumber(*maxConns**numClients), *numClients, *maxConns)
 	fmt.Printf("  요청 타임아웃:       %v\n", *timeout)
+	if *enableWarmup {
+		fmt.Printf("  워밍업:              활성화 (%d개 요청)\n", *warmupRequests)
+	} else {
+		fmt.Printf("  워밍업:              비활성화\n")
+	}
 	if method == "POST" {
 		fmt.Printf("  최대 멤버 ID:        %s\n", formatNumber(*maxMemberID))
 	}
@@ -284,7 +372,7 @@ func printConfig(method string) {
 		fmt.Printf("  실행 추적:           %s\n", *traceprofile)
 	}
 
-	fmt.Printf("%s\n\n", separator)
+	fmt.Printf("%s\n", separator)
 }
 
 func formatNumber(n int) string {
@@ -345,7 +433,8 @@ func printFinalResults(stats *Stats, totalDuration, generationDuration time.Dura
 	fmt.Printf("\n 성능 요약:\n")
 	fmt.Printf("   - %s 요청 처리 완료: %v\n", formatNumber(total), totalDuration)
 	fmt.Printf("   - 초당 처리량: %s requests/sec\n", formatNumber(int(float64(atomic.LoadInt64(&stats.completed))/totalDuration.Seconds())))
-	fmt.Printf("   - 동시 고루틴: %s개, 최대 연결: %s\n", formatNumber(total), formatNumber(*maxConns))
+	fmt.Printf("   - 동시 고루틴: %s개, HTTP 클라이언트: %d개\n", formatNumber(total), *numClients)
+	fmt.Printf("   - 총 연결 풀: %s (클라이언트당 %s)\n", formatNumber(*maxConns**numClients), formatNumber(*maxConns))
 	if success > 0 {
 		fmt.Printf("   - 평균 응답시간: %dms\n", atomic.LoadInt64(&stats.sumLatency)/success)
 	}
@@ -387,7 +476,17 @@ func main() {
 
 	printConfig(method)
 
-	client := createOptimizedHTTP2Client(*maxConns, *timeout)
+	fmt.Printf("\n %d개의 HTTP 클라이언트 생성 중...\n", *numClients)
+	clients := make([]*http.Client, *numClients)
+	for i := 0; i < *numClients; i++ {
+		clients[i] = createOptimizedHTTP2Client(*maxConns, *timeout)
+	}
+	fmt.Printf("✓ 클라이언트 생성 완료 (총 연결 풀: %s)\n", formatNumber(*maxConns**numClients))
+
+	if *enableWarmup {
+		warmupConnections(clients, *baseURL, method, *warmupRequests)
+	}
+
 	stats := &Stats{minLatency: int64(^uint64(0) >> 1)}
 
 	var wg sync.WaitGroup
@@ -417,7 +516,7 @@ func main() {
 		}()
 	}
 
-	fmt.Printf("고루틴 %s개 생성 및 요청 시작\n\n", formatNumber(*totalRequests))
+	fmt.Printf("🚀 고루틴 %s개 생성 및 요청 시작\n\n", formatNumber(*totalRequests))
 	startTime := time.Now()
 	generationStart := time.Now()
 
@@ -436,13 +535,13 @@ func main() {
 			}
 		}
 
-		go sendRequest(i, client, payload, stats, &wg, *baseURL, method)
+		go sendRequest(i, clients, payload, stats, &wg, *baseURL, method)
 		atomic.AddInt64(&stats.sent, 1)
 	}
 
 	generationDuration := time.Since(generationStart)
-	fmt.Printf("모든 고루틴 발사 완료 (소요시간: %v)\n", generationDuration)
-	fmt.Println("\n모든 고루틴의 처리 완료 대기 중....")
+	fmt.Printf("✓ 모든 고루틴 발사 완료 (소요시간: %v)\n", generationDuration)
+	fmt.Println("\n⏳ 모든 고루틴의 처리 완료 대기 중....")
 
 	wg.Wait()
 
@@ -461,7 +560,7 @@ func main() {
 			log.Fatal("메모리 프로파일 생성 실패:", err)
 		}
 		defer f.Close()
-		runtime.GC() // 최신 메모리 상태 반영
+		runtime.GC()
 		if err := pprof.WriteHeapProfile(f); err != nil {
 			log.Fatal("메모리 프로파일 작성 실패:", err)
 		}
