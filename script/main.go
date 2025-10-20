@@ -25,10 +25,12 @@ import (
 
 var cpuprofile = flag.String("cpuprofile", "", "CPU 프로파일 출력 파일")
 var memprofile = flag.String("memprofile", "", "메모리 프로파일 출력 파일")
+var blockprofile = flag.String("blockprofile", "", "블로킹 프로파일 출력 파일")
+var mutexprofile = flag.String("mutexprofile", "", "뮤텍스 프로파일 출력 파일")
 
 var (
-	baseURL          = flag.String("url", "internal-alb-1198072083.ap-northeast-2.elb.amazonaws.com/healthz", "타겟 URL")
-	httpMethod       = flag.String("method", "POST", "HTTP 메서드 (GET, POST)")
+	baseURL          = flag.String("url", "http://localhost:8080/healthz", "타겟 URL")
+	httpMethod       = flag.String("method", "GET", "HTTP 메서드 (GET, POST)")
 	totalRequests    = flag.Int("requests", 100, "총 요청 수")
 	numWorkers       = flag.Int("workers", 5000, "워커 수 (동시성)")
 	maxConns         = flag.Int("conns", 2000, "호스트당 최대 연결 수")
@@ -273,6 +275,21 @@ func printConfig(method string) {
 		fmt.Printf("  최대 멤버 ID:        %s\n", formatNumber(*maxMemberID))
 	}
 	fmt.Printf("  CPU 코어 수:         %d\n", runtime.NumCPU())
+
+	// 프로파일링 설정 표시
+	if *cpuprofile != "" {
+		fmt.Printf("  CPU 프로파일:        %s\n", *cpuprofile)
+	}
+	if *memprofile != "" {
+		fmt.Printf("  메모리 프로파일:     %s\n", *memprofile)
+	}
+	if *blockprofile != "" {
+		fmt.Printf("  블로킹 프로파일:     %s\n", *blockprofile)
+	}
+	if *mutexprofile != "" {
+		fmt.Printf("  뮤텍스 프로파일:     %s\n", *mutexprofile)
+	}
+
 	fmt.Printf("%s\n\n", separator)
 }
 
@@ -348,10 +365,24 @@ func main() {
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("CPU 프로파일 생성 실패:", err)
 		}
-		pprof.StartCPUProfile(f)
+		defer f.Close()
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("CPU 프로파일 시작 실패:", err)
+		}
 		defer pprof.StopCPUProfile()
+		fmt.Printf("✓ CPU 프로파일링 활성화: %s\n", *cpuprofile)
+	}
+
+	if *blockprofile != "" {
+		runtime.SetBlockProfileRate(1) // 모든 블로킹 이벤트 기록
+		fmt.Printf("✓ 블로킹 프로파일링 활성화: %s\n", *blockprofile)
+	}
+
+	if *mutexprofile != "" {
+		runtime.SetMutexProfileFraction(1) // 모든 뮤텍스 경합 기록
+		fmt.Printf("✓ 뮤텍스 프로파일링 활성화: %s\n", *mutexprofile)
 	}
 
 	method := strings.ToUpper(*httpMethod)
@@ -441,4 +472,41 @@ func main() {
 	}
 
 	printFinalResults(stats, totalDuration, generationDuration, *totalRequests)
+
+	if *memprofile != "" {
+		f, err := os.Create(*memprofile)
+		if err != nil {
+			log.Fatal("메모리 프로파일 생성 실패:", err)
+		}
+		defer f.Close()
+		runtime.GC() // 최신 메모리 상태 반영
+		if err := pprof.WriteHeapProfile(f); err != nil {
+			log.Fatal("메모리 프로파일 작성 실패:", err)
+		}
+		fmt.Printf("\n✓ 메모리 프로파일 저장 완료: %s\n", *memprofile)
+	}
+
+	if *blockprofile != "" {
+		f, err := os.Create(*blockprofile)
+		if err != nil {
+			log.Fatal("블로킹 프로파일 생성 실패:", err)
+		}
+		defer f.Close()
+		if err := pprof.Lookup("block").WriteTo(f, 0); err != nil {
+			log.Fatal("블로킹 프로파일 작성 실패:", err)
+		}
+		fmt.Printf("✓ 블로킹 프로파일 저장 완료: %s\n", *blockprofile)
+	}
+
+	if *mutexprofile != "" {
+		f, err := os.Create(*mutexprofile)
+		if err != nil {
+			log.Fatal("뮤텍스 프로파일 생성 실패:", err)
+		}
+		defer f.Close()
+		if err := pprof.Lookup("mutex").WriteTo(f, 0); err != nil {
+			log.Fatal("뮤텍스 프로파일 작성 실패:", err)
+		}
+		fmt.Printf("✓ 뮤텍스 프로파일 저장 완료: %s\n", *mutexprofile)
+	}
 }
