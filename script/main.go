@@ -32,10 +32,8 @@ var (
 	baseURL          = flag.String("url", "http://localhost:8080/healthz", "타겟 URL")
 	httpMethod       = flag.String("method", "GET", "HTTP 메서드 (GET, POST)")
 	totalRequests    = flag.Int("requests", 100, "총 요청 수")
-	numWorkers       = flag.Int("workers", 5000, "워커 수 (동시성)")
 	maxConns         = flag.Int("conns", 2000, "호스트당 최대 연결 수")
 	timeout          = flag.Duration("timeout", 20*time.Second, "요청 타임아웃")
-	workQueueSize    = flag.Int("queue", 10000, "작업 큐 버퍼 크기")
 	maxMemberID      = flag.Int("members", 9000, "최대 멤버 ID")
 	showProgress     = flag.Bool("progress", true, "실시간 진행률 표시")
 	progressInterval = flag.Duration("interval", 1*time.Second, "진행률 출력 간격")
@@ -69,11 +67,6 @@ type Stats struct {
 	minLatency int64
 	maxLatency int64
 	sumLatency int64
-}
-
-type WorkItem struct {
-	id      int
-	payload []byte
 }
 
 func init() {
@@ -159,84 +152,80 @@ func createOptimizedHTTP2Client(maxConnsPerHost int, requestTimeout time.Duratio
 	}
 }
 
-func worker(id int, client *http.Client, workChan <-chan WorkItem, stats *Stats, wg *sync.WaitGroup, url string, method string) {
+func sendRequest(id int, client *http.Client, payload []byte, stats *Stats, wg *sync.WaitGroup, url string, method string) {
 	defer wg.Done()
 
-	httpMethod := strings.ToUpper(method)
+	startTime := time.Now()
 
-	for item := range workChan {
-		startTime := time.Now()
+	var req *http.Request
+	var err error
 
-		var req *http.Request
-		var err error
-
-		if httpMethod == "GET" {
-			req, err = http.NewRequest("GET", url, nil)
-		} else {
-			req, err = http.NewRequest("POST", url, bytes.NewBuffer(item.payload))
-			if err == nil {
-				req.Header.Set("Content-Type", "application/json")
-				req.Header.Set("Idempotency-Key", uuid.New().String())
-			}
+	if method == "GET" {
+		req, err = http.NewRequest("GET", url, nil)
+	} else {
+		req, err = http.NewRequest("POST", url, bytes.NewBuffer(payload))
+		if err == nil {
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Idempotency-Key", uuid.New().String())
 		}
-		if err != nil {
-			atomic.AddInt64(&stats.fail, 1)
-			atomic.AddInt64(&stats.completed, 1)
-			continue
-		}
-
-		ctx, cancel := context.WithTimeout(context.Background(), *timeout)
-		req = req.WithContext(ctx)
-
-		resp, err := client.Do(req)
-		cancel()
-
-		latency := time.Since(startTime).Milliseconds()
+	}
+	if err != nil {
+		atomic.AddInt64(&stats.fail, 1)
 		atomic.AddInt64(&stats.completed, 1)
+		return
+	}
 
-		if err != nil {
-			atomic.AddInt64(&stats.fail, 1)
-			continue
-		}
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	req = req.WithContext(ctx)
 
-		resp.Body.Close()
+	resp, err := client.Do(req)
+	cancel()
 
-		atomic.AddInt64(&stats.success, 1)
-		atomic.AddInt64(&stats.sumLatency, latency)
+	latency := time.Since(startTime).Milliseconds()
+	atomic.AddInt64(&stats.completed, 1)
 
-		// min/max 레이턴시 업데이트
-		for {
-			oldMin := atomic.LoadInt64(&stats.minLatency)
-			if oldMin == 0 || latency < oldMin {
-				if atomic.CompareAndSwapInt64(&stats.minLatency, oldMin, latency) {
-					break
-				}
-			} else {
+	if err != nil {
+		atomic.AddInt64(&stats.fail, 1)
+		return
+	}
+
+	resp.Body.Close()
+
+	atomic.AddInt64(&stats.success, 1)
+	atomic.AddInt64(&stats.sumLatency, latency)
+
+	// min/max 레이턴시 업데이트
+	for {
+		oldMin := atomic.LoadInt64(&stats.minLatency)
+		if oldMin == 0 || latency < oldMin {
+			if atomic.CompareAndSwapInt64(&stats.minLatency, oldMin, latency) {
 				break
 			}
+		} else {
+			break
 		}
+	}
 
-		for {
-			oldMax := atomic.LoadInt64(&stats.maxLatency)
-			if latency > oldMax {
-				if atomic.CompareAndSwapInt64(&stats.maxLatency, oldMax, latency) {
-					break
-				}
-			} else {
+	for {
+		oldMax := atomic.LoadInt64(&stats.maxLatency)
+		if latency > oldMax {
+			if atomic.CompareAndSwapInt64(&stats.maxLatency, oldMax, latency) {
 				break
 			}
+		} else {
+			break
 		}
+	}
 
-		switch {
-		case resp.StatusCode >= 200 && resp.StatusCode < 300:
-			atomic.AddInt64(&stats.status2xx, 1)
-		case resp.StatusCode >= 400 && resp.StatusCode < 500:
-			atomic.AddInt64(&stats.status4xx, 1)
-		case resp.StatusCode >= 500 && resp.StatusCode < 600:
-			atomic.AddInt64(&stats.status5xx, 1)
-		default:
-			atomic.AddInt64(&stats.other, 1)
-		}
+	switch {
+	case resp.StatusCode >= 200 && resp.StatusCode < 300:
+		atomic.AddInt64(&stats.status2xx, 1)
+	case resp.StatusCode >= 400 && resp.StatusCode < 500:
+		atomic.AddInt64(&stats.status4xx, 1)
+	case resp.StatusCode >= 500 && resp.StatusCode < 600:
+		atomic.AddInt64(&stats.status5xx, 1)
+	default:
+		atomic.AddInt64(&stats.other, 1)
 	}
 }
 
@@ -261,22 +250,20 @@ func printProgress(stats *Stats, elapsed time.Duration, total int) {
 func printConfig(method string) {
 	separator := strings.Repeat("=", 75)
 	fmt.Printf("%s\n", separator)
-	fmt.Printf(" HTTP/2 부하 테스트 시작\n")
+	fmt.Printf(" HTTP/2 부하 테스트 시작 (고루틴 직접 생성 방식)\n")
 	fmt.Printf("%s\n", separator)
 	fmt.Printf("설정:\n")
 	fmt.Printf("  HTTP 메서드:         %s\n", method)
 	fmt.Printf("  타겟 URL:            %s\n", *baseURL)
 	fmt.Printf("  총 요청 수:          %s\n", formatNumber(*totalRequests))
-	fmt.Printf("  워커 수:             %s\n", formatNumber(*numWorkers))
+	fmt.Printf("  동시 고루틴 수:      %s\n", formatNumber(*totalRequests))
 	fmt.Printf("  최대 연결 수:        %s (per host)\n", formatNumber(*maxConns))
-	fmt.Printf("  작업 큐 크기:        %s\n", formatNumber(*workQueueSize))
 	fmt.Printf("  요청 타임아웃:       %v\n", *timeout)
 	if method == "POST" {
 		fmt.Printf("  최대 멤버 ID:        %s\n", formatNumber(*maxMemberID))
 	}
 	fmt.Printf("  CPU 코어 수:         %d\n", runtime.NumCPU())
 
-	// 프로파일링 설정 표시
 	if *cpuprofile != "" {
 		fmt.Printf("  CPU 프로파일:        %s\n", *cpuprofile)
 	}
@@ -348,11 +335,10 @@ func printFinalResults(stats *Stats, totalDuration, generationDuration time.Dura
 	}
 	fmt.Printf("%s\n", separator)
 
-	// 성능 요약
 	fmt.Printf("\n 성능 요약:\n")
 	fmt.Printf("   - %s 요청 처리 완료: %v\n", formatNumber(total), totalDuration)
 	fmt.Printf("   - 초당 처리량: %s requests/sec\n", formatNumber(int(float64(atomic.LoadInt64(&stats.completed))/totalDuration.Seconds())))
-	fmt.Printf("   - HTTP/2 멀티플렉싱: %s workers, %s max conns\n", formatNumber(*numWorkers), formatNumber(*maxConns))
+	fmt.Printf("   - 동시 고루틴: %s개, 최대 연결: %s\n", formatNumber(total), formatNumber(*maxConns))
 	if success > 0 {
 		fmt.Printf("   - 평균 응답시간: %dms\n", atomic.LoadInt64(&stats.sumLatency)/success)
 	}
@@ -376,12 +362,12 @@ func main() {
 	}
 
 	if *blockprofile != "" {
-		runtime.SetBlockProfileRate(1) // 모든 블로킹 이벤트 기록
+		runtime.SetBlockProfileRate(1)
 		fmt.Printf("✓ 블로킹 프로파일링 활성화: %s\n", *blockprofile)
 	}
 
 	if *mutexprofile != "" {
-		runtime.SetMutexProfileFraction(1) // 모든 뮤텍스 경합 기록
+		runtime.SetMutexProfileFraction(1)
 		fmt.Printf("✓ 뮤텍스 프로파일링 활성화: %s\n", *mutexprofile)
 	}
 
@@ -397,15 +383,7 @@ func main() {
 	client := createOptimizedHTTP2Client(*maxConns, *timeout)
 	stats := &Stats{minLatency: int64(^uint64(0) >> 1)}
 
-	workChan := make(chan WorkItem, *workQueueSize)
-	var workerWg sync.WaitGroup
-
-	fmt.Println("워커 풀 초기화 시작")
-	for i := 0; i < *numWorkers; i++ {
-		workerWg.Add(1)
-		go worker(i, client, workChan, stats, &workerWg, *baseURL, method)
-	}
-	fmt.Printf("%s개 워커 준비 완료\n\n", formatNumber(*numWorkers))
+	var wg sync.WaitGroup
 
 	var stopProgress chan bool
 	var progressWg sync.WaitGroup
@@ -432,37 +410,34 @@ func main() {
 		}()
 	}
 
-	fmt.Println("요청 생성")
+	fmt.Printf("고루틴 %s개 생성 및 요청 시작\n\n", formatNumber(*totalRequests))
 	startTime := time.Now()
 	generationStart := time.Now()
 
 	for i := 0; i < *totalRequests; i++ {
+		wg.Add(1)
+
 		var payload []byte
 		var err error
 
-		// POST 요청인 경우에만 페이로드 생성
 		if method == "POST" {
 			payload, err = createPayload(*maxMemberID)
 			if err != nil {
 				fmt.Printf("Payload 생성 실패 #%d: %v\n", i, err)
+				wg.Done()
 				continue
 			}
 		}
 
-		workChan <- WorkItem{
-			id:      i,
-			payload: payload,
-		}
-
+		go sendRequest(i, client, payload, stats, &wg, *baseURL, method)
 		atomic.AddInt64(&stats.sent, 1)
 	}
 
 	generationDuration := time.Since(generationStart)
-	fmt.Printf("\n모든 요청 발사 완료 (소요시간: %v)\n", generationDuration)
-	fmt.Println("\n워커들의 처리 완료 대기 중....")
+	fmt.Printf("모든 고루틴 발사 완료 (소요시간: %v)\n", generationDuration)
+	fmt.Println("\n모든 고루틴의 처리 완료 대기 중....")
 
-	close(workChan)
-	workerWg.Wait()
+	wg.Wait()
 
 	totalDuration := time.Since(startTime)
 
@@ -479,7 +454,7 @@ func main() {
 			log.Fatal("메모리 프로파일 생성 실패:", err)
 		}
 		defer f.Close()
-		runtime.GC() // 최신 메모리 상태 반영
+		runtime.GC()
 		if err := pprof.WriteHeapProfile(f); err != nil {
 			log.Fatal("메모리 프로파일 작성 실패:", err)
 		}
