@@ -29,7 +29,6 @@ var memprofile = flag.String("memprofile", "", "메모리 프로파일 출력 �
 var blockprofile = flag.String("blockprofile", "", "블로킹 프로파일 출력 파일")
 var mutexprofile = flag.String("mutexprofile", "", "뮤텍스 프로파일 출력 파일")
 var goroutineprofile = flag.String("goroutineprofile", "", "고루틴 프로파일 출력 파일")
-var traceprofile = flag.String("traceprofile", "", "실행 추적 출력 파일")
 
 var (
 	baseURL          = flag.String("url", "https://internal-alb-2004079858.ap-northeast-2.elb.amazonaws.com/api/bookings/sync", "타겟 URL")
@@ -42,14 +41,14 @@ var (
 	progressInterval = flag.Duration("interval", 1*time.Second, "진행률 출력 간격")
 	enableWarmup     = flag.Bool("warmup", true, "워밍업 활성화")
 	warmupRequests   = flag.Int("warmup-requests", 100, "워밍업 요청 수")
-	numClients       = flag.Int("clients", 10, "HTTP 클라이언트 개수 (mutex 경합 감소)")
+	numClients       = flag.Int("clients", 10, "HTTP 클라이언트 개수")
 )
 
 var (
 	SECTION_WEIGHTS = []float64{0.35, 0.25, 0.15, 0.10, 0.08, 0.07}
 	SECTION_RANGES  = [][2]int{
-		{1, 75}, {76, 150}, {151, 225},
-		{226, 300}, {301, 375}, {376, 450},
+		{1, 7500}, {7501, 15000}, {15001, 22500},
+		{22501, 30000}, {30001, 37500}, {37501, 45000},
 	}
 	CUMULATIVE_WEIGHTS []float64
 )
@@ -72,7 +71,7 @@ type BookingRequest struct {
 	SectionID int   `json:"sectionId"`
 }
 
-type Stats struct {
+type StatsShard struct {
 	sent      int64
 	completed int64
 	success   int64
@@ -85,10 +84,67 @@ type Stats struct {
 	minLatency int64
 	maxLatency int64
 	sumLatency int64
+
+	_ [64 - (11*8)%64]byte
+}
+
+type ShardedStats struct {
+	shards    []StatsShard
+	numShards int
+}
+
+func NewShardedStats(numShards int) *ShardedStats {
+	if numShards <= 0 {
+		numShards = runtime.NumCPU()
+	}
+
+	shards := make([]StatsShard, numShards)
+	for i := range shards {
+		shards[i].minLatency = int64(^uint64(0) >> 1) // max int64
+	}
+
+	return &ShardedStats{
+		shards:    shards,
+		numShards: numShards,
+	}
+}
+
+func (s *ShardedStats) getShard(id int) *StatsShard {
+	return &s.shards[id%s.numShards]
+}
+
+func (s *ShardedStats) aggregate() (sent, completed, success, fail, status2xx, status4xx, status5xx, other, minLat, maxLat, sumLat int64) {
+	minLat = int64(^uint64(0) >> 1)
+	maxLat = 0
+
+	for i := range s.shards {
+		shard := &s.shards[i]
+
+		sent += atomic.LoadInt64(&shard.sent)
+		completed += atomic.LoadInt64(&shard.completed)
+		success += atomic.LoadInt64(&shard.success)
+		fail += atomic.LoadInt64(&shard.fail)
+		status2xx += atomic.LoadInt64(&shard.status2xx)
+		status4xx += atomic.LoadInt64(&shard.status4xx)
+		status5xx += atomic.LoadInt64(&shard.status5xx)
+		other += atomic.LoadInt64(&shard.other)
+		sumLat += atomic.LoadInt64(&shard.sumLatency)
+
+		shardMin := atomic.LoadInt64(&shard.minLatency)
+		shardMax := atomic.LoadInt64(&shard.maxLatency)
+
+		if shardMin < minLat && shardMin > 0 {
+			minLat = shardMin
+		}
+		if shardMax > maxLat {
+			maxLat = shardMax
+		}
+	}
+
+	return
 }
 
 func init() {
-	rand.Seed(time.Now().UnixNano())
 	CUMULATIVE_WEIGHTS = make([]float64, len(SECTION_WEIGHTS))
 	sum := 0.0
 	for i, w := range SECTION_WEIGHTS {
@@ -175,8 +231,8 @@ func createOptimizedHTTP2Client(maxConnsPerHost int, requestTimeout time.Duratio
 	}
 }
 
-func warmupConnections(clients []*http.Client, url string, method string, count int) {
-	fmt.Printf("\n🔥 워밍업 시작: %d개의 연결 미리 생성 중 (%d개 클라이언트 사용)...\n", count, len(clients))
+func warmupConnections(clients []*http.Client, url string, method string, count int, numShards int) {
+	fmt.Printf("\n 워밍업 시작: %d개의 연결 미리 생성 중 (%d개 클라이언트 사용)...\n", count, len(clients))
 	warmupStart := time.Now()
 
 	var wg sync.WaitGroup
@@ -223,18 +279,19 @@ func warmupConnections(clients []*http.Client, url string, method string, count 
 	wg.Wait()
 	warmupDuration := time.Since(warmupStart)
 
-	fmt.Printf("✓ 워밍업 완료: %d개 연결 생성 (성공: %d/%d, 소요시간: %v)\n",
+	fmt.Printf("워밍업 완료: %d개 연결 생성 (성공: %d/%d, 소요시간: %v)\n",
 		count, successCount, count, warmupDuration)
-	fmt.Printf("  평균 연결 생성 시간: %.2fms\n",
+	fmt.Printf("평균 연결 생성 시간: %.2fms\n",
 		float64(warmupDuration.Milliseconds())/float64(count))
-	fmt.Printf("  클라이언트당 연결: ~%d개\n\n", count/len(clients))
+	fmt.Printf("클라이언트당 연결: ~%d개\n\n", count/len(clients))
 
 	time.Sleep(500 * time.Millisecond)
 }
 
-func sendRequest(id int, clients []*http.Client, payload []byte, stats *Stats, wg *sync.WaitGroup, url string, method string) {
+func sendRequest(id int, clients []*http.Client, payload []byte, stats *ShardedStats, wg *sync.WaitGroup, url string, method string) {
 	defer wg.Done()
 
+	shard := stats.getShard(id)
 	client := clients[id%len(clients)]
 
 	startTime := time.Now()
@@ -252,34 +309,34 @@ func sendRequest(id int, clients []*http.Client, payload []byte, stats *Stats, w
 		}
 	}
 	if err != nil {
-		atomic.AddInt64(&stats.fail, 1)
-		atomic.AddInt64(&stats.completed, 1)
+		atomic.AddInt64(&shard.fail, 1)
+		atomic.AddInt64(&shard.completed, 1)
 		return
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
+	defer cancel()
 	req = req.WithContext(ctx)
 
 	resp, err := client.Do(req)
-	cancel()
 
 	latency := time.Since(startTime).Milliseconds()
-	atomic.AddInt64(&stats.completed, 1)
+	atomic.AddInt64(&shard.completed, 1)
 
 	if err != nil {
-		atomic.AddInt64(&stats.fail, 1)
+		atomic.AddInt64(&shard.fail, 1)
 		return
 	}
 	io.Copy(io.Discard, resp.Body)
 	resp.Body.Close()
 
-	atomic.AddInt64(&stats.success, 1)
-	atomic.AddInt64(&stats.sumLatency, latency)
+	atomic.AddInt64(&shard.success, 1)
+	atomic.AddInt64(&shard.sumLatency, latency)
 
 	for {
-		oldMin := atomic.LoadInt64(&stats.minLatency)
+		oldMin := atomic.LoadInt64(&shard.minLatency)
 		if oldMin == 0 || latency < oldMin {
-			if atomic.CompareAndSwapInt64(&stats.minLatency, oldMin, latency) {
+			if atomic.CompareAndSwapInt64(&shard.minLatency, oldMin, latency) {
 				break
 			}
 		} else {
@@ -288,9 +345,9 @@ func sendRequest(id int, clients []*http.Client, payload []byte, stats *Stats, w
 	}
 
 	for {
-		oldMax := atomic.LoadInt64(&stats.maxLatency)
+		oldMax := atomic.LoadInt64(&shard.maxLatency)
 		if latency > oldMax {
-			if atomic.CompareAndSwapInt64(&stats.maxLatency, oldMax, latency) {
+			if atomic.CompareAndSwapInt64(&shard.maxLatency, oldMax, latency) {
 				break
 			}
 		} else {
@@ -300,45 +357,43 @@ func sendRequest(id int, clients []*http.Client, payload []byte, stats *Stats, w
 
 	switch {
 	case resp.StatusCode >= 200 && resp.StatusCode < 300:
-		atomic.AddInt64(&stats.status2xx, 1)
+		atomic.AddInt64(&shard.status2xx, 1)
 	case resp.StatusCode >= 400 && resp.StatusCode < 500:
-		atomic.AddInt64(&stats.status4xx, 1)
+		atomic.AddInt64(&shard.status4xx, 1)
 	case resp.StatusCode >= 500 && resp.StatusCode < 600:
-		atomic.AddInt64(&stats.status5xx, 1)
+		atomic.AddInt64(&shard.status5xx, 1)
 	default:
-		atomic.AddInt64(&stats.other, 1)
+		atomic.AddInt64(&shard.other, 1)
 	}
 }
 
-func printProgress(stats *Stats, elapsed time.Duration, total int) {
-	sent := atomic.LoadInt64(&stats.sent)
-	completed := atomic.LoadInt64(&stats.completed)
-	success := atomic.LoadInt64(&stats.success)
-	fail := atomic.LoadInt64(&stats.fail)
+func printProgress(stats *ShardedStats, elapsed time.Duration, total int) {
+	sent, completed, success, fail, _, _, _, _, _, _, sumLat := stats.aggregate()
 
 	rps := float64(completed) / elapsed.Seconds()
 	progress := float64(completed) / float64(total) * 100
 
 	avgLatency := int64(0)
 	if success > 0 {
-		avgLatency = atomic.LoadInt64(&stats.sumLatency) / success
+		avgLatency = sumLat / success
 	}
 
 	fmt.Printf("[%6.1fs] Sent: %7d | Done: %7d/%d (%.1f%%) | RPS: %8.0f | Succ: %7d | Fail: %6d | Avg: %4dms\n",
 		elapsed.Seconds(), sent, completed, total, progress, rps, success, fail, avgLatency)
 }
 
-func printConfig(method string) {
+func printConfig(method string, numShards int) {
 	separator := strings.Repeat("=", 75)
 	fmt.Printf("%s\n", separator)
-	fmt.Printf(" HTTP/2 부하 테스트 시작 (다중 클라이언트)\n")
+	fmt.Printf(" HTTP/2 부하 테스트 시작 (샤딩된 통계 구조)\n")
 	fmt.Printf("%s\n", separator)
 	fmt.Printf("설정:\n")
 	fmt.Printf("  HTTP 메서드:         %s\n", method)
 	fmt.Printf("  타겟 URL:            %s\n", *baseURL)
 	fmt.Printf("  총 요청 수:          %s\n", formatNumber(*totalRequests))
 	fmt.Printf("  동시 고루틴 수:      %s\n", formatNumber(*totalRequests))
-	fmt.Printf("  HTTP 클라이언트 수:  %d개 (mutex 경합 감소)\n", *numClients)
+	fmt.Printf("  HTTP 클라이언트 수:  %d개\n", *numClients)
+	fmt.Printf("  통계 샤드 수:        %d개 (CPU 코어당 1개)\n", numShards)
 	fmt.Printf("  최대 연결 수:        %s (per host, per client)\n", formatNumber(*maxConns))
 	fmt.Printf("  총 연결 풀 크기:     %s (= %d clients × %d conns)\n",
 		formatNumber(*maxConns**numClients), *numClients, *maxConns)
@@ -368,9 +423,6 @@ func printConfig(method string) {
 	if *goroutineprofile != "" {
 		fmt.Printf("  고루틴 프로파일:     %s\n", *goroutineprofile)
 	}
-	if *traceprofile != "" {
-		fmt.Printf("  실행 추적:           %s\n", *traceprofile)
-	}
 
 	fmt.Printf("%s\n", separator)
 }
@@ -387,7 +439,9 @@ func formatNumber(n int) string {
 	return string(result)
 }
 
-func printFinalResults(stats *Stats, totalDuration, generationDuration time.Duration, total int) {
+func printFinalResults(stats *ShardedStats, totalDuration, generationDuration time.Duration, total int) {
+	sent, completed, success, fail, status2xx, status4xx, status5xx, other, minLat, maxLat, sumLat := stats.aggregate()
+
 	separator := strings.Repeat("=", 75)
 	fmt.Printf("\n%s\n", separator)
 	fmt.Printf("최종 결과\n")
@@ -399,16 +453,14 @@ func printFinalResults(stats *Stats, totalDuration, generationDuration time.Dura
 	fmt.Printf("\n")
 	fmt.Printf("요청:\n")
 	fmt.Printf("  총 요청 수:          %s\n", formatNumber(total))
-	fmt.Printf("  발사된 요청:         %s\n", formatNumber(int(atomic.LoadInt64(&stats.sent))))
-	fmt.Printf("  완료된 요청:         %s\n", formatNumber(int(atomic.LoadInt64(&stats.completed))))
+	fmt.Printf("  발사된 요청:         %s\n", formatNumber(int(sent)))
+	fmt.Printf("  완료된 요청:         %s\n", formatNumber(int(completed)))
 	fmt.Printf("\n")
 	fmt.Printf("처리량:\n")
-	fmt.Printf("  평균 RPS:            %s req/s\n", formatNumber(int(float64(atomic.LoadInt64(&stats.completed))/totalDuration.Seconds())))
+	fmt.Printf("  평균 RPS:            %s req/s\n", formatNumber(int(float64(completed)/totalDuration.Seconds())))
 	fmt.Printf("  최대 RPS:            %s req/s (이론상)\n", formatNumber(int(float64(total)/totalDuration.Seconds())))
 	fmt.Printf("\n")
 
-	success := atomic.LoadInt64(&stats.success)
-	fail := atomic.LoadInt64(&stats.fail)
 	totalCompleted := success + fail
 
 	fmt.Printf("결과:\n")
@@ -416,27 +468,28 @@ func printFinalResults(stats *Stats, totalDuration, generationDuration time.Dura
 	fmt.Printf("  실패:                %s (%.2f%%)\n", formatNumber(int(fail)), float64(fail)/float64(totalCompleted)*100)
 	fmt.Printf("\n")
 	fmt.Printf("상태 코드:\n")
-	fmt.Printf("  2xx:                 %s\n", formatNumber(int(atomic.LoadInt64(&stats.status2xx))))
-	fmt.Printf("  4xx:                 %s\n", formatNumber(int(atomic.LoadInt64(&stats.status4xx))))
-	fmt.Printf("  5xx:                 %s\n", formatNumber(int(atomic.LoadInt64(&stats.status5xx))))
-	fmt.Printf("  기타:                %s\n", formatNumber(int(atomic.LoadInt64(&stats.other))))
+	fmt.Printf("  2xx:                 %s\n", formatNumber(int(status2xx)))
+	fmt.Printf("  4xx:                 %s\n", formatNumber(int(status4xx)))
+	fmt.Printf("  5xx:                 %s\n", formatNumber(int(status5xx)))
+	fmt.Printf("  기타:                %s\n", formatNumber(int(other)))
 	fmt.Printf("\n")
 
 	if success > 0 {
 		fmt.Printf("응답 시간 (Latency):\n")
-		fmt.Printf("  최소:                %d ms\n", atomic.LoadInt64(&stats.minLatency))
-		fmt.Printf("  최대:                %d ms\n", atomic.LoadInt64(&stats.maxLatency))
-		fmt.Printf("  평균:                %d ms\n", atomic.LoadInt64(&stats.sumLatency)/success)
+		fmt.Printf("  최소:                %d ms\n", minLat)
+		fmt.Printf("  최대:                %d ms\n", maxLat)
+		fmt.Printf("  평균:                %d ms\n", sumLat/success)
 	}
 	fmt.Printf("%s\n", separator)
 
 	fmt.Printf("\n 성능 요약:\n")
 	fmt.Printf("   - %s 요청 처리 완료: %v\n", formatNumber(total), totalDuration)
-	fmt.Printf("   - 초당 처리량: %s requests/sec\n", formatNumber(int(float64(atomic.LoadInt64(&stats.completed))/totalDuration.Seconds())))
-	fmt.Printf("   - 동시 고루틴: %s개, HTTP 클라이언트: %d개\n", formatNumber(total), *numClients)
+	fmt.Printf("   - 초당 처리량: %s requests/sec\n", formatNumber(int(float64(completed)/totalDuration.Seconds())))
+	fmt.Printf("   - 동시 고루틴: %s개, HTTP 클라이언트: %d개, 통계 샤드: %d개\n",
+		formatNumber(total), *numClients, stats.numShards)
 	fmt.Printf("   - 총 연결 풀: %s (클라이언트당 %s)\n", formatNumber(*maxConns**numClients), formatNumber(*maxConns))
 	if success > 0 {
-		fmt.Printf("   - 평균 응답시간: %dms\n", atomic.LoadInt64(&stats.sumLatency)/success)
+		fmt.Printf("   - 평균 응답시간: %dms\n", sumLat/success)
 	}
 	fmt.Println()
 }
@@ -454,17 +507,17 @@ func main() {
 			log.Fatal("CPU 프로파일 시작 실패:", err)
 		}
 		defer pprof.StopCPUProfile()
-		fmt.Printf("✓ CPU 프로파일링 활성화: %s\n", *cpuprofile)
+		fmt.Printf("CPU 프로파일링 활성화: %s\n", *cpuprofile)
 	}
 
 	if *blockprofile != "" {
 		runtime.SetBlockProfileRate(1)
-		fmt.Printf("✓ 블로킹 프로파일링 활성화: %s\n", *blockprofile)
+		fmt.Printf("블로킹 프로파일링 활성화: %s\n", *blockprofile)
 	}
 
 	if *mutexprofile != "" {
 		runtime.SetMutexProfileFraction(1)
-		fmt.Printf("✓ 뮤텍스 프로파일링 활성화: %s\n", *mutexprofile)
+		fmt.Printf("뮤텍스 프로파일링 활성화: %s\n", *mutexprofile)
 	}
 
 	method := strings.ToUpper(*httpMethod)
@@ -474,20 +527,21 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	printConfig(method)
+	numShards := runtime.NumCPU()
+	printConfig(method, numShards)
 
 	fmt.Printf("\n %d개의 HTTP 클라이언트 생성 중...\n", *numClients)
 	clients := make([]*http.Client, *numClients)
 	for i := 0; i < *numClients; i++ {
 		clients[i] = createOptimizedHTTP2Client(*maxConns, *timeout)
 	}
-	fmt.Printf("✓ 클라이언트 생성 완료 (총 연결 풀: %s)\n", formatNumber(*maxConns**numClients))
+	fmt.Printf("클라이언트 생성 완료 (총 연결 풀: %s)\n", formatNumber(*maxConns**numClients))
 
 	if *enableWarmup {
-		warmupConnections(clients, *baseURL, method, *warmupRequests)
+		warmupConnections(clients, *baseURL, method, *warmupRequests, numShards)
 	}
 
-	stats := &Stats{minLatency: int64(^uint64(0) >> 1)}
+	stats := NewShardedStats(numShards)
 
 	var wg sync.WaitGroup
 
@@ -516,7 +570,7 @@ func main() {
 		}()
 	}
 
-	fmt.Printf("🚀 고루틴 %s개 생성 및 요청 시작\n\n", formatNumber(*totalRequests))
+	fmt.Printf(" 고루틴 %s개 생성 및 요청 시작 (통계 샤드: %d개)\n\n", formatNumber(*totalRequests), numShards)
 	startTime := time.Now()
 	generationStart := time.Now()
 
@@ -536,12 +590,14 @@ func main() {
 		}
 
 		go sendRequest(i, clients, payload, stats, &wg, *baseURL, method)
-		atomic.AddInt64(&stats.sent, 1)
+
+		shard := stats.getShard(i)
+		atomic.AddInt64(&shard.sent, 1)
 	}
 
 	generationDuration := time.Since(generationStart)
-	fmt.Printf("✓ 모든 고루틴 발사 완료 (소요시간: %v)\n", generationDuration)
-	fmt.Println("\n⏳ 모든 고루틴의 처리 완료 대기 중....")
+	fmt.Printf(" 모든 고루틴 발사 완료 (소요시간: %v)\n", generationDuration)
+	fmt.Println("\n 모든 고루틴의 처리 완료 대기 중....")
 
 	wg.Wait()
 
@@ -564,7 +620,7 @@ func main() {
 		if err := pprof.WriteHeapProfile(f); err != nil {
 			log.Fatal("메모리 프로파일 작성 실패:", err)
 		}
-		fmt.Printf("\n✓ 메모리 프로파일 저장 완료: %s\n", *memprofile)
+		fmt.Printf("\n메모리 프로파일 저장 완료: %s\n", *memprofile)
 	}
 
 	if *blockprofile != "" {
@@ -576,7 +632,7 @@ func main() {
 		if err := pprof.Lookup("block").WriteTo(f, 0); err != nil {
 			log.Fatal("블로킹 프로파일 작성 실패:", err)
 		}
-		fmt.Printf("✓ 블로킹 프로파일 저장 완료: %s\n", *blockprofile)
+		fmt.Printf("블로킹 프로파일 저장 완료: %s\n", *blockprofile)
 	}
 
 	if *mutexprofile != "" {
@@ -588,7 +644,7 @@ func main() {
 		if err := pprof.Lookup("mutex").WriteTo(f, 0); err != nil {
 			log.Fatal("뮤텍스 프로파일 작성 실패:", err)
 		}
-		fmt.Printf("✓ 뮤텍스 프로파일 저장 완료: %s\n", *mutexprofile)
+		fmt.Printf("뮤텍스 프로파일 저장 완료: %s\n", *mutexprofile)
 	}
 
 	if *goroutineprofile != "" {
@@ -600,6 +656,6 @@ func main() {
 		if err := pprof.Lookup("goroutine").WriteTo(f, 0); err != nil {
 			log.Fatal("고루틴 프로파일 작성 실패:", err)
 		}
-		fmt.Printf("✓ 고루틴 프로파일 저장 완료: %s\n", *goroutineprofile)
+		fmt.Printf("고루틴 프로파일 저장 완료: %s\n", *goroutineprofile)
 	}
 }
