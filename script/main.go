@@ -31,7 +31,7 @@ var mutexprofile = flag.String("mutexprofile", "", "뮤텍스 프로파일 출�
 var goroutineprofile = flag.String("goroutineprofile", "", "고루틴 프로파일 출력 파일")
 
 var (
-	baseURL          = flag.String("url", "https://internal-alb-2004079858.ap-northeast-2.elb.amazonaws.com/api/bookings/sync", "타겟 URL")
+	baseURL          = flag.String("url", "https://internal-alb-2004079858.ap-northeast-2.elb.amazonaws.com/api/bookings", "타겟 URL")
 	httpMethod       = flag.String("method", "POST", "HTTP 메서드 (GET, POST)")
 	totalRequests    = flag.Int("requests", 100, "총 요청 수")
 	maxConns         = flag.Int("conns", 2000, "호스트당 최대 연결 수")
@@ -45,17 +45,18 @@ var (
 )
 
 type SubSection struct {
-	SectionID int     // 1..86 (세부 섹션 고유 번호)
-	Group     string  // "G1","G2","G3","P","R","S","A"
-	Index     int     // 그룹 내 인덱스 (1부터)
-	SeatStart int     // 이 세부 섹션의 좌석 시작 ID (전역 seat id)
-	SeatEnd   int     // 이 세부 섹션의 좌석 끝 ID (전역 seat id)
+	SectionID int    // 1..86
+	Group     string // "G1","G2","G3","P","R","S","A"
+	Index     int
+	SeatStart int     // 이 세부 섹션의 좌석 시작 ID
+	SeatEnd   int     // 이 세부 섹션의 좌석 끝 ID
 	Weight    float64 // 전체에서 이 세부 섹션이 선택될 확률
 }
 
 var (
 	SubSections       []SubSection
-	CumulativeWeights []float64 // SubSections와 같은 인덱스
+	CumulativeWeights []float64
+	SectionMap        map[int]SubSection
 )
 
 var rngPool = sync.Pool{
@@ -121,6 +122,7 @@ func (s *ShardedStats) getShard(id int) *StatsShard {
 func (s *ShardedStats) aggregate() (sent, completed, success, fail, status2xx, status4xx, status5xx, other, minLat, maxLat, sumLat int64) {
 	minLat = int64(^uint64(0) >> 1)
 	maxLat = 0
+	hasValidLatency := false
 
 	for i := range s.shards {
 		shard := &s.shards[i]
@@ -138,14 +140,21 @@ func (s *ShardedStats) aggregate() (sent, completed, success, fail, status2xx, s
 		shardMin := atomic.LoadInt64(&shard.minLatency)
 		shardMax := atomic.LoadInt64(&shard.maxLatency)
 
-		if shardMin < minLat && shardMin > 0 {
-			minLat = shardMin
+		if shardMin < int64(^uint64(0)>>1) {
+			hasValidLatency = true
+			if shardMin < minLat {
+				minLat = shardMin
+			}
 		}
+
 		if shardMax > maxLat {
 			maxLat = shardMax
 		}
 	}
 
+	if !hasValidLatency {
+		minLat = 0
+	}
 	return
 }
 
@@ -202,6 +211,11 @@ func init() {
 		sum += SubSections[i].Weight
 		CumulativeWeights[i] = sum
 	}
+
+	SectionMap = make(map[int]SubSection, len(SubSections))
+	for _, sub := range SubSections {
+		SectionMap[sub.SectionID] = sub
+	}
 }
 
 func pickSection(r *rand.Rand) int {
@@ -216,34 +230,41 @@ func pickSection(r *rand.Rand) int {
 
 func createPayload(maxMember int) ([]byte, error) {
 	var payload []byte
+	var err error
 
 	withRNG(func(r *rand.Rand) {
 		sectionID := pickSection(r)
-
-		var s SubSection
-		for i := range SubSections {
-			if SubSections[i].SectionID == sectionID {
-				s = SubSections[i]
-				break
-			}
-		}
+		s := SectionMap[sectionID]
 
 		seatCount := r.Intn(4) + 1
-		seatIDs := make([]int, seatCount)
 		span := s.SeatEnd - s.SeatStart + 1
-		for i := 0; i < seatCount; i++ {
-			seatIDs[i] = s.SeatStart + r.Intn(span)
+
+		seatIDs := make([]int, 0, seatCount)
+
+		if seatCount >= span {
+			for i := 0; i < span; i++ {
+				seatIDs = append(seatIDs, s.SeatStart+i)
+			}
+		} else {
+			used := make(map[int]bool, seatCount)
+			for len(seatIDs) < seatCount {
+				seat := s.SeatStart + r.Intn(span)
+				if !used[seat] {
+					seatIDs = append(seatIDs, seat)
+					used[seat] = true
+				}
+			}
 		}
 
 		req := BookingRequest{
 			MemberID:  r.Intn(maxMember) + 1,
 			TicketIDs: seatIDs,
-			SectionID: sectionID, // 1..86
+			SectionID: sectionID,
 		}
-		payload, _ = json.Marshal(req)
+		payload, err = json.Marshal(req)
 	})
 
-	return payload, nil
+	return payload, err
 }
 
 func createOptimizedHTTP2Client(maxConnsPerHost int, requestTimeout time.Duration) *http.Client {
@@ -394,22 +415,20 @@ func sendRequest(id int, clients []*http.Client, payload []byte, stats *ShardedS
 
 	for {
 		oldMin := atomic.LoadInt64(&shard.minLatency)
-		if oldMin == 0 || latency < oldMin {
-			if atomic.CompareAndSwapInt64(&shard.minLatency, oldMin, latency) {
-				break
-			}
-		} else {
+		if latency >= oldMin {
+			break
+		}
+		if atomic.CompareAndSwapInt64(&shard.minLatency, oldMin, latency) {
 			break
 		}
 	}
 
 	for {
 		oldMax := atomic.LoadInt64(&shard.maxLatency)
-		if latency > oldMax {
-			if atomic.CompareAndSwapInt64(&shard.maxLatency, oldMax, latency) {
-				break
-			}
-		} else {
+		if latency <= oldMax {
+			break
+		}
+		if atomic.CompareAndSwapInt64(&shard.maxLatency, oldMax, latency) {
 			break
 		}
 	}
