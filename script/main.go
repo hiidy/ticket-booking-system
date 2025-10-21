@@ -32,7 +32,7 @@ var goroutineprofile = flag.String("goroutineprofile", "", "고루틴 프로파�
 
 var (
 	baseURL          = flag.String("url", "https://internal-alb-2004079858.ap-northeast-2.elb.amazonaws.com/api/bookings/sync", "타겟 URL")
-	httpMethod       = flag.String("method", "GET", "HTTP 메서드 (GET, POST)")
+	httpMethod       = flag.String("method", "POST", "HTTP 메서드 (GET, POST)")
 	totalRequests    = flag.Int("requests", 100, "총 요청 수")
 	maxConns         = flag.Int("conns", 2000, "호스트당 최대 연결 수")
 	timeout          = flag.Duration("timeout", 20*time.Second, "요청 타임아웃")
@@ -44,13 +44,18 @@ var (
 	numClients       = flag.Int("clients", 10, "HTTP 클라이언트 개수")
 )
 
+type SubSection struct {
+	SectionID int     // 1..86 (세부 섹션 고유 번호)
+	Group     string  // "G1","G2","G3","P","R","S","A"
+	Index     int     // 그룹 내 인덱스 (1부터)
+	SeatStart int     // 이 세부 섹션의 좌석 시작 ID (전역 seat id)
+	SeatEnd   int     // 이 세부 섹션의 좌석 끝 ID (전역 seat id)
+	Weight    float64 // 전체에서 이 세부 섹션이 선택될 확률
+}
+
 var (
-	SECTION_WEIGHTS = []float64{0.35, 0.25, 0.15, 0.10, 0.08, 0.07}
-	SECTION_RANGES  = [][2]int{
-		{1, 7500}, {7501, 15000}, {15001, 22500},
-		{22501, 30000}, {30001, 37500}, {37501, 45000},
-	}
-	CUMULATIVE_WEIGHTS []float64
+	SubSections       []SubSection
+	CumulativeWeights []float64 // SubSections와 같은 인덱스
 )
 
 var rngPool = sync.Pool{
@@ -145,22 +150,68 @@ func (s *ShardedStats) aggregate() (sent, completed, success, fail, status2xx, s
 }
 
 func init() {
-	CUMULATIVE_WEIGHTS = make([]float64, len(SECTION_WEIGHTS))
+	type groupDef struct {
+		name       string
+		count      int
+		weight     float64
+		totalSeats int
+	}
+
+	groups := []groupDef{
+		{"G1", 10, 0.25, 6000},
+		{"G2", 12, 0.20, 6000},
+		{"G3", 12, 0.18, 6000},
+		{"P", 20, 0.15, 10000},
+		{"R", 11, 0.10, 8000},
+		{"S", 12, 0.07, 6000},
+		{"A", 9, 0.05, 4000},
+	}
+	SubSections = make([]SubSection, 0, 86)
+	seatCursor := 1
+	sectionID := 1
+
+	for _, g := range groups {
+		base := g.totalSeats / g.count
+		rem := g.totalSeats % g.count
+		wPerSub := g.weight / float64(g.count)
+
+		for i := 1; i <= g.count; i++ {
+			seatSpan := base
+			if i == g.count {
+				seatSpan += rem
+			}
+			start := seatCursor
+			end := start + seatSpan - 1
+
+			SubSections = append(SubSections, SubSection{
+				SectionID: sectionID,
+				Group:     g.name,
+				Index:     i,
+				SeatStart: start,
+				SeatEnd:   end,
+				Weight:    wPerSub,
+			})
+
+			seatCursor = end + 1
+			sectionID++
+		}
+	}
+	CumulativeWeights = make([]float64, len(SubSections))
 	sum := 0.0
-	for i, w := range SECTION_WEIGHTS {
-		sum += w
-		CUMULATIVE_WEIGHTS[i] = sum
+	for i := range SubSections {
+		sum += SubSections[i].Weight
+		CumulativeWeights[i] = sum
 	}
 }
 
 func pickSection(r *rand.Rand) int {
 	v := r.Float64()
-	for i, cw := range CUMULATIVE_WEIGHTS {
+	for i, cw := range CumulativeWeights {
 		if v <= cw {
-			return i + 1
+			return SubSections[i].SectionID
 		}
 	}
-	return 6
+	return SubSections[len(SubSections)-1].SectionID
 }
 
 func createPayload(maxMember int) ([]byte, error) {
@@ -168,18 +219,26 @@ func createPayload(maxMember int) ([]byte, error) {
 
 	withRNG(func(r *rand.Rand) {
 		sectionID := pickSection(r)
-		sectionRange := SECTION_RANGES[sectionID-1]
+
+		var s SubSection
+		for i := range SubSections {
+			if SubSections[i].SectionID == sectionID {
+				s = SubSections[i]
+				break
+			}
+		}
 
 		seatCount := r.Intn(4) + 1
 		seatIDs := make([]int, seatCount)
+		span := s.SeatEnd - s.SeatStart + 1
 		for i := 0; i < seatCount; i++ {
-			seatIDs[i] = r.Intn(sectionRange[1]-sectionRange[0]+1) + sectionRange[0]
+			seatIDs[i] = s.SeatStart + r.Intn(span)
 		}
 
 		req := BookingRequest{
 			MemberID:  r.Intn(maxMember) + 1,
 			TicketIDs: seatIDs,
-			SectionID: sectionID,
+			SectionID: sectionID, // 1..86
 		}
 		payload, _ = json.Marshal(req)
 	})
@@ -232,7 +291,7 @@ func createOptimizedHTTP2Client(maxConnsPerHost int, requestTimeout time.Duratio
 }
 
 func warmupConnections(clients []*http.Client, url string, method string, count int, numShards int) {
-	fmt.Printf("\n 워밍업 시작: %d개의 연결 미리 생성 중 (%d개 클라이언트 사용)...\n", count, len(clients))
+	fmt.Printf("\n워밍업 시작: %d개의 연결 미리 생성 중 (%d개 클라이언트 사용)...\n", count, len(clients))
 	warmupStart := time.Now()
 
 	var wg sync.WaitGroup
@@ -471,7 +530,7 @@ func printFinalResults(stats *ShardedStats, totalDuration, generationDuration ti
 	fmt.Printf("  2xx:                 %s\n", formatNumber(int(status2xx)))
 	fmt.Printf("  4xx:                 %s\n", formatNumber(int(status4xx)))
 	fmt.Printf("  5xx:                 %s\n", formatNumber(int(status5xx)))
-	fmt.Printf("  기타:                %s\n", formatNumber(int(other)))
+	fmt.Printf("  기타:                 %s\n", formatNumber(int(other)))
 	fmt.Printf("\n")
 
 	if success > 0 {
@@ -530,7 +589,7 @@ func main() {
 	numShards := runtime.NumCPU()
 	printConfig(method, numShards)
 
-	fmt.Printf("\n %d개의 HTTP 클라이언트 생성 중...\n", *numClients)
+	fmt.Printf("\n%d개의 HTTP 클라이언트 생성 중.....\n", *numClients)
 	clients := make([]*http.Client, *numClients)
 	for i := 0; i < *numClients; i++ {
 		clients[i] = createOptimizedHTTP2Client(*maxConns, *timeout)
