@@ -4,6 +4,7 @@ import com.seatwise.booking.dto.BookingCreatedEvent;
 import com.seatwise.booking.dto.response.BookingStatusResponse;
 import com.seatwise.booking.entity.Booking;
 import com.seatwise.booking.entity.BookingRepository;
+import com.seatwise.booking.entity.BookingStatus;
 import com.seatwise.booking.exception.FatalBookingException;
 import com.seatwise.booking.exception.RecoverableBookingException;
 import com.seatwise.core.ErrorCode;
@@ -61,6 +62,7 @@ public class BookingService {
     int totalAmount = tickets.stream().map(Ticket::getPrice).reduce(0, Integer::sum);
     Booking booking = Booking.success(requestId, member, totalAmount);
     Booking savedBooking = bookingRepository.save(booking);
+    log.info("booking 저장 : {}", booking.getId());
     tickets.forEach(
         ticket ->
             ticket.assignBooking(savedBooking.getId(), bookingRequestTime, Duration.ofMinutes(10)));
@@ -103,15 +105,14 @@ public class BookingService {
   }
 
   @Transactional
-  public Long createFailedBooking(UUID requestId, Long memberId) {
+  public void createFailedBooking(UUID requestId, Long memberId) {
     Member member =
         memberRepository
             .findById(memberId)
             .orElseThrow(() -> new FatalBookingException(ErrorCode.MEMBER_NOT_FOUND, requestId));
 
     Booking booking = Booking.failed(requestId, member);
-    Booking failedBooking = bookingRepository.save(booking);
-    return failedBooking.getId();
+    bookingRepository.save(booking);
   }
 
   @Transactional
@@ -145,11 +146,11 @@ public class BookingService {
   }
 
   public BookingStatusResponse getBookingStatus(UUID requestId) {
-    Optional<Booking> bookingOpt = bookingRepository.findByRequestId(requestId);
+    Booking booking = bookingRepository.findByRequestId(requestId).orElseThrow();
 
-    if (bookingOpt.isPresent()) {
-      return BookingStatusResponse.success(bookingOpt.get().getId(), requestId);
+    if (booking.getStatus() == BookingStatus.SUCCESS) {
+      return BookingStatusResponse.success(booking.getId(), requestId);
     }
-    return BookingStatusResponse.pending(requestId);
+    return BookingStatusResponse.failed(requestId);
   }
 }

@@ -4,6 +4,7 @@ import com.seatwise.booking.dto.BookingCreateCommand;
 import com.seatwise.booking.dto.BookingMessage;
 import com.seatwise.booking.dto.BookingMessageType;
 import com.seatwise.booking.exception.BookingException;
+import com.seatwise.booking.exception.RecoverableBookingException;
 import com.seatwise.booking.messaging.BookingMessageProducer;
 import com.seatwise.core.ErrorCode;
 import com.seatwise.ticket.TicketCacheService;
@@ -31,7 +32,7 @@ public class BookingRequestService {
     UUID requestId = UUID.randomUUID();
 
     if (cacheService.hasUnavailableTickets(command.ticketIds(), command.memberId())) {
-      throw new BookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
+      throw new RecoverableBookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
     }
 
     producer.sendMessage(
