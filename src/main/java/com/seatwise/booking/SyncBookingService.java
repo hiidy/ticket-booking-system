@@ -67,8 +67,6 @@ public class SyncBookingService {
   private void safeUnlock(RLock lock) {
     try {
       lock.unlock();
-    } catch (IllegalMonitorStateException e) {
-      log.debug("락이 이미 해제됐거나 다른 스레드에 의해 해제됨");
     } catch (Exception e) {
       log.error("락 도중 예외 발생", e);
     }
