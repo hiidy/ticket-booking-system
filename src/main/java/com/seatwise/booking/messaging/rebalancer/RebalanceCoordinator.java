@@ -74,12 +74,11 @@ public class RebalanceCoordinator
         states.clear();
         states.putAll(consumerStateRepository.getAllConsumerStates());
 
-        if (message.rebalanceType().equals(RebalanceType.JOIN)) {
-          if (!states.containsKey(message.requestedBy())) {
-            states.put(
-                message.requestedBy(),
-                new StreamConsumerState(message.requestedBy(), Collections.emptyList()));
-          }
+        if (message.rebalanceType().equals(RebalanceType.JOIN)
+            && !states.containsKey(message.requestedBy())) {
+          states.put(
+              message.requestedBy(),
+              new StreamConsumerState(message.requestedBy(), Collections.emptyList()));
         }
 
         if (message.rebalanceType().equals(RebalanceType.LEAVE)) {
@@ -94,6 +93,7 @@ public class RebalanceCoordinator
       }
 
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       log.warn("admin lock 획득 실패 - 다른 컨슈머가 리밸런스 중");
     } finally {
       adminLock.unlock();
