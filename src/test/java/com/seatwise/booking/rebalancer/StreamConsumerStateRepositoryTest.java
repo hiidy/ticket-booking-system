@@ -16,13 +16,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 @EmbeddedRedisTest
 class StreamConsumerStateRepositoryTest {
 
-  private final String STATE_KEY = "consumer:states";
+  private static final String STATE_KEY = "consumer:states";
   @Autowired private StreamConsumerStateRepository repository;
   @Autowired private RedisTemplate<String, Object> redisTemplate;
 
   @BeforeEach
   void flushRedis() {
-    redisTemplate.getConnectionFactory().getConnection().flushAll();
+    redisTemplate.getConnectionFactory().getConnection().serverCommands().flushAll();
   }
 
   @Test
