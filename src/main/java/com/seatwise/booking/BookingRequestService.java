@@ -3,8 +3,10 @@ package com.seatwise.booking;
 import com.seatwise.booking.dto.BookingCreateCommand;
 import com.seatwise.booking.dto.BookingMessage;
 import com.seatwise.booking.dto.BookingMessageType;
+import com.seatwise.booking.exception.BookingException;
 import com.seatwise.booking.messaging.BookingMessageProducer;
-import java.time.Duration;
+import com.seatwise.core.ErrorCode;
+import com.seatwise.ticket.TicketCacheService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -15,28 +17,30 @@ import org.springframework.stereotype.Service;
 public class BookingRequestService {
 
   private final BookingMessageProducer producer;
+  private final TicketCacheService cacheService;
   private final RedisTemplate<String, String> redisTemplate;
   private static final String KEY = "booking:request:";
 
-  public String createBookingRequest(
-      UUID idempotencyKey, BookingCreateCommand bookingCreateCommand) {
+  public UUID createBookingRequest(UUID idempotencyKey, BookingCreateCommand command) {
+    String key = KEY + idempotencyKey;
+    String existingRequestId = redisTemplate.opsForValue().get(key);
+    if (existingRequestId != null) {
+      return UUID.fromString(existingRequestId);
+    }
 
-    String key = KEY + idempotencyKey.toString();
-    String requestId = UUID.randomUUID().toString();
+    UUID requestId = UUID.randomUUID();
 
-    Boolean success =
-        redisTemplate.opsForValue().setIfAbsent(key, requestId, Duration.ofMinutes(30));
-    if (Boolean.FALSE.equals(success)) {
-      return redisTemplate.opsForValue().get(key);
+    if (cacheService.hasUnavailableTickets(command.ticketIds(), command.memberId())) {
+      throw new BookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
     }
 
     producer.sendMessage(
         new BookingMessage(
             BookingMessageType.BOOKING,
-            requestId,
-            bookingCreateCommand.memberId(),
-            bookingCreateCommand.ticketIds(),
-            bookingCreateCommand.sectionId()));
+            requestId.toString(),
+            command.memberId(),
+            command.ticketIds(),
+            command.sectionId()));
     return requestId;
   }
 }

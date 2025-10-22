@@ -124,6 +124,7 @@ public class BookingMessageConsumer
             requestId,
             e.getErrorCode(),
             request.memberId());
+        bookingService.createFailedBooking(requestId, request.memberId());
       } finally {
         bookingMessageAckService.acknowledge(properties.getConsumerGroup(), message);
       }

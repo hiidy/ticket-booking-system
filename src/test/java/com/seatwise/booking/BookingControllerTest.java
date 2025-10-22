@@ -1,9 +1,12 @@
 package com.seatwise.booking;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.seatwise.booking.dto.BookingCreateCommand;
 import com.seatwise.booking.dto.request.BookingRequest;
 import com.seatwise.booking.messaging.BookingMessageProducer;
 import java.util.List;
@@ -31,6 +34,11 @@ class BookingControllerTest {
   void shouldReturnAccepted_whenCreateBookingWithValidIdempotencyKey() throws Exception {
     // given
     BookingRequest bookingRequest = new BookingRequest(1L, List.of(1001L), 200L);
+    UUID generatedRequestId = UUID.randomUUID();
+
+    given(requestService.createBookingRequest(
+        any(UUID.class), any(BookingCreateCommand.class)))
+        .willReturn(generatedRequestId);
 
     // when & then
     mockMvc

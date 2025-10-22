@@ -59,7 +59,7 @@ public class BookingService {
     }
 
     int totalAmount = tickets.stream().map(Ticket::getPrice).reduce(0, Integer::sum);
-    Booking booking = new Booking(requestId, member, totalAmount);
+    Booking booking = Booking.success(requestId, member, totalAmount);
     Booking savedBooking = bookingRepository.save(booking);
     tickets.forEach(
         ticket ->
@@ -91,7 +91,7 @@ public class BookingService {
     }
 
     int totalAmount = tickets.stream().mapToInt(Ticket::getPrice).sum();
-    Booking booking = new Booking(requestId, member, totalAmount);
+    Booking booking = Booking.success(requestId, member, totalAmount);
     Booking savedBooking = bookingRepository.save(booking);
 
     tickets.forEach(
@@ -100,6 +100,18 @@ public class BookingService {
     eventPublisher.publishEvent(new BookingCreatedEvent(ticketIds, memberId));
 
     return savedBooking.getId();
+  }
+
+  @Transactional
+  public Long createFailedBooking(UUID requestId, Long memberId) {
+    Member member =
+        memberRepository
+            .findById(memberId)
+            .orElseThrow(() -> new FatalBookingException(ErrorCode.MEMBER_NOT_FOUND, requestId));
+
+    Booking booking = Booking.failed(requestId, member);
+    Booking failedBooking = bookingRepository.save(booking);
+    return failedBooking.getId();
   }
 
   @Transactional

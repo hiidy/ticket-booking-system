@@ -34,17 +34,17 @@ public class BookingController {
   public ResponseEntity<BookingResponse> createBookingRequest(
       @RequestHeader("Idempotency-Key") UUID idempotencyKey,
       @Valid @RequestBody BookingRequest request) {
-    BookingCreateCommand createCommand =
+    BookingCreateCommand command =
         BookingCreateCommand.of(request.memberId(), request.ticketIds(), request.sectionId());
 
-    String requestId = bookingRequestService.createBookingRequest(idempotencyKey, createCommand);
+    UUID requestId = bookingRequestService.createBookingRequest(idempotencyKey, command);
     String pollingUrl =
         ServletUriComponentsBuilder.fromCurrentRequestUri()
-            .pathSegment(requestId, "status")
+            .pathSegment(requestId.toString(), "status")
             .build()
             .toUriString();
 
-    BookingResponse response = new BookingResponse(pollingUrl, requestId);
+    BookingResponse response = new BookingResponse(pollingUrl, requestId.toString());
     return ResponseEntity.accepted().body(response);
   }
 

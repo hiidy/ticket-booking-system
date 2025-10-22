@@ -4,6 +4,8 @@ import com.seatwise.core.jpa.BaseEntity;
 import com.seatwise.member.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -38,9 +40,28 @@ public class Booking extends BaseEntity {
 
   private int totalAmount;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "status")
+  private BookingStatus status;
+
   public Booking(UUID requestId, Member member, int totalAmount) {
     this.requestId = requestId;
     this.member = member;
     this.totalAmount = totalAmount;
+  }
+
+  private Booking(UUID requestId, Member member, int totalAmount, BookingStatus status) {
+    this.requestId = requestId;
+    this.member = member;
+    this.totalAmount = totalAmount;
+    this.status = status;
+  }
+
+  public static Booking success(UUID requestId, Member member, int totalAmount) {
+    return new Booking(requestId, member, totalAmount, BookingStatus.SUCCESS);
+  }
+
+  public static Booking failed(UUID requestId, Member member) {
+    return new Booking(requestId, member, 0, BookingStatus.FAILED);
   }
 }
