@@ -1,25 +1,18 @@
 steps:
-  - name: 'openjdk:17-slim'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        apt-get update && apt-get install -y gradle
-        gradle clean build
+  - name: 'gcr.io/cloud-builders/gradle'
+    args: [ 'clean', 'build' ]
     id: 'gradle-build'
 
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/ticket-booking:latest',
-           '-t', 'gcr.io/$PROJECT_ID/ticket-booking:$SHORT_SHA', '.']
+    args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/ticket-booking:latest', '.' ]
     id: 'build-image'
 
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/ticket-booking']
+    args: [ 'push', 'gcr.io/$PROJECT_ID/ticket-booking' ]
     id: 'push-image'
 
 images:
   - 'gcr.io/$PROJECT_ID/ticket-booking:latest'
-  - 'gcr.io/$PROJECT_ID/ticket-booking:$SHORT_SHA'
 
 timeout: '1800s'
 

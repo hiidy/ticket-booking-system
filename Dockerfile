@@ -1,4 +1,4 @@
-FROM gradle:8.7-jdk17 AS deps
+FROM gradle:8.10-jdk17 AS deps
 WORKDIR /app
 
 COPY gradle gradle
@@ -7,7 +7,7 @@ COPY build.gradle ./
 
 RUN ./gradlew dependencies --no-daemon --refresh-dependencies
 
-FROM gradle:8.7-jdk17 AS builder
+FROM gradle:8.10-jdk17 AS builder
 WORKDIR /app
 
 COPY --from=deps /home/gradle/.gradle /home/gradle/.gradle
