@@ -17,3 +17,6 @@ images:
   - 'gcr.io/$PROJECT_ID/ticket-booking:$SHORT_SHA'
 
 timeout: '1800s'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
