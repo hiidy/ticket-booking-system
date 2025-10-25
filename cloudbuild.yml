@@ -3,18 +3,20 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/app:latest'
+      - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/booking-platform:latest'
+      - '-f'
+      - 'booking-platform/Dockerfile'
       - '.'
-    id: 'build-image'
+    id: 'build-booking-platform-image'
 
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/app:latest'
-    id: 'push-image'
+      - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/booking-platform:latest'
+    id: 'push-booking-platform-image'
 
 images:
-  - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/app:latest'
+  - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/booking-platform:latest'
 
 timeout: '1800s'
 
