@@ -1,0 +1,67 @@
+plugins {
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+    id 'jacoco'
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    implementation 'org.springframework.kafka:spring-kafka'
+
+    implementation 'org.springframework.data:spring-data-redis:3.5.0'
+    implementation 'io.lettuce:lettuce-core:6.6.0.RELEASE'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.50.0'
+
+    implementation 'org.springframework.retry:spring-retry:2.0.11'
+
+    implementation 'org.codehaus.janino:janino'
+
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'com.h2database:h2'
+
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'com.github.codemonstur:embedded-redis:1.4.3'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.testcontainers:mysql'
+}
+
+bootJar {
+    enabled = true
+    archiveBaseName = 'booking-service'
+}
+
+jar {
+    enabled = false
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    '**/dto/**',
+                    '**/config/**',
+                    '**/exception/**',
+                    '**/core/**',
+                    '**/*Application*'
+            ])
+        }))
+    }
+}

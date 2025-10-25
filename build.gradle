@@ -1,95 +1,49 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.5'
-    id 'io.spring.dependency-management' version '1.1.6'
-    id "org.sonarqube" version "6.0.1.5171"
-    id 'jacoco'
+    id 'org.springframework.boot' version '3.3.5' apply false
+    id 'io.spring.dependency-management' version '1.1.6' apply false
 }
 
-group = 'com.seatwise'
-version = '0.0.1-SNAPSHOT'
+allprojects {
+    group = 'com.seatwise'
+    version = '0.0.1-SNAPSHOT'
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+    repositories {
+        mavenCentral()
     }
 }
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
     }
-}
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-cache'
-    implementation 'org.springframework.data:spring-data-redis:3.5.0'
-    implementation 'io.lettuce:lettuce-core:6.6.0.RELEASE'
-    implementation 'org.springframework.retry:spring-retry:2.0.11'
-    implementation 'org.redisson:redisson-spring-boot-starter:3.50.0'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.codehaus.janino:janino'
-
-    compileOnly 'org.projectlombok:lombok'
-
-    runtimeOnly 'com.mysql:mysql-connector-j'
-    runtimeOnly 'com.h2database:h2'
-    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
-
-    annotationProcessor 'org.projectlombok:lombok'
-
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'com.github.codemonstur:embedded-redis:1.4.3'
-    testImplementation 'org.testcontainers:junit-jupiter'
-    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-    testImplementation 'org.testcontainers:mysql'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testRuntimeOnly 'com.mysql:mysql-connector-j'
-}
-
-test {
-    useJUnitPlatform()
-    finalizedBy jacocoTestReport
-    systemProperty 'user.timezone', 'UTC'
-}
-
-jacoco {
-    toolVersion = "0.8.12"
-}
-
-jacocoTestReport {
-    dependsOn test
-    reports {
-        xml.required = true
-        csv.required = false
-        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
     }
-    afterEvaluate {
-        classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: [
-                    '**/dto/**',
-                    '**/config/**',
-                    '**/exception/**',
-                    '**/core/**',
-                    '**/*Application*'
-            ])
-        }))
-    }
-}
 
-sonar {
-    properties {
-        property "sonar.projectKey", "hiidy_ticket-booking-system"
-        property "sonar.organization", "hiidy"
-        property "sonar.host.url", "https://sonarcloud.io"
-        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
-        property "sonar.coverage.exclusions", "**/dto/**,**/config/**,**/exception/**,**/core/**,**/*Application*"
+    dependencies {
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+
+    test {
+        useJUnitPlatform()
+        systemProperty 'user.timezone', 'UTC'
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.compilerArgs += ['-parameters']
     }
 }
