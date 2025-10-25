@@ -1,9 +1,10 @@
 FROM gradle:8.10-jdk17 AS deps
 WORKDIR /app
 
-COPY ../gradle gradle
-COPY ../gradlew ../settings.gradle ../build.gradle ./
-COPY build.gradle ./build.gradle
+COPY gradle gradle
+COPY gradlew settings.gradle build.gradle ./
+
+COPY booking-platform/build.gradle ./booking-platform/build.gradle
 
 RUN ./gradlew :booking-platform:dependencies --no-daemon --refresh-dependencies
 
@@ -15,6 +16,8 @@ COPY --from=deps /app/gradle /app/gradle
 COPY --from=deps /app/gradlew /app/gradlew
 COPY --from=deps /app/settings.gradle /app/settings.gradle
 COPY --from=deps /app/build.gradle /app/build.gradle
+COPY --from=deps /app/booking-platform/build.gradle /app/booking-platform/build.gradle
+
 COPY . .
 
 RUN ./gradlew :booking-platform:bootJar --no-daemon -x test --build-cache

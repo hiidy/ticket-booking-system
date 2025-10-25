@@ -1,0 +1,20 @@
+# Git
+.git/
+.gitignore
+
+# Cloud Build
+cloudbuild.yml
+
+# Gradle
+build/
+.gradle/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# etc
+*.log
