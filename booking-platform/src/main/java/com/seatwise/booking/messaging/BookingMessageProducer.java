@@ -34,6 +34,6 @@ public class BookingMessageProducer {
 
     redisTemplate
         .opsForStream(new Jackson2HashMapper(true))
-        .add(objectRecord, XAddOptions.maxlen(1000).approximateTrimming(true));
+        .add(objectRecord);
   }
 }

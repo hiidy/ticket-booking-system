@@ -52,6 +52,6 @@ class BookingMessageProducerTest {
     bookingMessageProducer.sendMessage(request);
 
     // then
-    verify(streamOperations).add(any(ObjectRecord.class), any(XAddOptions.class));
+    verify(streamOperations).add(any(ObjectRecord.class));
   }
 }

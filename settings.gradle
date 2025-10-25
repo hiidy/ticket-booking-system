@@ -1,3 +1,4 @@
 rootProject.name = 'ticket-booking-system'
 
 include 'booking-platform'
+include 'booking-streams'

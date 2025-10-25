@@ -20,6 +20,6 @@ public class RebalanceMessageProducer {
         StreamRecords.newRecord().in(StreamKeyGenerator.getRebalanceUpdateKey()).ofObject(message);
     redisTemplate
         .opsForStream(new Jackson2HashMapper(true))
-        .add(objectRecord, XAddOptions.maxlen(1000).approximateTrimming(true));
+        .add(objectRecord);
   }
 }
