@@ -29,12 +29,11 @@ dependencies {
     testImplementation 'org.testcontainers:mysql'
 }
 
-bootJar {
-    enabled = true
+tasks.named('bootJar') {
     archiveBaseName = 'booking-platform'
 }
 
-jar {
+tasks.named('jar') {
     enabled = false
 }
 

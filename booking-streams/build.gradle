@@ -1,13 +1,31 @@
 plugins {
-    id 'java'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+    id 'com.github.davidmc24.gradle.plugin.avro'
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.apache.kafka:kafka-streams'
+
+    // Avro
+    implementation 'org.apache.avro:avro:1.11.3'
+    implementation 'io.confluent:kafka-streams-avro-serde:7.6.1'
+
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
 }
 
-test {
-    useJUnitPlatform()
+tasks.named('bootJar') {
+    archiveBaseName = 'booking-streams'
+}
+
+tasks.named('jar') {
+    enabled = false
 }
