@@ -22,4 +22,40 @@ public class KafkaTopicConfig {
         .compact()
         .build();
   }
+
+  @Bean
+  public NewTopic ticketTopic() {
+    return TopicBuilder.name(topicProperties.ticketState())
+        .partitions(topicProperties.partitions())
+        .replicas(topicProperties.replicas())
+        .compact()
+        .build();
+  }
+
+  @Bean
+  public NewTopic bookingCommandTopic() {
+    return TopicBuilder.name(topicProperties.bookingCommand())
+        .partitions(topicProperties.partitions())
+        .replicas(topicProperties.replicas())
+        .compact()
+        .build();
+  }
+
+  @Bean
+  public NewTopic bookingCompletedTopic() {
+    return TopicBuilder.name(topicProperties.bookingCompleted())
+        .partitions(topicProperties.partitions())
+        .replicas(topicProperties.replicas())
+        .compact()
+        .build();
+  }
+
+  @Bean
+  public NewTopic bookingResultTopic() {
+    return TopicBuilder.name(topicProperties.bookingResult())
+        .partitions(topicProperties.partitions())
+        .replicas(topicProperties.replicas())
+        .compact()
+        .build();
+  }
 }

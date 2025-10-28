@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.booking.system.BookingRequestAvro;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.seatwise.booking.BookingRequest;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import java.time.Duration;
 import java.util.HashMap;

@@ -4,49 +4,56 @@
   "namespace": "com.booking.system",
   "fields": [
     {
-      "name": "id",
-      "type": "long"
-    },
-    {
-      "name": "requestId",
-      "type": [
-        "null",
-        {
-          "type": "fixed",
-          "name": "UUID",
-          "size": 16
-        }
-      ],
-      "default": null
+      "name": "bookingId",
+      "type": "string"
     },
     {
       "name": "memberId",
       "type": "long"
     },
     {
-      "name": "totalAmount",
+      "name": "sectionId",
       "type": "long"
     },
     {
+      "name": "ticketIds",
+      "type": {
+        "type": "array",
+        "items": "long"
+      }
+    },
+    {
+      "name": "totalAmount",
+      "type": [
+        "null",
+        "long"
+      ],
+      "default": null
+    },
+    {
       "name": "status",
-      "type": "string"
+      "type": {
+        "type": "enum",
+        "name": "BookingStatus",
+        "symbols": [
+          "PENDING",
+          "BOOKED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "default": "PENDING"
+      }
+    },
+    {
+      "name": "errorMessage",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
     },
     {
       "name": "timestamp",
-      "type": {
-        "type": "long",
-        "logicalType": "timestamp-millis"
-      }
-    },
-    {
-      "name": "createdAt",
-      "type": {
-        "type": "long",
-        "logicalType": "timestamp-millis"
-      }
-    },
-    {
-      "name": "updatedAt",
       "type": {
         "type": "long",
         "logicalType": "timestamp-millis"

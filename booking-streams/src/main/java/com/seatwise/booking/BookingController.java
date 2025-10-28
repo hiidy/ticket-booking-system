@@ -1,6 +1,7 @@
-package com.seatwise;
+package com.seatwise.booking;
 
 import com.booking.system.BookingRequestAvro;
+import com.seatwise.KafkaTopicProperties;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +22,7 @@ public class BookingController {
   private final KafkaTopicProperties topicProperties;
 
   @PostMapping
-  public ResponseEntity<String> createBookingRequest(
-      @Valid @RequestBody BookingRequest request) {
+  public ResponseEntity<String> createBookingRequest(@Valid @RequestBody BookingRequest request) {
     String key = request.sectionId().toString();
     String requestID = UUID.randomUUID().toString();
     BookingRequestAvro avro = request.toAvro(requestID);

@@ -1,4 +1,4 @@
-package com.seatwise;
+package com.seatwise.booking;
 
 import com.booking.system.BookingRequestAvro;
 import java.util.List;

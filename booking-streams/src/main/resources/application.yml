@@ -11,12 +11,20 @@ spring:
         enable.idempotence: true
         schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
         auto.register.schemas: true
+    streams:
+      state-dir:
 
 kafka:
-  topics:
-    booking-request: ${KAFKA_TOPIC_PREFIX:local}-booking-request-v1
-    partitions: ${KAFKA_TOPIC_PARTITIONS:1}
+  topic:
+    prefix: ${KAFKA_TOPIC_PREFIX:local}
+    partitions: ${KAFKA_TOPIC_PARTITIONS:3}
     replicas: ${KAFKA_TOPIC_REPLICAS:1}
+
+    booking-request: ${kafka.topic.prefix}.booking.request.v1
+    booking-command: ${kafka.topic.prefix}.booking.command.v1
+    booking-completed: ${kafka.topic.prefix}.booking.completed.v1
+    ticket-state: ${kafka.topic.prefix}.ticket.state.v1
+    booking-result: ${kafka.topic.prefix}.booking.result.v1
 
 ---
 spring:
@@ -25,7 +33,7 @@ spring:
       on-profile: local
 
 kafka:
-  topics:
+  topic:
     partitions: 3
     replicas: 3
 
@@ -35,14 +43,9 @@ spring:
   config:
     activate:
       on-profile: prod
-
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
 kafka:
-  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
-  topics:
-    booking-request: prod-booking-request-v1
+  topic:
     partitions: 6
     replicas: 3
-
-logging:
-  level:
-    com.seatwise: INFO
