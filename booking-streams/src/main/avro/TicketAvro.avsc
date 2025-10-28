@@ -1,0 +1,60 @@
+{
+  "type": "record",
+  "name": "TicketAvro",
+  "namespace": "com.booking.system",
+  "fields": [
+    {
+      "name": "id",
+      "type": "long"
+    },
+    {
+      "name": "showTimeId",
+      "type": "long"
+    },
+    {
+      "name": "seatId",
+      "type": "long"
+    },
+    {
+      "name": "bookingId",
+      "type": [
+        "null",
+        "long"
+      ],
+      "default": null
+    },
+    {
+      "name": "price",
+      "type": "long"
+    },
+    {
+      "name": "status",
+      "type": "string"
+    },
+    {
+      "name": "expirationTime",
+      "type": [
+        "null",
+        {
+          "type": "long",
+          "logicalType": "timestamp-millis"
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "createdAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "updatedAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    }
+  ]
+}

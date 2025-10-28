@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: seatwise-booking-service
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092,localhost:39092,localhost:49092}
+    producer:
+      retries: 2147483647
+      acks: all
+      properties:
+        enable.idempotence: true
+        schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
+        auto.register.schemas: true
+
+kafka:
+  topics:
+    booking-request: ${KAFKA_TOPIC_PREFIX:local}-booking-request-v1
+    partitions: ${KAFKA_TOPIC_PARTITIONS:1}
+    replicas: ${KAFKA_TOPIC_REPLICAS:1}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+kafka:
+  topics:
+    partitions: 3
+    replicas: 3
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+kafka:
+  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+  topics:
+    booking-request: prod-booking-request-v1
+    partitions: 6
+    replicas: 3
+
+logging:
+  level:
+    com.seatwise: INFO

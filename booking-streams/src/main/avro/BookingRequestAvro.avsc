@@ -1,0 +1,26 @@
+{
+  "type": "record",
+  "name": "BookingRequestAvro",
+  "namespace": "com.booking.system",
+  "fields": [
+    {
+      "name": "memberId",
+      "type": "long"
+    },
+    {
+      "name": "ticketIds",
+      "type": {
+        "type": "array",
+        "items": "long"
+      }
+    },
+    {
+      "name": "sectionId",
+      "type": "long"
+    },
+    {
+      "name": "requestId",
+      "type": "string"
+    }
+  ]
+}

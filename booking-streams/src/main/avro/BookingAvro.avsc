@@ -1,0 +1,56 @@
+{
+  "type": "record",
+  "name": "BookingAvro",
+  "namespace": "com.booking.system",
+  "fields": [
+    {
+      "name": "id",
+      "type": "long"
+    },
+    {
+      "name": "requestId",
+      "type": [
+        "null",
+        {
+          "type": "fixed",
+          "name": "UUID",
+          "size": 16
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "memberId",
+      "type": "long"
+    },
+    {
+      "name": "totalAmount",
+      "type": "long"
+    },
+    {
+      "name": "status",
+      "type": "string"
+    },
+    {
+      "name": "timestamp",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "createdAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "updatedAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    }
+  ]
+}
