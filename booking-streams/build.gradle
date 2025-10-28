@@ -4,6 +4,13 @@ plugins {
     id 'com.github.davidmc24.gradle.plugin.avro'
 }
 
+configurations.all {
+    exclude group: 'org.slf4j', module: 'slf4j-reload4j'
+    exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+    exclude group: 'log4j', module: 'log4j'
+    exclude group: 'ch.qos.reload4j', module: 'reload4j'
+}
+
 dependencies {
     // Spring Boot Starters
     implementation 'org.springframework.boot:spring-boot-starter'
@@ -21,6 +28,7 @@ dependencies {
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
+    testImplementation 'io.confluent:kafka-schema-registry:7.5.0:tests'
 }
 
 tasks.named('bootJar') {
