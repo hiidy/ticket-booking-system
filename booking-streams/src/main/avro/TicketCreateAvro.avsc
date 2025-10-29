@@ -1,0 +1,35 @@
+{
+  "type": "record",
+  "name": "TicketCreateAvro",
+  "namespace": "com.booking.system",
+  "fields": [
+    {
+      "name": "showTimeId",
+      "type": "long"
+    },
+    {
+      "name": "ticketPrices",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "TicketPriceRange",
+          "fields": [
+            {
+              "name": "startSeatId",
+              "type": "long"
+            },
+            {
+              "name": "endSeatId",
+              "type": "long"
+            },
+            {
+              "name": "price",
+              "type": "long"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

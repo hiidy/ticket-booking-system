@@ -4,6 +4,7 @@ import com.booking.system.BookingAvro;
 import com.booking.system.BookingCommandAvro;
 import com.booking.system.BookingRequestAvro;
 import com.booking.system.TicketAvro;
+import com.booking.system.TicketCreateAvro;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
 import java.util.Map;
 import org.apache.avro.specific.SpecificRecord;
@@ -41,6 +42,11 @@ public class SerdeConfig {
 
   @Bean
   Serde<BookingCommandAvro> bookingCommandAvroSerde() {
+    return avroSerde();
+  }
+
+  @Bean
+  Serde<TicketCreateAvro> ticketCreateAvroSerde() {
     return avroSerde();
   }
 
