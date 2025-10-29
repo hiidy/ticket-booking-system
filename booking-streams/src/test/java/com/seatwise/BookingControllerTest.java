@@ -43,7 +43,7 @@ import org.springframework.test.web.servlet.MvcResult;
 @AutoConfigureMockMvc
 @DirtiesContext
 @EmbeddedKafka(
-    partitions = 1,
+    partitions = 3,
     topics = {"booking-request-test"},
     brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
 @TestPropertySource(
@@ -52,7 +52,7 @@ import org.springframework.test.web.servlet.MvcResult;
       "spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer",
       "spring.kafka.producer.value-serializer=io.confluent.kafka.serializers.KafkaAvroSerializer",
       "spring.kafka.producer.properties.schema.registry.url=mock://test-registry",
-      "kafka.topics.booking-request=booking-request-test"
+      "kafka.topic.booking-request=booking-request-test"
     })
 class BookingControllerTest {
 
