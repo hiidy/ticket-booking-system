@@ -10,20 +10,19 @@ import org.apache.kafka.streams.processor.api.FixedKeyProcessor;
 import org.apache.kafka.streams.processor.api.FixedKeyProcessorContext;
 import org.apache.kafka.streams.processor.api.FixedKeyRecord;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
-import org.springframework.stereotype.Service;
 
-@Service
 @RequiredArgsConstructor
 public class BookingRequestProcessor
     implements FixedKeyProcessor<String, BookingRequestAvro, BookingCommandAvro> {
 
+  private final String storeName;
   private ReadOnlyKeyValueStore<String, TicketAvro> ticketCache;
   private FixedKeyProcessorContext<String, BookingCommandAvro> context;
 
   @Override
   public void init(FixedKeyProcessorContext<String, BookingCommandAvro> context) {
     this.context = context;
-    this.ticketCache = context.getStateStore("ticket-cache");
+    this.ticketCache = context.getStateStore(storeName);
   }
 
   @Override

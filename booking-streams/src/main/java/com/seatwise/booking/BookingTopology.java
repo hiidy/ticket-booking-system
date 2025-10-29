@@ -7,13 +7,13 @@ import com.booking.system.TicketAvro;
 import com.seatwise.KafkaTopicProperties;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.common.serialization.Serde;
-import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Named;
 import org.apache.kafka.streams.kstream.Produced;
+import org.apache.kafka.streams.state.Stores;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafkaStreams;
@@ -26,12 +26,14 @@ import org.springframework.kafka.streams.KafkaStreamsInteractiveQueryService;
 public class BookingTopology {
 
   private final KafkaTopicProperties topicProperties;
-  private final BookingRequestProcessor bookingRequestProcessor;
   private final Serde<String> stringSerde;
   private final Serde<BookingRequestAvro> bookingRequestSerde;
   private final Serde<BookingCommandAvro> bookingCommandAvroSerde;
   private final Serde<BookingAvro> bookingAvroSerde;
   private final Serde<TicketAvro> ticketAvroSerde;
+
+  public static final String TICKET_CACHE_STORE = "ticket-cache";
+  private static final int MAX_CACHE_SIZE = 1000;
 
   @Bean
   public KafkaStreamsInteractiveQueryService queryService(StreamsBuilderFactoryBean factoryBean) {
@@ -44,8 +46,10 @@ public class BookingTopology {
     // retrieve GlobalKTable cache
     builder.globalTable(
         topicProperties.ticketState(),
-        Consumed.with(Serdes.String(), ticketAvroSerde),
-        Materialized.as("ticket-cache"));
+        Consumed.with(stringSerde, ticketAvroSerde),
+        Materialized.<String, TicketAvro>as(Stores.lruMap(TICKET_CACHE_STORE, MAX_CACHE_SIZE))
+            .withKeySerde(stringSerde)
+            .withValueSerde(ticketAvroSerde));
 
     // BookingRequest Stream
     KStream<String, BookingRequestAvro> bookingRequests =
@@ -56,7 +60,8 @@ public class BookingTopology {
     KStream<String, BookingCommandAvro> commands =
         bookingRequests
             .processValues(
-                BookingRequestProcessor::new, Named.as("booking-command-processor"))
+                () -> new BookingRequestProcessor(TICKET_CACHE_STORE),
+                Named.as("booking-command-processor"))
             .filter((key, value) -> value != null);
 
     // ticket service로 전송
@@ -64,7 +69,11 @@ public class BookingTopology {
         topicProperties.bookingCommand(), Produced.with(stringSerde, bookingCommandAvroSerde));
 
     // ticket service로부터 결과 받기
-    KStream<String, BookingAvro> results = builder.stream(topicProperties.bookingResult(), Consumed.with(stringSerde, bookingAvroSerde));
+    KStream<String, BookingAvro> results =
+        builder.stream(
+            topicProperties.bookingResult(), Consumed.with(stringSerde, bookingAvroSerde));
+    results.to(topicProperties.bookingCompleted(), Produced.with(stringSerde, bookingAvroSerde));
+
     results.to(topicProperties.bookingCompleted(), Produced.with(stringSerde, bookingAvroSerde));
     return results;
   }

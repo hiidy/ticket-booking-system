@@ -12,4 +12,5 @@ public record KafkaTopicProperties(
     @NotBlank(message = "ticket state topic is required") String ticketState,
     @NotBlank(message = "booking command topic is required") String bookingCommand,
     @NotBlank(message = "booking result topic is required") String bookingResult,
-    @NotBlank(message = "booking completed topic is required") String bookingCompleted) {}
+    @NotBlank(message = "booking completed topic is required") String bookingCompleted,
+    @NotBlank(message = "ticket init data topic is required") String ticketInit) {}

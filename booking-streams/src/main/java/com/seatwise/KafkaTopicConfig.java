@@ -58,4 +58,13 @@ public class KafkaTopicConfig {
         .compact()
         .build();
   }
+
+  @Bean
+  public NewTopic ticketInitTopic() {
+    return TopicBuilder.name(topicProperties.ticketInit())
+        .partitions(topicProperties.partitions())
+        .replicas(topicProperties.replicas())
+        .compact()
+        .build();
+  }
 }

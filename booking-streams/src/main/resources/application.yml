@@ -11,8 +11,6 @@ spring:
         enable.idempotence: true
         schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
         auto.register.schemas: true
-    streams:
-      state-dir:
 
 kafka:
   topic:
@@ -25,6 +23,7 @@ kafka:
     booking-completed: ${kafka.topic.prefix}.booking.completed.v1
     ticket-state: ${kafka.topic.prefix}.ticket.state.v1
     booking-result: ${kafka.topic.prefix}.booking.result.v1
+    ticket-init: ${kafka.topic.prefix}.ticket.init.v1
 
 ---
 spring:
