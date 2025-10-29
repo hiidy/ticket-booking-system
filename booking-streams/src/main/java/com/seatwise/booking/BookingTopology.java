@@ -72,7 +72,6 @@ public class BookingTopology {
     KStream<String, BookingAvro> results =
         builder.stream(
             topicProperties.bookingResult(), Consumed.with(stringSerde, bookingAvroSerde));
-    results.to(topicProperties.bookingCompleted(), Produced.with(stringSerde, bookingAvroSerde));
 
     results.to(topicProperties.bookingCompleted(), Produced.with(stringSerde, bookingAvroSerde));
     return results;
