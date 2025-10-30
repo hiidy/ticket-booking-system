@@ -1,11 +1,11 @@
-package com.seatwise.ticket;
+package com.seatwise;
 
 import com.booking.system.BookingAvro;
 import com.booking.system.BookingCommandAvro;
 import com.booking.system.TicketAvro;
 import com.booking.system.TicketCreateAvro;
 import com.booking.system.TicketPriceRange;
-import com.seatwise.KafkaTopicProperties;
+import com.booking.system.TicketStatus;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +62,7 @@ public class TicketTopology {
                           .setSeatId(seatId)
                           .setBookingId(null)
                           .setPrice(price)
-                          .setStatus("AVAILABLE")
+                          .setStatus(TicketStatus.AVAILABLE)
                           .setExpirationTime(null)
                           .build();
                   tickets.add(ticket);

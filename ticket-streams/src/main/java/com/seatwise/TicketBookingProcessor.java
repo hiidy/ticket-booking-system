@@ -1,24 +1,29 @@
-package com.seatwise.ticket;
+package com.seatwise;
 
 import com.booking.system.BookingAvro;
 import com.booking.system.BookingCommandAvro;
 import com.booking.system.BookingStatus;
 import com.booking.system.TicketAvro;
+import com.booking.system.TicketStatus;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.processor.api.Processor;
 import org.apache.kafka.streams.processor.api.ProcessorContext;
 import org.apache.kafka.streams.processor.api.Record;
 import org.apache.kafka.streams.state.KeyValueStore;
+import org.apache.kafka.streams.state.ValueAndTimestamp;
 
+@Slf4j
 @RequiredArgsConstructor
 public class TicketBookingProcessor
     implements Processor<String, BookingCommandAvro, String, BookingAvro> {
 
   private final String storeName;
-  private KeyValueStore<String, TicketAvro> ticketStore;
+  private KeyValueStore<String, ValueAndTimestamp<TicketAvro>> ticketStore;
   private ProcessorContext<String, BookingAvro> context;
 
   @Override
@@ -32,6 +37,8 @@ public class TicketBookingProcessor
     String sectionId = record.key();
     BookingCommandAvro command = record.value();
 
+    Instant now = Instant.now();
+
     BookingAvro booking =
         BookingAvro.newBuilder()
             .setBookingId(command.getBookingId())
@@ -39,14 +46,22 @@ public class TicketBookingProcessor
             .setSectionId(command.getSectionId())
             .setTicketIds(command.getTicketIds())
             .setStatus(BookingStatus.PENDING)
-            .setTimestamp(Instant.now())
+            .setTimestamp(now)
             .build();
 
     List<Long> ticketIds = command.getTicketIds();
     List<TicketAvro> validTickets = new ArrayList<>();
 
     for (Long ticketId : ticketIds) {
-      TicketAvro ticket = ticketStore.get(ticketId.toString());
+      String key = ticketId.toString();
+      ValueAndTimestamp<TicketAvro> valueAndTimestamp = ticketStore.get(ticketId.toString());
+
+      if (valueAndTimestamp == null) {
+        log.warn("Ticket NOT FOUND in store: ticketId={}, key='{}'", ticketId, key);
+        continue;
+      }
+
+      TicketAvro ticket = valueAndTimestamp.value();
 
       // 1. 티켓 존재 여부
       if (ticket == null) {
@@ -56,8 +71,8 @@ public class TicketBookingProcessor
         return;
       }
 
-      // 2. 티켓 상태 확인
-      if (!"AVAILABLE".equals(ticket.getStatus())) {
+      // 2. 티켓 예약 검증
+      if (!isTicketAvailable(ticket, now)) {
         booking.setStatus(BookingStatus.FAILED);
         booking.setErrorMessage(
             String.format(
@@ -66,16 +81,6 @@ public class TicketBookingProcessor
         return;
       }
 
-      // 3. 만료 시간 확인
-      if (ticket.getExpirationTime() != null && Instant.now().isAfter(ticket.getExpirationTime())) {
-        booking.setStatus(BookingStatus.FAILED);
-        booking.setErrorMessage(
-            String.format(
-                "Ticket expired: ticketId=%d, expirationTime=%s",
-                ticketId, ticket.getExpirationTime()));
-        context.forward(record.withKey(booking.getBookingId()).withValue(booking));
-        return;
-      }
       validTickets.add(ticket);
     }
 
@@ -89,11 +94,13 @@ public class TicketBookingProcessor
 
       TicketAvro updatedTicket =
           TicketAvro.newBuilder(ticket)
-              .setStatus("BOOKED")
-              .setBookingId(Long.parseLong(command.getBookingId()))
+              .setStatus(TicketStatus.PAYMENT_PENDING)
+              .setExpirationTime(now.plus(Duration.ofMinutes(5)))
+              .setBookingId(command.getBookingId())
               .build();
 
-      ticketStore.put(ticketId.toString(), updatedTicket);
+      ticketStore.put(
+          ticketId.toString(), ValueAndTimestamp.make(updatedTicket, now.toEpochMilli()));
       totalAmount += ticket.getPrice();
     }
 
@@ -105,5 +112,17 @@ public class TicketBookingProcessor
   @Override
   public void close() {
     Processor.super.close();
+  }
+
+  private boolean isTicketAvailable(TicketAvro ticket, Instant now) {
+    if (ticket.getStatus() == TicketStatus.AVAILABLE) {
+      return ticket.getExpirationTime() == null;
+    }
+
+    if (ticket.getStatus() == TicketStatus.PAYMENT_PENDING) {
+      return ticket.getExpirationTime() != null && ticket.getExpirationTime().isBefore(now);
+    }
+
+    return false;
   }
 }

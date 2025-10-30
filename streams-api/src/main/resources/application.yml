@@ -1,7 +1,6 @@
 spring:
   application:
-    name: booking-streams-service
-
+    name: seatwise-api-service
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092,localhost:39092,localhost:49092}
     producer:
@@ -12,43 +11,21 @@ spring:
         schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
         auto.register.schemas: true
     streams:
-      application-id: booking-streams-service
+      application-id: streams-api
       properties:
         application.server: ${HOST:localhost}:${SERVER_PORT:8080}
+
+server:
+  port: 8080
 
 kafka:
   topic:
     prefix: ${KAFKA_TOPIC_PREFIX:local}
-    partitions: ${KAFKA_TOPIC_PARTITIONS:3}
-    replicas: ${KAFKA_TOPIC_REPLICAS:1}
-
-    booking-request: ${kafka.topic.prefix}.booking.request.v1
-    booking-command: ${kafka.topic.prefix}.booking.command.v1
-    booking-completed: ${kafka.topic.prefix}.booking.completed.v1
-    ticket-state: ${kafka.topic.prefix}.ticket.state.v1
-    booking-result: ${kafka.topic.prefix}.booking.result.v1
-    ticket-init: ${kafka.topic.prefix}.ticket.init.v1
-
----
-spring:
-  config:
-    activate:
-      on-profile: local
-
-kafka:
-  topic:
     partitions: 3
-    replicas: 3
-
-
----
-spring:
-  config:
-    activate:
-      on-profile: prod
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
-kafka:
-  topic:
-    partitions: 6
-    replicas: 3
+    replicas: 1
+    booking-request: ${kafka.topic.prefix}.booking.request.v1
+    ticket-init: ${kafka.topic.prefix}.ticket.init.v1
+    ticket-state: ${kafka.topic.prefix}.ticket.state.v1
+    booking-command: ${kafka.topic.prefix}.booking.command.v1
+    booking-result: ${kafka.topic.prefix}.booking.result.v1
+    booking-completed: ${kafka.topic.prefix}.booking.completed.v1

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: booking-streams-service
+    name: ticket-streams-service
 
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092,localhost:39092,localhost:49092}
@@ -12,7 +12,7 @@ spring:
         schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
         auto.register.schemas: true
     streams:
-      application-id: booking-streams-service
+      application-id: ticket-streams-service
       properties:
         application.server: ${HOST:localhost}:${SERVER_PORT:8080}
 

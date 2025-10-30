@@ -1,8 +1,9 @@
-package com.seatwise.ticket;
+package com.seatwise;
 
 import com.booking.system.TicketCreateAvro;
 import com.booking.system.TicketPriceRange;
-import com.seatwise.KafkaTopicProperties;
+import com.seatwise.dto.TicketCreateRequest;
+import com.seatwise.dto.TicketCreateResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.seatwise.booking;
+package com.seatwise.dto;
 
 import com.booking.system.BookingAvro;
 import java.time.Instant;

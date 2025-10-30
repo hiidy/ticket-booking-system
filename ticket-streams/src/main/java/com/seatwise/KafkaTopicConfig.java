@@ -15,8 +15,8 @@ public class KafkaTopicConfig {
   private final KafkaTopicProperties topicProperties;
 
   @Bean
-  public NewTopic bookingRequestTopic() {
-    return TopicBuilder.name(topicProperties.bookingRequest())
+  public NewTopic ticketTopic() {
+    return TopicBuilder.name(topicProperties.ticketState())
         .partitions(topicProperties.partitions())
         .replicas(topicProperties.replicas())
         .compact()
@@ -24,8 +24,8 @@ public class KafkaTopicConfig {
   }
 
   @Bean
-  public NewTopic bookingCommandTopic() {
-    return TopicBuilder.name(topicProperties.bookingCommand())
+  public NewTopic bookingResultTopic() {
+    return TopicBuilder.name(topicProperties.bookingResult())
         .partitions(topicProperties.partitions())
         .replicas(topicProperties.replicas())
         .compact()
@@ -33,8 +33,8 @@ public class KafkaTopicConfig {
   }
 
   @Bean
-  public NewTopic bookingCompletedTopic() {
-    return TopicBuilder.name(topicProperties.bookingCompleted())
+  public NewTopic ticketInitTopic() {
+    return TopicBuilder.name(topicProperties.ticketInit())
         .partitions(topicProperties.partitions())
         .replicas(topicProperties.replicas())
         .compact()

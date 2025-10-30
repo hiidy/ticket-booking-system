@@ -19,7 +19,7 @@
       "name": "bookingId",
       "type": [
         "null",
-        "long"
+        "string"
       ],
       "default": null
     },
@@ -29,7 +29,17 @@
     },
     {
       "name": "status",
-      "type": "string"
+      "type": {
+        "type": "enum",
+        "name": "TicketStatus",
+        "symbols": [
+          "AVAILABLE",
+          "PAYMENT_PENDING",
+          "BOOKED",
+          "CANCELLED"
+        ],
+        "default": "AVAILABLE"
+      }
     },
     {
       "name": "expirationTime",

@@ -1,8 +1,9 @@
-package com.seatwise.booking;
+package com.seatwise;
 
 import com.booking.system.BookingAvro;
 import com.booking.system.BookingRequestAvro;
-import com.seatwise.KafkaTopicProperties;
+import com.seatwise.dto.BookingRequest;
+import com.seatwise.dto.BookingResult;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -48,10 +49,9 @@ public class BookingController {
   public ResponseEntity<BookingResult> getBookingResult(@PathVariable String requestId) {
     HostInfo hostInfo =
         interactiveQueryService.getKafkaStreamsApplicationHostInfo(
-            BookingTopology.BOOKING_RESULT_STORE, requestId, new StringSerializer());
+            "booking-result-store", requestId, new StringSerializer());
 
     HostInfo currentHost = interactiveQueryService.getCurrentKafkaStreamsApplicationHostInfo();
-
     if (currentHost.equals(hostInfo)) {
       BookingAvro bookingAvro = getLocalBooking(requestId);
       return bookingAvro != null
@@ -82,7 +82,7 @@ public class BookingController {
   private BookingAvro getLocalBooking(String requestId) {
     ReadOnlyKeyValueStore<String, BookingAvro> store =
         interactiveQueryService.retrieveQueryableStore(
-            BookingTopology.BOOKING_RESULT_STORE, QueryableStoreTypes.keyValueStore());
+            "booking-result-store", QueryableStoreTypes.keyValueStore());
     return store.get(requestId);
   }
 }

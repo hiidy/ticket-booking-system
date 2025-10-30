@@ -13,5 +13,5 @@ dependencies {
 }
 
 tasks.named('bootJar') {
-    archiveBaseName = 'booking-streams'
+    archiveBaseName = 'ticket-streams'
 }

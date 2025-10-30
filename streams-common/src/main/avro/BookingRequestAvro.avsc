@@ -8,7 +8,11 @@
       "type": "long"
     },
     {
-      "name": "ticketIds",
+      "name": "showTimeId",
+      "type": "long"
+    },
+    {
+      "name": "seatIds",
       "type": {
         "type": "array",
         "items": "long"

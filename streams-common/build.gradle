@@ -1,0 +1,40 @@
+plugins {
+    id 'java-library'
+    id 'io.spring.dependency-management'
+    id 'com.github.davidmc24.gradle.plugin.avro'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:3.3.5"
+    }
+}
+
+configurations.configureEach {
+    exclude group: 'org.slf4j', module: 'slf4j-reload4j'
+    exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+    exclude group: 'log4j', module: 'log4j'
+    exclude group: 'ch.qos.reload4j', module: 'reload4j'
+}
+
+dependencies {
+    // Avro
+    api 'org.apache.avro:avro:1.12.1'
+    api 'io.confluent:kafka-streams-avro-serde:7.6.1'
+
+    // Spring
+    api 'org.springframework.boot:spring-boot-starter'
+    api 'org.springframework.kafka:spring-kafka'
+    api 'org.apache.kafka:kafka-streams'
+
+    // Validation
+    api 'org.springframework.boot:spring-boot-starter-validation'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'build/generated-main-avro-java'
+        }
+    }
+}

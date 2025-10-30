@@ -13,3 +13,6 @@ rootProject.name = 'ticket-booking-system'
 
 include 'booking-platform'
 include 'booking-streams'
+include 'ticket-streams'
+include 'streams-common'
+include 'streams-api'

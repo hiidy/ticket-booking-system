@@ -1,4 +1,4 @@
-package com.seatwise.booking;
+package com.seatwise;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
