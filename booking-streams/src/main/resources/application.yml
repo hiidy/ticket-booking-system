@@ -11,6 +11,10 @@ spring:
         enable.idempotence: true
         schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
         auto.register.schemas: true
+    streams:
+      application-id: booking-service
+      properties:
+        application.server: ${HOST:localhost}:${SERVER_PORT:8080}
 
 kafka:
   topic:

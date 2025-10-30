@@ -9,6 +9,7 @@ import com.seatwise.KafkaTopicProperties;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -23,6 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafkaStreams;
 
+@Slf4j
 @Configuration
 @EnableKafkaStreams
 @RequiredArgsConstructor
@@ -38,7 +40,6 @@ public class TicketTopology {
 
   @Bean
   public KStream<String, BookingAvro> ticketStream(StreamsBuilder builder) {
-
     KStream<String, TicketCreateAvro> ticketCreateStream =
         builder.stream(
             topicProperties.ticketInit(), Consumed.with(stringSerde, ticketCreateAvroSerde));
@@ -91,8 +92,9 @@ public class TicketTopology {
             Named.as("ticket-booking-processor"),
             TICKET_STORE_NAME);
 
-    bookingResults.to(
-        topicProperties.bookingResult(), Produced.with(stringSerde, bookingAvroSerde));
+    bookingResults
+        .selectKey((key, booking) -> booking.getBookingId())
+        .to(topicProperties.bookingResult(), Produced.with(stringSerde, bookingAvroSerde));
 
     ticketTable
         .toStream()

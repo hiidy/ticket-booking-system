@@ -6,20 +6,23 @@ import com.booking.system.BookingRequestAvro;
 import com.booking.system.TicketAvro;
 import com.seatwise.KafkaTopicProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serde;
+import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Named;
 import org.apache.kafka.streams.kstream.Produced;
+import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.Stores;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafkaStreams;
-import org.springframework.kafka.config.StreamsBuilderFactoryBean;
-import org.springframework.kafka.streams.KafkaStreamsInteractiveQueryService;
 
+@Slf4j
 @Configuration
 @EnableKafkaStreams
 @RequiredArgsConstructor
@@ -33,16 +36,11 @@ public class BookingTopology {
   private final Serde<TicketAvro> ticketAvroSerde;
 
   public static final String TICKET_CACHE_STORE = "ticket-cache";
+  public static final String BOOKING_RESULT_STORE = "booking-result-store";
   private static final int MAX_CACHE_SIZE = 1000;
 
   @Bean
-  public KafkaStreamsInteractiveQueryService queryService(StreamsBuilderFactoryBean factoryBean) {
-    return new KafkaStreamsInteractiveQueryService(factoryBean);
-  }
-
-  @Bean
   public KStream<String, BookingAvro> bookingStream(StreamsBuilder builder) {
-
     // retrieve GlobalKTable cache
     builder.globalTable(
         topicProperties.ticketState(),
@@ -72,6 +70,13 @@ public class BookingTopology {
     KStream<String, BookingAvro> results =
         builder.stream(
             topicProperties.bookingResult(), Consumed.with(stringSerde, bookingAvroSerde));
+
+    KTable<String, BookingAvro> bookingResultTable =
+        results.toTable(
+            Named.as("booking-result-table"),
+            Materialized.<String, BookingAvro, KeyValueStore<Bytes, byte[]>>as(BOOKING_RESULT_STORE)
+                .withKeySerde(stringSerde)
+                .withValueSerde(bookingAvroSerde));
 
     results.to(topicProperties.bookingCompleted(), Produced.with(stringSerde, bookingAvroSerde));
     return results;
