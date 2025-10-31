@@ -24,13 +24,11 @@ data "confluent_schema_registry_cluster" "load_test_sr" {
   depends_on = [confluent_kafka_cluster.basic]
 }
 
-# Service Account (유지)
 resource "confluent_service_account" "app-manager" {
   display_name = "app-manager"
   description  = "Service account for load testing Kafka cluster"
 }
 
-# Role Bindings (유지)
 resource "confluent_role_binding" "app-manager-kafka-cluster-admin" {
   principal   = "User:${confluent_service_account.app-manager.id}"
   role_name   = "CloudClusterAdmin"
@@ -43,7 +41,6 @@ resource "confluent_role_binding" "app-manager-environment-admin" {
   crn_pattern = confluent_environment.load_test_env.resource_name
 }
 
-# API Keys (유지)
 resource "confluent_api_key" "kafka_key" {
   display_name = "kafka-load-test-key"
   description  = "API Key for Kafka load testing"
@@ -84,4 +81,91 @@ resource "confluent_api_key" "sr_key" {
     }
   }
   depends_on = [confluent_role_binding.app-manager-environment-admin]
+}
+
+resource "confluent_kafka_topic" "booking_request" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.basic.id
+  }
+  topic_name         = "${var.topic_prefix}.booking.request.v1"
+  partitions_count   = var.topic_partitions
+  rest_endpoint      = confluent_kafka_cluster.basic.rest_endpoint
+  credentials {
+    key    = confluent_api_key.kafka_key.id
+    secret = confluent_api_key.kafka_key.secret
+  }
+
+  depends_on = [confluent_api_key.kafka_key]
+}
+
+resource "confluent_kafka_topic" "ticket_state" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.basic.id
+  }
+  topic_name         = "${var.topic_prefix}.ticket.state.v1"
+  partitions_count   = var.topic_partitions
+  rest_endpoint      = confluent_kafka_cluster.basic.rest_endpoint
+  credentials {
+    key    = confluent_api_key.kafka_key.id
+    secret = confluent_api_key.kafka_key.secret
+  }
+
+  depends_on = [confluent_api_key.kafka_key]
+}
+
+resource "confluent_kafka_topic" "booking_command" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.basic.id
+  }
+  topic_name         = "${var.topic_prefix}.booking.command.v1"
+  partitions_count   = var.topic_partitions
+  rest_endpoint      = confluent_kafka_cluster.basic.rest_endpoint
+  credentials {
+    key    = confluent_api_key.kafka_key.id
+    secret = confluent_api_key.kafka_key.secret
+  }
+  depends_on = [confluent_api_key.kafka_key]
+}
+
+resource "confluent_kafka_topic" "booking_result" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.basic.id
+  }
+  topic_name         = "${var.topic_prefix}.booking.result.v1"
+  partitions_count   = var.topic_partitions
+  rest_endpoint      = confluent_kafka_cluster.basic.rest_endpoint
+  credentials {
+    key    = confluent_api_key.kafka_key.id
+    secret = confluent_api_key.kafka_key.secret
+  }
+  depends_on = [confluent_api_key.kafka_key]
+}
+
+resource "confluent_kafka_topic" "booking_completed" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.basic.id
+  }
+  topic_name         = "${var.topic_prefix}.booking.completed.v1"
+  partitions_count   = var.topic_partitions
+  rest_endpoint      = confluent_kafka_cluster.basic.rest_endpoint
+  credentials {
+    key    = confluent_api_key.kafka_key.id
+    secret = confluent_api_key.kafka_key.secret
+  }
+  depends_on = [confluent_api_key.kafka_key]
+}
+
+resource "confluent_kafka_topic" "ticket_init" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.basic.id
+  }
+  topic_name         = "${var.topic_prefix}.ticket.init.v1"
+  partitions_count   = var.topic_partitions
+  rest_endpoint      = confluent_kafka_cluster.basic.rest_endpoint
+  credentials {
+    key    = confluent_api_key.kafka_key.id
+    secret = confluent_api_key.kafka_key.secret
+  }
+
+  depends_on = [confluent_api_key.kafka_key]
 }

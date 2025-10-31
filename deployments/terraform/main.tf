@@ -6,7 +6,7 @@ module "confluent_cloud" {
   confluent_cloud_api_secret = var.confluent_cloud_api_secret
   gcp_project_id             = var.gcp_project_id
   gcp_region                 = var.gcp_region
-  gcp_vpc_name               = google_compute_network.load_test_vpc.name # GKE VPC 사용
+  gcp_vpc_name               = google_compute_network.load_test_vpc.name
 
   providers = {
     confluent = confluent
@@ -16,19 +16,11 @@ module "confluent_cloud" {
 module "gke_autopilot" {
   source = "./modules/gke"
 
-  gcp_project_id = var.gcp_project_id
-  gcp_region     = var.gcp_region
-  gcp_vpc_name   = google_compute_network.load_test_vpc.name
+  gcp_project_id  = var.gcp_project_id
+  gcp_region      = var.gcp_region
+  gcp_vpc_name    = google_compute_network.load_test_vpc.name
   gcp_subnet_name = google_compute_subnetwork.load_test_subnet.name
 
-  kafka_bootstrap_endpoint = module.confluent_cloud.kafka_bootstrap_endpoint
-  kafka_api_key            = module.confluent_cloud.kafka_api_key
-  kafka_api_secret         = module.confluent_cloud.kafka_api_secret
-  schema_registry_url      = module.confluent_cloud.schema_registry_endpoint_url
-  schema_registry_api_key  = module.confluent_cloud.schema_registry_api_key
-  schema_registry_secret   = module.confluent_cloud.schema_registry_api_secret
-
-  depends_on = [module.confluent_cloud]
 }
 
 resource "google_compute_network" "load_test_vpc" {

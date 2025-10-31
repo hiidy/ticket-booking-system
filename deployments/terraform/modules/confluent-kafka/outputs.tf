@@ -29,3 +29,15 @@ output "schema_registry_api_secret" {
   value       = confluent_api_key.sr_key.secret
   sensitive   = true
 }
+
+output "kafka_topics" {
+  description = "List of created Kafka topics"
+  value = {
+    booking_request  = confluent_kafka_topic.booking_request.topic_name
+    ticket_state     = confluent_kafka_topic.ticket_state.topic_name
+    booking_command  = confluent_kafka_topic.booking_command.topic_name
+    booking_result   = confluent_kafka_topic.booking_result.topic_name
+    booking_completed = confluent_kafka_topic.booking_completed.topic_name
+    ticket_init      = confluent_kafka_topic.ticket_init.topic_name
+  }
+}

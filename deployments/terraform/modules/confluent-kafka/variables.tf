@@ -24,3 +24,21 @@ variable "gcp_vpc_name" {
   description = "GCP VPC Name"
   type        = string
 }
+
+variable "topic_partitions" {
+  description = "Number of partitions for Kafka topics"
+  type        = number
+  default     = 3
+}
+
+variable "topic_replication_factor" {
+  description = "Replication factor for Kafka topics"
+  type        = number
+  default     = 3
+}
+
+variable "topic_prefix" {
+  description = "Prefix for Kafka topic names"
+  type        = string
+  default     = "local"
+}
