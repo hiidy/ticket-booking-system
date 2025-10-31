@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    implementation project(':streams-common')
+    implementation project(':streams-infra')
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
