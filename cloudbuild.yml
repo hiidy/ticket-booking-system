@@ -3,16 +3,6 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/booking-platform:latest'
-      - '-f'
-      - 'booking-platform/Dockerfile'
-      - '.'
-    id: 'build-booking-platform'
-
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'build'
-      - '-t'
       - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/streams-api:latest'
       - '-f'
       - 'streams-api/Dockerfile'
@@ -40,7 +30,6 @@ steps:
     id: 'build-ticket-streams'
 
 images:
-  - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/booking-platform:latest'
   - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/streams-api:latest'
   - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/booking-streams:latest'
   - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/ticket-streams:latest'
