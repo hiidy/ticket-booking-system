@@ -7,9 +7,7 @@ spring:
     properties:
       security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
       sasl.mechanism: ${KAFKA_SASL_MECHANISM:PLAIN}
-      sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required \
-        username="${KAFKA_API_KEY:}" \
-        password="${KAFKA_API_SECRET:}";
+      sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_API_KEY:}" password="${KAFKA_API_SECRET:}";
 
     producer:
       retries: 2147483647
@@ -20,12 +18,9 @@ spring:
         basic.auth.credentials.source: ${SCHEMA_REGISTRY_AUTH_SOURCE:USER_INFO}
         basic.auth.user.info: ${SCHEMA_REGISTRY_API_KEY:}:${SCHEMA_REGISTRY_API_SECRET:}
         auto.register.schemas: true
-
         security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
         sasl.mechanism: ${KAFKA_SASL_MECHANISM:PLAIN}
-        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required \
-          username="${KAFKA_API_KEY:}" \
-          password="${KAFKA_API_SECRET:}";
+        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_API_KEY:}" password="${KAFKA_API_SECRET:}";
 
     streams:
       application-id: streams-api
@@ -33,9 +28,7 @@ spring:
         application.server: ${HOST:localhost}:${SERVER_PORT:8080}
         security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
         sasl.mechanism: ${KAFKA_SASL_MECHANISM:PLAIN}
-        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required \
-          username="${KAFKA_API_KEY:}" \
-          password="${KAFKA_API_SECRET:}";
+        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_API_KEY:}" password="${KAFKA_API_SECRET:}";
 
 server:
   port: 8080
@@ -61,17 +54,13 @@ spring:
     properties:
       security.protocol: SASL_SSL
       sasl.mechanism: PLAIN
-      sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required \
-        username="${KAFKA_API_KEY}" \
-        password="${KAFKA_API_SECRET}";
+      sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_API_KEY}" password="${KAFKA_API_SECRET}";
 
     producer:
       properties:
         security.protocol: SASL_SSL
         sasl.mechanism: PLAIN
-        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required \
-          username="${KAFKA_API_KEY}" \
-          password="${KAFKA_API_SECRET}";
+        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_API_KEY}" password="${KAFKA_API_SECRET}";
         schema.registry.url: ${SCHEMA_REGISTRY_URL}
         basic.auth.credentials.source: USER_INFO
         basic.auth.user.info: ${SCHEMA_REGISTRY_API_KEY}:${SCHEMA_REGISTRY_API_SECRET}
@@ -80,6 +69,4 @@ spring:
       properties:
         security.protocol: SASL_SSL
         sasl.mechanism: PLAIN
-        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required \
-          username="${KAFKA_API_KEY}" \
-          password="${KAFKA_API_SECRET}";
+        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_API_KEY}" password="${KAFKA_API_SECRET}";
