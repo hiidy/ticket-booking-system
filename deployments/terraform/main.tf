@@ -46,6 +46,17 @@ resource "google_compute_subnetwork" "load_test_subnet" {
   }
 }
 
+resource "google_compute_subnetwork" "proxy_only_subnet" {
+  name          = "load-test-proxy-subnet"
+  ip_cidr_range = "10.13.0.0/24"
+  region        = var.gcp_region
+  network       = google_compute_network.load_test_vpc.id
+
+  purpose       = "REGIONAL_MANAGED_PROXY"
+  role          = "ACTIVE"
+
+}
+
 resource "google_compute_router" "router" {
   name    = "load-test-router"
   network = google_compute_network.load_test_vpc.id

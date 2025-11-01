@@ -1,0 +1,52 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: external-http
+  namespace: kafka-streams
+spec:
+  gatewayClassName: gke-l7-regional-external-managed
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: Same
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: streams-api-route
+  namespace: kafka-streams
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: external-http
+      namespace: kafka-streams
+  rules:
+    - backendRefs:
+        - kind: Service
+          name: kafka-streams-system-streams-api
+          port: 80
+---
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: streams-api-custom-health-check
+  namespace: kafka-streams
+spec:
+  default:
+    gcpHealthCheck:
+      httpHealthCheck:
+        port: 8080
+        requestPath: /actuator/health
+
+      checkIntervalSec: 5
+      timeoutSec: 5
+      healthyThreshold: 1
+      unhealthyThreshold: 3
+
+  targetRef:
+    group: ""
+    kind: Service
+    name: kafka-streams-system-streams-api

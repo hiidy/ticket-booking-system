@@ -92,22 +92,28 @@ spec:
           {{- if .Values.probes.enabled }}
           livenessProbe:
             httpGet:
-              path: {{ .Values.probes.livenessPath }}
+              path: {{ .Values.probes.liveness.httpGet.path }}
               port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 10
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
           readinessProbe:
             httpGet:
-              path: {{ .Values.probes.readinessPath }}
+              path: {{ .Values.probes.readiness.httpGet.path }}
               port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 5
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
           startupProbe:
             httpGet:
-              path: {{ .Values.probes.readinessPath }}
+              path: {{ .Values.probes.startup.httpGet.path }}
               port: 8080
-            failureThreshold: 30
-            periodSeconds: 10
-          {{- end }}
+            initialDelaySeconds: {{ .Values.probes.startup.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.startup.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.startup.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+          {{- end}}
           resources:
             {{ toYaml .Values.streamsApi.resources | nindent 12 }}

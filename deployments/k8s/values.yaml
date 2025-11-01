@@ -22,7 +22,7 @@ streamsApi:
   image:
     repository: "asia-northeast3-docker.pkg.dev/gifted-slice-475903-c6/ticket-booking/streams-api"
     tag: "latest"
-    pullPolicy: "IfNotPresent"
+    pullPolicy: "Always"
   resources:
     requests:
       cpu: "1000m"
@@ -31,14 +31,12 @@ streamsApi:
       cpu: "2000m"
       memory: "4Gi"
   env:
-    # ✅ JAVA_TOOL_OPTIONS이 더 확실함 (KAFKA_HEAP_OPTS와 함께 사용)
     - name: JAVA_TOOL_OPTIONS
       value: "-Xmx2560m -Xms1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp"
     - name: KAFKA_HEAP_OPTS
       value: "-Xmx2560m -Xms1g"
-    # ✅ Kafka Streams 메모리 제한 설정
     - name: SPRING_KAFKA_STREAMS_PROPERTIES_CACHE_MAX_BYTES_BUFFERING
-      value: "10485760"  # 10MB
+      value: "10485760"
     - name: SPRING_KAFKA_STREAMS_PROPERTIES_BUFFERED_RECORDS_PER_PARTITION
       value: "100"
     - name: SPRING_KAFKA_STREAMS_PROPERTIES_COMMIT_INTERVAL_MS
@@ -52,7 +50,7 @@ bookingStreams:
   image:
     repository: "asia-northeast3-docker.pkg.dev/gifted-slice-475903-c6/ticket-booking/booking-streams"
     tag: "latest"
-    pullPolicy: "IfNotPresent"
+    pullPolicy: "Always"
   resources:
     requests:
       cpu: "500m"
@@ -78,7 +76,7 @@ ticketStreams:
   image:
     repository: "asia-northeast3-docker.pkg.dev/gifted-slice-475903-c6/ticket-booking/ticket-streams"
     tag: "latest"
-    pullPolicy: "IfNotPresent"
+    pullPolicy: "Always"
   resources:
     requests:
       cpu: "500m"
@@ -109,7 +107,7 @@ probes:
     timeoutSeconds: 5
   liveness:
     httpGet:
-      path: /actuator/health/liveness
+      path: /actuator/health
       port: 8080
     initialDelaySeconds: 60
     periodSeconds: 10
@@ -117,7 +115,7 @@ probes:
     timeoutSeconds: 5
   readiness:
     httpGet:
-      path: /actuator/health/readiness
+      path: /actuator/health
       port: 8080
     initialDelaySeconds: 30
     periodSeconds: 10
