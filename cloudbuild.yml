@@ -1,38 +1,33 @@
 steps:
-  - name: 'gcr.io/cloud-builders/docker'
+  - name: 'gcr.io/kaniko-project/executor:latest'
     args:
-      - 'build'
-      - '-t'
-      - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/streams-api:latest'
-      - '-f'
-      - 'streams-api/Dockerfile'
-      - '.'
+      - '--dockerfile=streams-api/Dockerfile'
+      - '--context=dir://.'
+      - '--destination=asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/streams-api:latest'
+      - '--cache=true'
+      - '--cache-ttl=336h'
     id: 'build-streams-api'
+    waitFor: ['-']
 
-  - name: 'gcr.io/cloud-builders/docker'
+  - name: 'gcr.io/kaniko-project/executor:latest'
     args:
-      - 'build'
-      - '-t'
-      - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/booking-streams:latest'
-      - '-f'
-      - 'booking-streams/Dockerfile'
-      - '.'
+      - '--dockerfile=booking-streams/Dockerfile'
+      - '--context=dir://.'
+      - '--destination=asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/booking-streams:latest'
+      - '--cache=true'
+      - '--cache-ttl=336h'
     id: 'build-booking-streams'
+    waitFor: ['-']
 
-  - name: 'gcr.io/cloud-builders/docker'
+  - name: 'gcr.io/kaniko-project/executor:latest'
     args:
-      - 'build'
-      - '-t'
-      - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/ticket-streams:latest'
-      - '-f'
-      - 'ticket-streams/Dockerfile'
-      - '.'
+      - '--dockerfile=ticket-streams/Dockerfile'
+      - '--context=dir://.'
+      - '--destination=asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/ticket-streams:latest'
+      - '--cache=true'
+      - '--cache-ttl=336h'
     id: 'build-ticket-streams'
-
-images:
-  - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/streams-api:latest'
-  - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/booking-streams:latest'
-  - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/ticket-streams:latest'
+    waitFor: ['-']
 
 timeout: '1800s'
 
