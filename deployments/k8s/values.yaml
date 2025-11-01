@@ -1,0 +1,125 @@
+kafka:
+  bootstrapServers: "pkc-xxxxx.gcp.region.confluent.cloud:9092"
+  schemaRegistryUrl: "https://psrc-xxxxx.gcp.region.confluent.cloud"
+  topicPrefix: "gke"
+
+auth:
+  kafka:
+    apiKey: "your-kafka-api-key"
+    apiSecret: "your-kafka-api-secret"
+  schemaRegistry:
+    apiKey: "your-sr-api-key"
+    apiSecret: "your-sr-api-secret"
+
+# ========================================
+# Streams API
+# ========================================
+streamsApi:
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 80
+  image:
+    repository: "asia-northeast3-docker.pkg.dev/gifted-slice-475903-c6/ticket-booking/streams-api"
+    tag: "latest"
+    pullPolicy: "IfNotPresent"
+  resources:
+    requests:
+      cpu: "1000m"
+      memory: "3Gi"
+    limits:
+      cpu: "2000m"
+      memory: "4Gi"
+  env:
+    # ✅ JAVA_TOOL_OPTIONS이 더 확실함 (KAFKA_HEAP_OPTS와 함께 사용)
+    - name: JAVA_TOOL_OPTIONS
+      value: "-Xmx2560m -Xms1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp"
+    - name: KAFKA_HEAP_OPTS
+      value: "-Xmx2560m -Xms1g"
+    # ✅ Kafka Streams 메모리 제한 설정
+    - name: SPRING_KAFKA_STREAMS_PROPERTIES_CACHE_MAX_BYTES_BUFFERING
+      value: "10485760"  # 10MB
+    - name: SPRING_KAFKA_STREAMS_PROPERTIES_BUFFERED_RECORDS_PER_PARTITION
+      value: "100"
+    - name: SPRING_KAFKA_STREAMS_PROPERTIES_COMMIT_INTERVAL_MS
+      value: "5000"
+
+# ========================================
+# Booking Streams
+# ========================================
+bookingStreams:
+  replicaCount: 1
+  image:
+    repository: "asia-northeast3-docker.pkg.dev/gifted-slice-475903-c6/ticket-booking/booking-streams"
+    tag: "latest"
+    pullPolicy: "IfNotPresent"
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "2Gi"
+    limits:
+      cpu: "1000m"
+      memory: "3Gi"
+  env:
+    - name: JAVA_TOOL_OPTIONS
+      value: "-Xmx2g -Xms512m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp"
+    - name: KAFKA_HEAP_OPTS
+      value: "-Xmx2g -Xms512m"
+    - name: SPRING_KAFKA_STREAMS_PROPERTIES_CACHE_MAX_BYTES_BUFFERING
+      value: "10485760"
+    - name: SPRING_KAFKA_STREAMS_PROPERTIES_BUFFERED_RECORDS_PER_PARTITION
+      value: "100"
+
+# ========================================
+# Ticket Streams
+# ========================================
+ticketStreams:
+  replicaCount: 1
+  image:
+    repository: "asia-northeast3-docker.pkg.dev/gifted-slice-475903-c6/ticket-booking/ticket-streams"
+    tag: "latest"
+    pullPolicy: "IfNotPresent"
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "2Gi"
+    limits:
+      cpu: "1000m"
+      memory: "3Gi"
+  env:
+    - name: JAVA_TOOL_OPTIONS
+      value: "-Xmx2g -Xms512m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp"
+    - name: KAFKA_HEAP_OPTS
+      value: "-Xmx2g -Xms512m"
+    - name: SPRING_KAFKA_STREAMS_PROPERTIES_CACHE_MAX_BYTES_BUFFERING
+      value: "10485760"
+    - name: SPRING_KAFKA_STREAMS_PROPERTIES_BUFFERED_RECORDS_PER_PARTITION
+      value: "100"
+
+
+probes:
+  enabled: true
+  startup:
+    httpGet:
+      path: /actuator/health
+      port: 8080
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    failureThreshold: 30
+    timeoutSeconds: 5
+  liveness:
+    httpGet:
+      path: /actuator/health/liveness
+      port: 8080
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    failureThreshold: 3
+    timeoutSeconds: 5
+  readiness:
+    httpGet:
+      path: /actuator/health/readiness
+      port: 8080
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    failureThreshold: 3
+    timeoutSeconds: 5

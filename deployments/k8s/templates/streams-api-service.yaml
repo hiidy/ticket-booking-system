@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-streams-api
+  labels:
+    {{- include "kafka-streams-system.labels" .
+        | fromYaml
+        | merge (dict "app.kubernetes.io/component" "streams-api")
+        | toYaml
+        | nindent 4 }}
+spec:
+  type: {{ .Values.streamsApi.service.type }}
+  ports:
+    - port: {{ .Values.streamsApi.service.port }}
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    {{- include "kafka-streams-system.selectorLabels" .
+        | fromYaml
+        | merge (dict "app.kubernetes.io/component" "streams-api")
+        | toYaml
+        | nindent 4 }}

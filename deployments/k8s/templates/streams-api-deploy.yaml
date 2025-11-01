@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-streams-api
+  labels:
+    {{- include "kafka-streams-system.labels" .
+        | fromYaml
+        | merge (dict "app.kubernetes.io/component" "streams-api")
+        | toYaml
+        | nindent 4 }}
+spec:
+  replicas: {{ .Values.streamsApi.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "kafka-streams-system.selectorLabels" .
+          | fromYaml
+          | merge (dict "app.kubernetes.io/component" "streams-api")
+          | toYaml
+          | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "kafka-streams-system.selectorLabels" .
+            | fromYaml
+            | merge (dict "app.kubernetes.io/component" "streams-api")
+            | toYaml
+            | nindent 8 }}
+    spec:
+      containers:
+        - name: streams-api
+          image: "{{ .Values.streamsApi.image.repository }}:{{ .Values.streamsApi.image.tag }}"
+          imagePullPolicy: {{ .Values.streamsApi.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-kafka-config
+                  key: KAFKA_BOOTSTRAP_SERVERS
+            - name: SCHEMA_REGISTRY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-kafka-config
+                  key: SCHEMA_REGISTRY_URL
+            - name: KAFKA_TOPIC_PREFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-kafka-config
+                  key: KAFKA_TOPIC_PREFIX
+            - name: KAFKA_SECURITY_PROTOCOL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-kafka-config
+                  key: KAFKA_SECURITY_PROTOCOL
+            - name: KAFKA_SASL_MECHANISM
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Name }}-kafka-config
+                  key: KAFKA_SASL_MECHANISM
+            - name: KAFKA_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-kafka-auth
+                  key: KAFKA_API_KEY
+            - name: KAFKA_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-kafka-auth
+                  key: KAFKA_API_SECRET
+            - name: SCHEMA_REGISTRY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-kafka-auth
+                  key: SCHEMA_REGISTRY_API_KEY
+            - name: SCHEMA_REGISTRY_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-kafka-auth
+                  key: SCHEMA_REGISTRY_API_SECRET
+            - name: SERVER_PORT
+              value: "8080"
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+            - name: HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            {{- with .Values.streamsApi.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- if .Values.probes.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probes.livenessPath }}
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probes.readinessPath }}
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          startupProbe:
+            httpGet:
+              path: {{ .Values.probes.readinessPath }}
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 10
+          {{- end }}
+          resources:
+            {{ toYaml .Values.streamsApi.resources | nindent 12 }}

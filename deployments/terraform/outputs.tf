@@ -1,6 +1,7 @@
 output "kafka_bootstrap_endpoint" {
-  description = "Kafka cluster bootstrap endpoint"
-  value       = module.confluent_cloud.kafka_bootstrap_endpoint
+  description = "Kafka cluster bootstrap endpoint (without protocol)"
+  value       = replace(module.confluent_cloud.kafka_bootstrap_endpoint, "SASL_SSL://", "")
+  sensitive   = true
 }
 
 output "kafka_api_key" {
