@@ -8,8 +8,8 @@ import com.booking.system.TicketPriceRange;
 import com.booking.system.TicketStatus;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -20,11 +20,13 @@ import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Named;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.state.KeyValueStore;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafkaStreams;
+import org.springframework.kafka.annotation.KafkaStreamsDefaultConfiguration;
+import org.springframework.kafka.config.KafkaStreamsConfiguration;
 
-@Slf4j
 @Configuration
 @EnableKafkaStreams
 @RequiredArgsConstructor
@@ -36,7 +38,14 @@ public class TicketTopology {
   private final Serde<TicketAvro> ticketAvroSerde;
   private final Serde<BookingAvro> bookingAvroSerde;
   private final Serde<TicketCreateAvro> ticketCreateAvroSerde;
+  private final KafkaProperties kafkaProperties;
   private static final String TICKET_STORE_NAME = "ticket-store";
+
+  @Bean(name = KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)
+  public KafkaStreamsConfiguration kStreamsConfig() {
+    Map<String, Object> props = kafkaProperties.buildStreamsProperties(null);
+    return new KafkaStreamsConfiguration(props);
+  }
 
   @Bean
   public KStream<String, BookingAvro> ticketStream(StreamsBuilder builder) {

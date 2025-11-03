@@ -29,6 +29,9 @@ spring:
       application-id: booking-streams-service
       properties:
         application.server: ${HOST}:${SERVER_PORT}
+        schema.registry.url: ${SCHEMA_REGISTRY_URL}
+        basic.auth.credentials.source: USER_INFO
+        basic.auth.user.info: ${SCHEMA_REGISTRY_API_KEY}:${SCHEMA_REGISTRY_API_SECRET}
 
 
 kafka:

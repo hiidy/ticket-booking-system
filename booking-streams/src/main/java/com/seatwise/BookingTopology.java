@@ -1,8 +1,8 @@
 package com.seatwise;
 
 import com.booking.system.BookingAvro;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -13,9 +13,12 @@ import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Named;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.state.KeyValueStore;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafkaStreams;
+import org.springframework.kafka.annotation.KafkaStreamsDefaultConfiguration;
+import org.springframework.kafka.config.KafkaStreamsConfiguration;
 
 @Configuration
 @EnableKafkaStreams
@@ -25,8 +28,15 @@ public class BookingTopology {
   private final KafkaTopicProperties topicProperties;
   private final Serde<String> stringSerde;
   private final Serde<BookingAvro> bookingAvroSerde;
+  private final KafkaProperties kafkaProperties;
 
   public static final String BOOKING_RESULT_STORE = "booking-result-store";
+
+  @Bean(name = KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)
+  public KafkaStreamsConfiguration kStreamsConfig() {
+    Map<String, Object> props = kafkaProperties.buildStreamsProperties(null);
+    return new KafkaStreamsConfiguration(props);
+  }
 
   @Bean
   public KStream<String, BookingAvro> bookingStream(StreamsBuilder builder) {

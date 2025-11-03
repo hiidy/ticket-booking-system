@@ -6,7 +6,6 @@ import com.booking.system.BookingRequestAvro;
 import com.booking.system.TicketAvro;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Consumed;
@@ -22,7 +21,6 @@ import org.springframework.kafka.annotation.EnableKafkaStreams;
 import org.springframework.kafka.annotation.KafkaStreamsDefaultConfiguration;
 import org.springframework.kafka.config.KafkaStreamsConfiguration;
 
-@Slf4j
 @Configuration
 @EnableKafkaStreams
 @RequiredArgsConstructor
