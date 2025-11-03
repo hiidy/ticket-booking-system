@@ -21,6 +21,9 @@ spring:
       properties:
         enable.idempotence: true
         auto.register.schemas: true
+        schema.registry.url: ${SCHEMA_REGISTRY_URL}
+        basic.auth.credentials.source: USER_INFO
+        basic.auth.user.info: ${SCHEMA_REGISTRY_API_KEY}:${SCHEMA_REGISTRY_API_SECRET}
 
     streams:
       application-id: ticket-streams-service
