@@ -16,33 +16,27 @@ spring:
       properties:
         enable.idempotence: true
         schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
-        basic.auth.credentials.source: ${SCHEMA_REGISTRY_AUTH_SOURCE:USER_INFO}
+        basic.auth.credentials.source: USER_INFO
         basic.auth.user.info: ${SCHEMA_REGISTRY_API_KEY:}:${SCHEMA_REGISTRY_API_SECRET:}
         auto.register.schemas: true
-        security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
-        sasl.mechanism: ${KAFKA_SASL_MECHANISM:PLAIN}
-        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_API_KEY:}" password="${KAFKA_API_SECRET:}";
 
     streams:
       application-id: booking-streams-service
       properties:
         application.server: ${HOST:localhost}:${SERVER_PORT:8080}
-        security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
-        sasl.mechanism: ${KAFKA_SASL_MECHANISM:PLAIN}
-        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_API_KEY:}" password="${KAFKA_API_SECRET:}";
 
 kafka:
   topic:
     prefix: ${KAFKA_TOPIC_PREFIX:local}
     partitions: ${KAFKA_TOPIC_PARTITIONS:3}
     replicas: ${KAFKA_TOPIC_REPLICAS:1}
-
     booking-request: ${kafka.topic.prefix}.booking.request.v1
     booking-command: ${kafka.topic.prefix}.booking.command.v1
     booking-completed: ${kafka.topic.prefix}.booking.completed.v1
     ticket-state: ${kafka.topic.prefix}.ticket.state.v1
     booking-result: ${kafka.topic.prefix}.booking.result.v1
     ticket-init: ${kafka.topic.prefix}.ticket.init.v1
+
 management:
   endpoints:
     web:
@@ -73,26 +67,12 @@ spring:
       on-profile: prod
 
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     properties:
       security.protocol: SASL_SSL
-      sasl.mechanism: PLAIN
-      sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_API_KEY}" password="${KAFKA_API_SECRET}";
 
     producer:
       properties:
-        security.protocol: SASL_SSL
-        sasl.mechanism: PLAIN
-        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_API_KEY}" password="${KAFKA_API_SECRET}";
         schema.registry.url: ${SCHEMA_REGISTRY_URL}
-        basic.auth.credentials.source: USER_INFO
-        basic.auth.user.info: ${SCHEMA_REGISTRY_API_KEY}:${SCHEMA_REGISTRY_API_SECRET}
-
-    streams:
-      properties:
-        security.protocol: SASL_SSL
-        sasl.mechanism: PLAIN
-        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_API_KEY}" password="${KAFKA_API_SECRET}";
 
 kafka:
   topic:
