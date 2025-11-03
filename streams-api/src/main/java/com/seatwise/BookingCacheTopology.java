@@ -19,6 +19,7 @@ import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafkaStreams;
+import org.springframework.kafka.annotation.KafkaStreamsDefaultConfiguration;
 import org.springframework.kafka.config.KafkaStreamsConfiguration;
 
 @Slf4j
@@ -39,7 +40,7 @@ public class BookingCacheTopology {
   public static final String BOOKING_RESULT_STORE = "booking-result-store";
   private static final int MAX_CACHE_SIZE = 1000;
 
-  @Bean(name = "default-streams-config")
+  @Bean(name = KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)
   public KafkaStreamsConfiguration kStreamsConfig() {
     Map<String, Object> props = kafkaProperties.buildStreamsProperties(null);
     return new KafkaStreamsConfiguration(props);
