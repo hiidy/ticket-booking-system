@@ -2,39 +2,38 @@ spring:
   application:
     name: seatwise-api-service
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092,localhost:39092,localhost:49092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
 
     properties:
-      security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
-      sasl.mechanism: ${KAFKA_SASL_MECHANISM:PLAIN}
-      sasl.jaas.config: ${SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG:org.apache.kafka.common.security.plain.PlainLoginModule required username='' password='';}
+      security.protocol: SASL_SSL
+      sasl.mechanism: PLAIN
+      sasl.jaas.config: ${SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG}
+      session.timeout.ms: 45000
+      client.id: ${CLIENT_ID:streams-api-client}
+      basic.auth.credentials.source: USER_INFO
+      basic.auth.user.info: ${SCHEMA_REGISTRY_API_KEY}:${SCHEMA_REGISTRY_API_SECRET}
+      schema.registry.url: ${SCHEMA_REGISTRY_URL}
 
     producer:
       retries: 2147483647
       acks: all
       properties:
         enable.idempotence: true
-        security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
-        sasl.mechanism: ${KAFKA_SASL_MECHANISM:PLAIN}
-        sasl.jaas.config: ${SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG:org.apache.kafka.common.security.plain.PlainLoginModule required username='' password='';}
-        schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
-        schema.registry.basic.auth.credentials.source: USER_INFO
-        schema.registry.basic.auth.user.info: ${SCHEMA_REGISTRY_API_KEY:}:${SCHEMA_REGISTRY_API_SECRET:}
         auto.register.schemas: true
 
     streams:
       application-id: streams-api
       properties:
-        application.server: ${HOST:localhost}:${SERVER_PORT:8080}
+        application.server: ${HOST}:${SERVER_PORT}
 
 server:
   port: 8080
 
 kafka:
   topic:
-    prefix: ${KAFKA_TOPIC_PREFIX:local}
+    prefix: ${KAFKA_TOPIC_PREFIX}
     partitions: 3
-    replicas: 1
+    replicas: 3
     booking-request: ${kafka.topic.prefix}.booking.request.v1
     ticket-init: ${kafka.topic.prefix}.ticket.init.v1
     ticket-state: ${kafka.topic.prefix}.ticket.state.v1
@@ -53,15 +52,3 @@ management:
       show-details: always
     info:
       enabled: true
-
----
-spring:
-  config:
-    activate:
-      on-profile: prod
-  kafka:
-    properties:
-      security.protocol: SASL_SSL
-    producer:
-      properties:
-        schema.registry.url: ${SCHEMA_REGISTRY_URL}

@@ -3,36 +3,35 @@ spring:
     name: ticket-streams-service
 
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092,localhost:39092,localhost:49092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
 
     properties:
-      security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
-      sasl.mechanism: ${KAFKA_SASL_MECHANISM:PLAIN}
-      sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_API_KEY:}" password="${KAFKA_API_SECRET:}";
+      security.protocol: SASL_SSL
+      sasl.mechanism: PLAIN
+      sasl.jaas.config: ${SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG}
+      session.timeout.ms: 45000
+      client.id: ${CLIENT_ID:ticket-streams-client}
+      basic.auth.credentials.source: USER_INFO
+      basic.auth.user.info: ${SCHEMA_REGISTRY_API_KEY}:${SCHEMA_REGISTRY_API_SECRET}
+      schema.registry.url: ${SCHEMA_REGISTRY_URL}
 
     producer:
       retries: 2147483647
       acks: all
       properties:
         enable.idempotence: true
-        schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
-        basic.auth.credentials.source: USER_INFO
-        basic.auth.user.info: ${SCHEMA_REGISTRY_API_KEY:}:${SCHEMA_REGISTRY_API_SECRET:}
         auto.register.schemas: true
 
     streams:
       application-id: ticket-streams-service
       properties:
-        application.server: ${HOST:localhost}:${SERVER_PORT:8080}
-        schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
-        basic.auth.credentials.source: USER_INFO
-        basic.auth.user.info: ${SCHEMA_REGISTRY_API_KEY:}:${SCHEMA_REGISTRY_API_SECRET:}
+        application.server: ${HOST}:${SERVER_PORT}
 
 kafka:
   topic:
-    prefix: ${KAFKA_TOPIC_PREFIX:local}
-    partitions: ${KAFKA_TOPIC_PARTITIONS:3}
-    replicas: ${KAFKA_TOPIC_REPLICAS:1}
+    prefix: ${KAFKA_TOPIC_PREFIX}
+    partitions: 3
+    replicas: 3
     booking-request: ${kafka.topic.prefix}.booking.request.v1
     booking-command: ${kafka.topic.prefix}.booking.command.v1
     booking-completed: ${kafka.topic.prefix}.booking.completed.v1
@@ -51,28 +50,3 @@ management:
       show-details: always
     info:
       enabled: true
-
----
-spring:
-  config:
-    activate:
-      on-profile: local
-
-kafka:
-  topic:
-    replicas: 3
-
----
-spring:
-  config:
-    activate:
-      on-profile: prod
-
-  kafka:
-    properties:
-      security.protocol: SASL_SSL
-
-kafka:
-  topic:
-    partitions: 6
-    replicas: 3
