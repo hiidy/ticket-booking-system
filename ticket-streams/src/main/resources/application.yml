@@ -36,8 +36,6 @@ spring:
 kafka:
   topic:
     prefix: ${KAFKA_TOPIC_PREFIX}
-    partitions: 3
-    replicas: 3
     booking-request: ${kafka.topic.prefix}.booking.request.v1
     booking-command: ${kafka.topic.prefix}.booking.command.v1
     booking-completed: ${kafka.topic.prefix}.booking.completed.v1
