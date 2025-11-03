@@ -17,8 +17,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SerdeConfig {
 
-  @Value("${spring.kafka.producer.properties.schema.registry.url}")
+  @Value("${spring.kafka.properties.schema.registry.url}")
   private String schemaRegistryUrl;
+
+  @Value("${spring.kafka.properties.basic.auth.user.info}")
+  private String basicAuthUserInfo;
 
   @Bean
   public Serde<String> stringSerde() {
@@ -52,7 +55,11 @@ public class SerdeConfig {
 
   private <T extends SpecificRecord> Serde<T> avroSerde() {
     SpecificAvroSerde<T> serde = new SpecificAvroSerde<>();
-    serde.configure(Map.of("schema.registry.url", schemaRegistryUrl), false);
+    serde.configure(Map.of(
+        "schema.registry.url", schemaRegistryUrl,
+        "basic.auth.credentials.source", "USER_INFO",
+        "basic.auth.user.info", basicAuthUserInfo
+    ), false);
     return serde;
   }
 }
