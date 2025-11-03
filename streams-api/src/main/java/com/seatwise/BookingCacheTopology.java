@@ -4,6 +4,7 @@ import com.booking.system.BookingAvro;
 import com.booking.system.BookingCommandAvro;
 import com.booking.system.BookingRequestAvro;
 import com.booking.system.TicketAvro;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serde;
@@ -14,9 +15,11 @@ import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Named;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.state.Stores;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafkaStreams;
+import org.springframework.kafka.config.KafkaStreamsConfiguration;
 
 @Slf4j
 @Configuration
@@ -30,10 +33,17 @@ public class BookingCacheTopology {
   private final Serde<BookingCommandAvro> bookingCommandAvroSerde;
   private final Serde<BookingAvro> bookingAvroSerde;
   private final Serde<TicketAvro> ticketAvroSerde;
+  private final KafkaProperties kafkaProperties;
 
   public static final String TICKET_CACHE_STORE = "ticket-cache";
   public static final String BOOKING_RESULT_STORE = "booking-result-store";
   private static final int MAX_CACHE_SIZE = 1000;
+
+  @Bean(name = "default-streams-config")
+  public KafkaStreamsConfiguration kStreamsConfig() {
+    Map<String, Object> props = kafkaProperties.buildStreamsProperties(null);
+    return new KafkaStreamsConfiguration(props);
+  }
 
   @Bean
   public KStream<String, BookingCommandAvro> cacheStream(StreamsBuilder builder) {
