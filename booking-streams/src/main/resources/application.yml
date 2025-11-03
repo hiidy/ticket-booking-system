@@ -24,6 +24,9 @@ spring:
       application-id: booking-streams-service
       properties:
         application.server: ${HOST:localhost}:${SERVER_PORT:8080}
+        schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
+        basic.auth.credentials.source: USER_INFO
+        basic.auth.user.info: ${SCHEMA_REGISTRY_API_KEY:}:${SCHEMA_REGISTRY_API_SECRET:}
 
 kafka:
   topic:
@@ -57,7 +60,6 @@ spring:
 
 kafka:
   topic:
-    partitions: 3
     replicas: 3
 
 ---
@@ -69,10 +71,6 @@ spring:
   kafka:
     properties:
       security.protocol: SASL_SSL
-
-    producer:
-      properties:
-        schema.registry.url: ${SCHEMA_REGISTRY_URL}
 
 kafka:
   topic:
