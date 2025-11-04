@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-kafka-config
   labels:
-    {{- include "kafka-streams-system.labels" . | fromYaml | toYaml | nindent 4 }}
+    {{- include "kafka-streams-system.labels" . | nindent 4 }}
 data:
   KAFKA_BOOTSTRAP_SERVERS: {{ .Values.kafka.bootstrapServers | quote }}
   SCHEMA_REGISTRY_URL: {{ .Values.kafka.schemaRegistryUrl | quote }}

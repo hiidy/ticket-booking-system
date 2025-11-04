@@ -36,16 +36,15 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   default:
-    gcpHealthCheck:
+    checkIntervalSec: 5
+    timeoutSec: 5
+    healthyThreshold: 1
+    unhealthyThreshold: 3
+    config:
+      type: HTTP
       httpHealthCheck:
         port: 8080
         requestPath: /actuator/health
-
-      checkIntervalSec: 5
-      timeoutSec: 5
-      healthyThreshold: 1
-      unhealthyThreshold: 3
-
   targetRef:
     group: ""
     kind: Service

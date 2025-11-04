@@ -169,3 +169,14 @@ resource "confluent_kafka_topic" "ticket_init" {
 
   depends_on = [confluent_api_key.kafka_key]
 }
+
+resource "confluent_role_binding" "app-manager-schema-registry" {
+  principal   = "User:${confluent_service_account.app-manager.id}"
+  role_name   = "ResourceOwner"
+  crn_pattern = "${data.confluent_schema_registry_cluster.load_test_sr.resource_name}/subject=*"
+
+  depends_on = [
+    confluent_role_binding.app-manager-environment-admin,
+    data.confluent_schema_registry_cluster.load_test_sr
+  ]
+}

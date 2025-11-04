@@ -1,32 +1,12 @@
-{{/*
-Define common labels
-*/}}
 {{- define "kafka-streams-system.labels" -}}
-helm.sh/chart: {{ include "kafka-streams-system.chart" . }}
-{{ include "kafka-streams-system.selectorLabels" . }}
+app.kubernetes.io/name: {{ .Chart.Name }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
-{{/*
-Selector labels
-*/}}
 {{- define "kafka-streams-system.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "kafka-streams-system.name" . }}
+app.kubernetes.io/name: {{ .Chart.Name }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end -}}
-
-{{/*
-Create chart name
-*/}}
-{{- define "kafka-streams-system.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
-{{/*
-Create a default name
-*/}}
-{{- define "kafka-streams-system.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "kafka-streams-system.kafkaEnv" -}}
@@ -45,16 +25,6 @@ Create a default name
     configMapKeyRef:
       name: {{ .Release.Name }}-kafka-config
       key: KAFKA_TOPIC_PREFIX
-- name: KAFKA_SECURITY_PROTOCOL
-  valueFrom:
-    configMapKeyRef:
-      name: {{ .Release.Name }}-kafka-config
-      key: KAFKA_SECURITY_PROTOCOL
-- name: KAFKA_SASL_MECHANISM
-  valueFrom:
-    configMapKeyRef:
-      name: {{ .Release.Name }}-kafka-config
-      key: KAFKA_SASL_MECHANISM
 - name: KAFKA_API_KEY
   valueFrom:
     secretKeyRef:
@@ -75,6 +45,18 @@ Create a default name
     secretKeyRef:
       name: {{ .Release.Name }}-kafka-auth
       key: SCHEMA_REGISTRY_API_SECRET
-- name: SPRING_PROFILES_ACTIVE
-  value: "prod"
+- name: SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG
+  value: "org.apache.kafka.common.security.plain.PlainLoginModule required username='$(KAFKA_API_KEY)' password='$(KAFKA_API_SECRET)';"
+- name: SPRING_KAFKA_PROPERTIES_BASIC_AUTH_CREDENTIALS_SOURCE
+  value: "USER_INFO"
+- name: SPRING_KAFKA_PROPERTIES_BASIC_AUTH_USER_INFO
+  value: "$(SCHEMA_REGISTRY_API_KEY):$(SCHEMA_REGISTRY_API_SECRET)"
+- name: CLIENT_ID
+  value: "{{ .Release.Name }}-{{ .Chart.Name }}-client"
+- name: HOST
+  valueFrom:
+    fieldRef:
+      fieldPath: status.podIP
+- name: SERVER_PORT
+  value: "8080"
 {{- end -}}

@@ -40,5 +40,5 @@ variable "topic_replication_factor" {
 variable "topic_prefix" {
   description = "Prefix for Kafka topic names"
   type        = string
-  default     = "local"
+  default     = "prod"
 }
