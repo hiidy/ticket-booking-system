@@ -24,31 +24,20 @@ public class SyncBookingService {
   private static final long LOCK_LEASE_TIME = 300;
   private static final TimeUnit LOCK_TIME_UNIT = TimeUnit.SECONDS;
 
-  public Long createBookingSync(UUID requestId, Long memberId, List<Long> ticketIds) {
+  public Long createBookingWithDbLock(UUID requestId, Long memberId, List<Long> ticketIds) {
     if (cacheService.hasUnavailableTickets(ticketIds, memberId)) {
       throw new RecoverableBookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
     }
     return bookingService.createBookingWithLock(requestId, memberId, ticketIds);
   }
 
-  public Long createBookingSyncWithLock(UUID requestId, Long memberId, List<Long> ticketIds) {
-    if (cacheService.hasUnavailableTickets(ticketIds, memberId)) {
-      throw new RecoverableBookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
-    }
-    return createBookingWithRedisLock(requestId, memberId, ticketIds);
-  }
+  public Long createWithRedisLock(UUID requestId, Long memberId, List<Long> ticketIds) {
+    validateTicketAvailability(ticketIds, memberId, requestId);
 
-  public Long createBookingWithRedisLock(UUID requestId, Long memberId, List<Long> ticketIds) {
-    RLock multiLock =
-        redissonClient.getMultiLock(
-            ticketIds.stream()
-                .sorted()
-                .map(id -> redissonClient.getLock("lock:seat:" + id))
-                .toArray(RLock[]::new));
+    RLock multiLock = acquireMultiLock(ticketIds);
 
     try {
-      boolean acquired = multiLock.tryLock(LOCK_WAIT_TIME, LOCK_LEASE_TIME, LOCK_TIME_UNIT);
-      if (!acquired) {
+      if (!multiLock.tryLock(LOCK_WAIT_TIME, LOCK_LEASE_TIME, LOCK_TIME_UNIT)) {
         throw new RecoverableBookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
       }
 
@@ -56,19 +45,32 @@ public class SyncBookingService {
 
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
-      log.error("락 도중에 인터럽트 발생 : requestId={}", requestId);
+      log.error("락 획득 중 인터럽트 발생: requestId={}", requestId);
       throw new RecoverableBookingException(ErrorCode.LOCK_ACQUISITION_TIMEOUT, requestId);
-
     } finally {
       safeUnlock(multiLock);
     }
+  }
+
+  private void validateTicketAvailability(List<Long> ticketIds, Long memberId, UUID requestId) {
+    if (cacheService.hasUnavailableTickets(ticketIds, memberId)) {
+      throw new RecoverableBookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
+    }
+  }
+
+  private RLock acquireMultiLock(List<Long> ticketIds) {
+    return redissonClient.getMultiLock(
+        ticketIds.stream()
+            .sorted()
+            .map(id -> redissonClient.getLock("lock:seat:" + id))
+            .toArray(RLock[]::new));
   }
 
   private void safeUnlock(RLock lock) {
     try {
       lock.unlock();
     } catch (Exception e) {
-      log.error("락 도중 예외 발생", e);
+      log.error("락 해제 중 예외 발생", e);
     }
   }
 }

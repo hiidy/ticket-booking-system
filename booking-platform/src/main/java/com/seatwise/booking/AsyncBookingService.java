@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class BookingRequestService {
+public class AsyncBookingService {
 
   private final BookingMessageProducer producer;
   private final TicketCacheService cacheService;

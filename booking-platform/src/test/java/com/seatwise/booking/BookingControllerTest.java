@@ -28,7 +28,8 @@ class BookingControllerTest {
 
   @MockBean private BookingMessageProducer bookingMessageProducer;
   @MockBean private BookingService bookingService;
-  @MockBean private BookingRequestService requestService;
+  @MockBean private AsyncBookingService asyncBookingService;
+  @MockBean private SyncBookingService syncBookingService;
 
   @Test
   void shouldReturnAccepted_whenCreateBookingWithValidIdempotencyKey() throws Exception {
@@ -36,7 +37,7 @@ class BookingControllerTest {
     BookingRequest bookingRequest = new BookingRequest(1L, List.of(1001L), 200L);
     UUID generatedRequestId = UUID.randomUUID();
 
-    given(requestService.createBookingRequest(
+    given(asyncBookingService.createBookingRequest(
         any(UUID.class), any(BookingCreateCommand.class)))
         .willReturn(generatedRequestId);
 

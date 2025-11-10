@@ -28,7 +28,8 @@ public class BookingController {
 
   private final BookingMessageProducer producer;
   private final BookingService bookingService;
-  private final BookingRequestService bookingRequestService;
+  private final AsyncBookingService asyncBookingService;
+  private final SyncBookingService syncBookingService;
 
   @PostMapping
   public ResponseEntity<BookingResponse> createBookingRequest(
@@ -37,7 +38,7 @@ public class BookingController {
     BookingCreateCommand command =
         BookingCreateCommand.of(request.memberId(), request.ticketIds(), request.sectionId());
 
-    UUID requestId = bookingRequestService.createBookingRequest(idempotencyKey, command);
+    UUID requestId = asyncBookingService.createBookingRequest(idempotencyKey, command);
     String pollingUrl =
         ServletUriComponentsBuilder.fromCurrentRequestUri()
             .pathSegment(requestId.toString(), "status")
@@ -46,6 +47,22 @@ public class BookingController {
 
     BookingResponse response = new BookingResponse(pollingUrl, requestId.toString());
     return ResponseEntity.accepted().body(response);
+  }
+
+  @PostMapping("/sync/db-lock")
+  public ResponseEntity<BookingStatusResponse> createBookingWithDbLock(
+      @RequestHeader("Idempotency-Key") UUID key, @Valid @RequestBody BookingRequest request) {
+    Long bookingId =
+        syncBookingService.createBookingWithDbLock(key, request.memberId(), request.ticketIds());
+    return ResponseEntity.ok(BookingStatusResponse.success(bookingId, key));
+  }
+
+  @PostMapping("/sync/redis-lock")
+  public ResponseEntity<BookingStatusResponse> createBookingWithRedisLock(
+      @RequestHeader("Idempotency-Key") UUID key, @Valid @RequestBody BookingRequest request) {
+    Long bookingId =
+        syncBookingService.createWithRedisLock(key, request.memberId(), request.ticketIds());
+    return ResponseEntity.ok(BookingStatusResponse.success(bookingId, key));
   }
 
   @GetMapping("/{requestId}/status")
