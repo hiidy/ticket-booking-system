@@ -1,6 +1,7 @@
 package com.seatwise.ticket;
 
 import com.seatwise.booking.dto.BookingCreatedEvent;
+import com.seatwise.cache.TicketCacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;

@@ -2,6 +2,21 @@ spring:
   profiles:
     active: local
 
+cache:
+  local:
+    enabled: true
+    max-size: 10000
+    expire-after-write: 10m
+    record-stats: true
+  redis:
+    enabled: true
+    ticket-hold-ttl: 10m
+  multi-level:
+    enabled: true
+    invalidation-channel: cache:invalidation
+    read-through: true
+    write-through: true
+
 ---
 spring:
   config:
