@@ -29,8 +29,9 @@ class TicketRepositoryTest {
             null, null, LocalDate.of(2025, 1, 1), LocalTime.of(14, 0), LocalTime.of(15, 0));
     showTimeRepository.save(showTime);
 
-    Seat seat1 = new Seat(1, SeatGrade.VIP, null);
-    Seat seat2 = new Seat(2, SeatGrade.VIP, null);
+    Seat seat1 = Seat.builder().seatNumber(1).grade(SeatGrade.VIP).build();
+    Seat seat2 = Seat.builder().seatNumber(2).grade(SeatGrade.VIP).build();
+
     seatRepository.saveAll(List.of(seat1, seat2));
 
     Ticket ticket1 = Ticket.createAvailable(showTime, seat1, 40000);
@@ -54,9 +55,9 @@ class TicketRepositoryTest {
             null, null, LocalDate.of(2025, 1, 1), LocalTime.of(14, 0), LocalTime.of(15, 0));
     showTimeRepository.save(showTime);
 
-    Seat seat1 = new Seat(1, SeatGrade.VIP, null);
-    Seat seat2 = new Seat(2, SeatGrade.VIP, null);
-    Seat seat3 = new Seat(3, SeatGrade.VIP, null);
+    Seat seat1 = Seat.builder().seatNumber(1).grade(SeatGrade.VIP).build();
+    Seat seat2 = Seat.builder().seatNumber(2).grade(SeatGrade.VIP).build();
+    Seat seat3 = Seat.builder().seatNumber(3).grade(SeatGrade.VIP).build();
     seatRepository.saveAll(List.of(seat1, seat2, seat3));
 
     Ticket ticket1 = Ticket.createAvailable(showTime, seat1, 40000);

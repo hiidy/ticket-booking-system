@@ -4,12 +4,14 @@ USE booking_system;
 
 CREATE TABLE seat
 (
-    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
-    seat_number INT         NOT NULL,
-    grade       VARCHAR(50) NOT NULL,
-    venue_id    BIGINT      NOT NULL,
-    created_at  TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at  TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    seat_number   INT         NOT NULL,
+    section_id    VARCHAR(20) NOT NULL,
+    section_group VARCHAR(10) NOT NULL,
+    grade         VARCHAR(50) NOT NULL,
+    venue_id      BIGINT      NOT NULL,
+    created_at    TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE member

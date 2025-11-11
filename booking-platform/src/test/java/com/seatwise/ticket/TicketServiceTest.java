@@ -115,9 +115,9 @@ class TicketServiceTest {
             .withTime(startTime, startTime.plusHours(2))
             .build();
 
-    Seat vip1 = new Seat(1, SeatGrade.VIP, venue);
-    Seat vip2 = new Seat(2, SeatGrade.VIP, venue);
-    Seat rSeat = new Seat(3, SeatGrade.R, venue);
+    Seat vip1 = Seat.builder().seatNumber(1).venue(venue).grade(SeatGrade.VIP).build();
+    Seat vip2 = Seat.builder().seatNumber(2).venue(venue).grade(SeatGrade.VIP).build();
+    Seat rSeat = Seat.builder().seatNumber(3).venue(venue).grade(SeatGrade.R).build();
     seatRepository.saveAll(List.of(vip1, vip2, rSeat));
 
     ticketRepository.saveAll(

@@ -27,6 +27,10 @@ public class Seat extends BaseEntity {
 
   private int seatNumber;
 
+  private String sectionId;
+
+  private String sectionGroup;
+
   @Enumerated(EnumType.STRING)
   private SeatGrade grade;
 
@@ -34,8 +38,10 @@ public class Seat extends BaseEntity {
   private Venue venue;
 
   @Builder
-  public Seat(int seatNumber, SeatGrade grade, Venue venue) {
+  public Seat(int seatNumber, String sectionId, String sectionGroup, SeatGrade grade, Venue venue) {
     this.seatNumber = seatNumber;
+    this.sectionId = sectionId;
+    this.sectionGroup = sectionGroup;
     this.grade = grade;
     this.venue = venue;
   }
