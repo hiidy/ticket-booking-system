@@ -1,33 +1,45 @@
 steps:
+  # Booking Platform 빌드
   - name: 'gcr.io/kaniko-project/executor:latest'
     args:
-      - '--dockerfile=streams-api/Dockerfile'
+      - '--dockerfile=booking-platform/Dockerfile'
       - '--context=dir://.'
-      - '--destination=asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/streams-api:latest'
+      - '--destination=asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/booking-platform:latest'
       - '--cache=true'
       - '--cache-ttl=336h'
-    id: 'build-streams-api'
+    id: 'build-booking-platform'
     waitFor: ['-']
 
-  - name: 'gcr.io/kaniko-project/executor:latest'
-    args:
-      - '--dockerfile=booking-streams/Dockerfile'
-      - '--context=dir://.'
-      - '--destination=asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/booking-streams:latest'
-      - '--cache=true'
-      - '--cache-ttl=336h'
-    id: 'build-booking-streams'
-    waitFor: ['-']
+  # Streams 모듈들 (현재는 주석 처리)
+  # - name: 'gcr.io/kaniko-project/executor:latest'
+  #   args:
+  #     - '--dockerfile=streams-api/Dockerfile'
+  #     - '--context=dir://.'
+  #     - '--destination=asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/streams-api:latest'
+  #     - '--cache=true'
+  #     - '--cache-ttl=336h'
+  #   id: 'build-streams-api'
+  #   waitFor: ['-']
 
-  - name: 'gcr.io/kaniko-project/executor:latest'
-    args:
-      - '--dockerfile=ticket-streams/Dockerfile'
-      - '--context=dir://.'
-      - '--destination=asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/ticket-streams:latest'
-      - '--cache=true'
-      - '--cache-ttl=336h'
-    id: 'build-ticket-streams'
-    waitFor: ['-']
+  # - name: 'gcr.io/kaniko-project/executor:latest'
+  #   args:
+  #     - '--dockerfile=booking-streams/Dockerfile'
+  #     - '--context=dir://.'
+  #     - '--destination=asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/booking-streams:latest'
+  #     - '--cache=true'
+  #     - '--cache-ttl=336h'
+  #   id: 'build-booking-streams'
+  #   waitFor: ['-']
+
+  # - name: 'gcr.io/kaniko-project/executor:latest'
+  #   args:
+  #     - '--dockerfile=ticket-streams/Dockerfile'
+  #     - '--context=dir://.'
+  #     - '--destination=asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/ticket-streams:latest'
+  #     - '--cache=true'
+  #     - '--cache-ttl=336h'
+  #   id: 'build-ticket-streams'
+  #   waitFor: ['-']
 
 timeout: '1800s'
 
