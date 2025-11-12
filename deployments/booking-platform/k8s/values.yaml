@@ -1,4 +1,23 @@
-# MySQL 설정
+nginx:
+  enabled: true
+
+ingress-nginx:
+  controller:
+    service:
+      type: LoadBalancer
+      annotations:
+        cloud.google.com/load-balancer-type: "External"
+    metrics:
+      enabled: true
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+# MySQL
 mysql:
   enabled: true
   image:
