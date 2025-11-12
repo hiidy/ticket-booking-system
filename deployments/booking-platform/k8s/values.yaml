@@ -1,0 +1,101 @@
+# MySQL 설정
+mysql:
+  enabled: true
+  image:
+    repository: mysql
+    tag: "8.0"
+  storage:
+    size: 10Gi
+    storageClass: standard-rwo
+  rootPassword: "root"
+  database: "booking_system"
+  username: "booking_user"
+  password: "booking_pass"
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "1000m"
+      memory: "2Gi"
+
+# Redis 설정
+redis:
+  enabled: true
+  image:
+    repository: redis
+    tag: "7-alpine"
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+
+# Booking Platform 설정
+bookingPlatform:
+  replicaCount: 1
+  image:
+    repository: asia-northeast3-docker.pkg.dev/gifted-slice-475903-c6/ticket-booking/booking-platform
+    tag: "latest"
+    pullPolicy: Always
+
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 8080
+
+  resources:
+    requests:
+      cpu: "1000m"
+      memory: "2Gi"
+    limits:
+      cpu: "2000m"
+      memory: "3Gi"
+
+  env:
+    - name: JAVA_TOOL_OPTIONS
+      value: "-Xmx2g -Xms1g -XX:+UseG1GC"
+    - name: SPRING_PROFILES_ACTIVE
+      value: "test"
+
+  queuePartitionCount: 32
+
+# Ingress 설정
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  hosts: []
+  tls: []
+
+# Health check 설정
+probes:
+  enabled: true
+  startup:
+    httpGet:
+      path: /actuator/health
+      port: 8080
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    failureThreshold: 30
+    timeoutSeconds: 5
+  liveness:
+    httpGet:
+      path: /actuator/health
+      port: 8080
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    failureThreshold: 3
+    timeoutSeconds: 5
+  readiness:
+    httpGet:
+      path: /actuator/health
+      port: 8080
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    failureThreshold: 3
+    timeoutSeconds: 5

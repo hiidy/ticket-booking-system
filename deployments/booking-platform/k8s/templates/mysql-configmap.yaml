@@ -1,0 +1,11 @@
+{{- if .Values.mysql.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "booking-platform.mysql.fullname" . }}-init
+  labels:
+    {{- include "booking-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: mysql
+data:
+  init.sql: {{ .Files.Get "files/init.sql" | quote }}
+{{- end }}

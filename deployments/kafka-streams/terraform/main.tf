@@ -1,6 +1,6 @@
 
 module "confluent_cloud" {
-  source = "./modules/confluent-kafka"
+  source = "modules/confluent-kafka"
 
   confluent_cloud_api_key    = var.confluent_cloud_api_key
   confluent_cloud_api_secret = var.confluent_cloud_api_secret
@@ -14,7 +14,7 @@ module "confluent_cloud" {
 }
 
 module "gke_autopilot" {
-  source = "./modules/gke"
+  source = "modules/gke"
 
   gcp_project_id  = var.gcp_project_id
   gcp_region      = var.gcp_region

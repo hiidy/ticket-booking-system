@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "booking-platform.fullname" . }}
+  labels:
+    {{- include "booking-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: booking-platform
+spec:
+  replicas: {{ .Values.bookingPlatform.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "booking-platform.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: booking-platform
+  template:
+    metadata:
+      labels:
+        {{- include "booking-platform.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: booking-platform
+    spec:
+      initContainers:
+        - name: wait-for-mysql
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z {{ include "booking-platform.mysql.fullname" . }} 3306; do echo waiting for mysql; sleep 2; done;']
+        - name: wait-for-redis
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z {{ include "booking-platform.redis.fullname" . }} 6379; do echo waiting for redis; sleep 2; done;']
+      containers:
+        - name: booking-platform
+          image: "{{ .Values.bookingPlatform.image.repository }}:{{ .Values.bookingPlatform.image.tag }}"
+          imagePullPolicy: {{ .Values.bookingPlatform.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: SERVER_PORT
+              value: "8080"
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "booking-platform.fullname" . }}-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "booking-platform.fullname" . }}-config
+                  key: DB_PORT
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "booking-platform.fullname" . }}-secret
+                  key: DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "booking-platform.fullname" . }}-secret
+                  key: DB_PASSWORD
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "booking-platform.fullname" . }}-config
+                  key: REDIS_HOST
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "booking-platform.fullname" . }}-config
+                  key: REDIS_PORT
+            - name: QUEUE_PARTITION_COUNT
+              value: {{ .Values.bookingPlatform.queuePartitionCount | quote }}
+            {{- with .Values.bookingPlatform.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- if .Values.probes.enabled }}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.probes.startup.httpGet.path }}
+              port: 8080
+            initialDelaySeconds: {{ .Values.probes.startup.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.startup.periodSeconds }}
+            failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+            timeoutSeconds: {{ .Values.probes.startup.timeoutSeconds }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probes.liveness.httpGet.path }}
+              port: 8080
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
+            timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probes.readiness.httpGet.path }}
+              port: 8080
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+            timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.bookingPlatform.resources | nindent 12 }}
