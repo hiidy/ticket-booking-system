@@ -19,14 +19,15 @@ func formatNumber(n int) string {
 	return string(result)
 }
 
-func printConfig(method string, numShards int) {
+func printConfig(method string, numShards int, targetURL string, lockType string) {
 	separator := strings.Repeat("=", 75)
 	fmt.Printf("%s\n", separator)
 	fmt.Printf(" HTTP/2 부하 테스트 시작 (샤딩된 통계 구조)\n")
 	fmt.Printf("%s\n", separator)
 	fmt.Printf("설정:\n")
 	fmt.Printf("  HTTP 메서드:         %s\n", method)
-	fmt.Printf("  타겟 URL:            %s\n", *baseURL)
+	fmt.Printf("  타겟 URL:            %s\n", targetURL)
+	fmt.Printf("  락 타입:             %s\n", lockType)
 	fmt.Printf("  총 요청 수:          %s\n", formatNumber(*totalRequests))
 	fmt.Printf("  동시 고루틴 수:      %s\n", formatNumber(*totalRequests))
 	fmt.Printf("  HTTP 클라이언트 수:  %d개\n", *numClients)

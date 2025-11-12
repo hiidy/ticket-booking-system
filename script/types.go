@@ -6,6 +6,16 @@ type BookingRequest struct {
 	SectionID int   `json:"sectionId"`
 }
 
+type BookingResponse struct {
+	BookingID string `json:"bookingId"`
+}
+
+type BookingStatusResponse struct {
+	Success   bool   `json:"success"`
+	BookingID int64  `json:"bookingId"`
+	RequestID string `json:"requestId"`
+}
+
 type SubSection struct {
 	SectionID int    // 1..86
 	Group     string // "G1","G2","G3","P","R","S","A"

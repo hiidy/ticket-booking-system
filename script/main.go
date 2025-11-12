@@ -23,7 +23,8 @@ var (
 	goroutineprofile = flag.String("goroutineprofile", "", "고루틴 프로파일 출력 파일")
 
 	// 테스트 설정 플래그
-	baseURL       = flag.String("url", "http://localhost:8080/api/bookings/sync", "타겟 URL")
+	baseURL       = flag.String("url", "http://localhost:8080/api/bookings/sync/redis-lock", "타겟 URL")
+	lockType      = flag.String("lock", "redis", "락 타입: redis 또는 db")
 	httpMethod    = flag.String("method", "POST", "HTTP 메서드 (GET, POST)")
 	totalRequests = flag.Int("requests", 100, "총 요청 수")
 	maxConns      = flag.Int("conns", 2000, "호스트당 최대 연결 수")
@@ -75,10 +76,27 @@ func main() {
 		log.Fatalf("지원되지 않은 메서드 사용: %s GET, POST만 가능\n", *httpMethod)
 	}
 
+	// 락 타입 검증 및 URL 자동 설정
+	lockTypeValue := strings.ToLower(*lockType)
+	if lockTypeValue != "redis" && lockTypeValue != "db" {
+		log.Fatalf("지원되지 않은 락 타입: %s (redis 또는 db만 가능)\n", *lockType)
+	}
+
+	// URL이 기본값이면 락 타입에 맞게 자동 설정
+	targetURL := *baseURL
+	if strings.Contains(targetURL, "/api/bookings/sync") && !strings.Contains(targetURL, "-lock") {
+		if lockTypeValue == "redis" {
+			targetURL = strings.Replace(targetURL, "/sync", "/sync/redis-lock", 1)
+		} else {
+			targetURL = strings.Replace(targetURL, "/sync", "/sync/db-lock", 1)
+		}
+		fmt.Printf("🔧 락 타입에 따라 URL 자동 설정: %s\n", targetURL)
+	}
+
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	numShards := runtime.NumCPU()
-	printConfig(method, numShards)
+	printConfig(method, numShards, targetURL, lockTypeValue)
 
 	// HTTP 클라이언트 생성
 	fmt.Printf("\n%d개의 HTTP 클라이언트 생성 중.....\n", *numClients)
@@ -90,7 +108,7 @@ func main() {
 
 	// 워밍업
 	if *enableWarmup {
-		warmupConnections(clients, *baseURL, method, *warmupRequests, numShards)
+		warmupConnections(clients, targetURL, method, *warmupRequests, numShards)
 	}
 
 	// 통계 초기화
@@ -144,7 +162,7 @@ func main() {
 			}
 		}
 
-		go sendRequest(i, clients, payload, stats, &wg, *baseURL, method)
+		go sendRequest(i, clients, payload, stats, &wg, targetURL, method)
 
 		shard := stats.getShard(i)
 		atomic.AddInt64(&shard.sent, 1)

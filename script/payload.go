@@ -27,29 +27,29 @@ func createPayload(maxMember int) ([]byte, error) {
 		sectionID := pickSection(r)
 		s := SectionMap[sectionID]
 
-		seatCount := r.Intn(4) + 1
+		ticketCount := r.Intn(4) + 1
 		span := s.SeatEnd - s.SeatStart + 1
 
-		seatIDs := make([]int, 0, seatCount)
+		ticketIDs := make([]int, 0, ticketCount)
 
-		if seatCount >= span {
+		if ticketCount >= span {
 			for i := 0; i < span; i++ {
-				seatIDs = append(seatIDs, s.SeatStart+i)
+				ticketIDs = append(ticketIDs, s.SeatStart+i)
 			}
 		} else {
-			used := make(map[int]bool, seatCount)
-			for len(seatIDs) < seatCount {
-				seat := s.SeatStart + r.Intn(span)
-				if !used[seat] {
-					seatIDs = append(seatIDs, seat)
-					used[seat] = true
+			used := make(map[int]bool, ticketCount)
+			for len(ticketIDs) < ticketCount {
+				ticketID := s.SeatStart + r.Intn(span)
+				if !used[ticketID] {
+					ticketIDs = append(ticketIDs, ticketID)
+					used[ticketID] = true
 				}
 			}
 		}
 
 		req := BookingRequest{
 			MemberID:  r.Intn(maxMember) + 1,
-			TicketIDs: seatIDs,
+			TicketIDs: ticketIDs,
 			SectionID: sectionID,
 		}
 		payload, err = json.Marshal(req)
