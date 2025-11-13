@@ -8,6 +8,8 @@ import com.seatwise.booking.dto.request.BookingTimeoutRequest;
 import com.seatwise.booking.dto.response.BookingResponse;
 import com.seatwise.booking.dto.response.BookingStatusResponse;
 import com.seatwise.booking.messaging.BookingMessageProducer;
+import com.seatwise.booking.strategy.BookingContext;
+import com.seatwise.booking.strategy.BookingVersion;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class BookingController {
   private final BookingService bookingService;
   private final AsyncBookingService asyncBookingService;
   private final SyncBookingService syncBookingService;
+  private final BookingContext bookingContext;
 
   @PostMapping
   public ResponseEntity<BookingResponse> createBookingRequest(
@@ -49,12 +52,12 @@ public class BookingController {
     return ResponseEntity.accepted().body(response);
   }
 
-  @PostMapping("/sync/db-lock")
-  public ResponseEntity<BookingStatusResponse> createBookingWithDbLock(
+  @PostMapping("/v1")
+  public ResponseEntity<BookingStatusResponse> createBookingV1(
       @RequestHeader("Idempotency-Key") UUID key, @Valid @RequestBody BookingRequest request) {
-    Long bookingId =
-        syncBookingService.createBookingWithDbLock(key, request.memberId(), request.ticketIds());
-    return ResponseEntity.ok(BookingStatusResponse.success(bookingId, key));
+    BookingStatusResponse response =
+        bookingContext.get(BookingVersion.V1.getVersion()).createBooking(key, request);
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping("/sync/redis-lock")

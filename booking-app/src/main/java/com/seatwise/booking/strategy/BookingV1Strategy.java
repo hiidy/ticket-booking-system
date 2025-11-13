@@ -1,0 +1,23 @@
+package com.seatwise.booking.strategy;
+
+import com.seatwise.booking.SyncBookingService;
+import com.seatwise.booking.dto.request.BookingRequest;
+import com.seatwise.booking.dto.response.BookingStatusResponse;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class BookingV1Strategy implements BookingStrategy {
+
+  private final SyncBookingService syncBookingService;
+
+  @Override
+  public BookingStatusResponse createBooking(UUID idempotencyKey, BookingRequest request) {
+    Long bookingId =
+        syncBookingService.createBookingWithDbLock(
+            idempotencyKey, request.memberId(), request.ticketIds());
+    return BookingStatusResponse.success(bookingId, idempotencyKey);
+  }
+}
