@@ -5,9 +5,8 @@ import com.seatwise.booking.dto.request.BookingRequest;
 import com.seatwise.booking.dto.response.BookingStatusResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
-@Component
+@BookingStrategyVersion("v1")
 @RequiredArgsConstructor
 public class BookingV1Strategy implements BookingStrategy {
 
