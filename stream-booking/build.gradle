@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    implementation project(':streams-infra')
+    implementation project(':stream-common')
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -14,5 +14,5 @@ dependencies {
 }
 
 tasks.named('bootJar') {
-    archiveBaseName = 'ticket-streams'
+    archiveBaseName = 'stream-booking'
 }

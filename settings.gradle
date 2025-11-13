@@ -11,8 +11,8 @@ plugins {
 
 rootProject.name = 'ticket-booking-system'
 
-include 'booking-platform'
-include 'booking-streams'
-include 'ticket-streams'
-include 'streams-infra'
-include 'streams-api'
+include 'booking-app'
+include 'stream-booking'
+include 'stream-ticket'
+include 'stream-common'
+include 'stream-api'

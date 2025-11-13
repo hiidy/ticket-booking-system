@@ -31,7 +31,7 @@ dependencies {
 }
 
 tasks.named('bootJar') {
-    archiveBaseName = 'booking-platform'
+    archiveBaseName = 'booking-app'
 }
 
 tasks.named('jar') {

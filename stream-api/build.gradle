@@ -11,7 +11,7 @@ configurations.configureEach {
 }
 
 dependencies {
-    implementation project(':streams-infra')
+    implementation project(':stream-common')
 
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -28,7 +28,7 @@ dependencies {
     implementation 'org.springframework.retry:spring-retry'
 }
 tasks.named('bootJar') {
-    archiveBaseName = 'streams-api'
+    archiveBaseName = 'stream-api'
 }
 
 tasks.named('jar') {
