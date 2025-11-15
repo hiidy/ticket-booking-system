@@ -3,20 +3,20 @@ WORKDIR /app
 
 COPY build.gradle settings.gradle gradlew ./
 COPY gradle ./gradle
-COPY streams-api/build.gradle ./streams-api/
+COPY stream-api/build.gradle ./stream-api/
 
-RUN gradle :streams-api:dependencies --no-daemon || true
+RUN gradle :stream-api:dependencies --no-daemon || true
 
 COPY . .
 
-RUN gradle :streams-api:bootJar --no-daemon
+RUN gradle :stream-api:bootJar --no-daemon
 
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
-COPY --from=build /app/streams-api/build/libs/*.jar app.jar
+COPY --from=build /app/stream-api/build/libs/*.jar app.jar
 
 RUN chown appuser:appuser app.jar
 
