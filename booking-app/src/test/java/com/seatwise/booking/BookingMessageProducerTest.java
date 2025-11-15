@@ -8,7 +8,7 @@ import com.seatwise.booking.dto.BookingMessage;
 import com.seatwise.booking.dto.BookingMessageType;
 import com.seatwise.booking.messaging.BookingMessageProducer;
 import com.seatwise.booking.messaging.MessagingProperties;
-import com.seatwise.cache.TicketCacheService;
+import com.seatwise.show.cache.TicketCacheService;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;

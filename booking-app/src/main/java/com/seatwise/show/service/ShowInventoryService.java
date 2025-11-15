@@ -1,8 +1,10 @@
-package com.seatwise.inventory;
+package com.seatwise.show.service;
 
 import com.seatwise.core.BusinessException;
 import com.seatwise.core.ErrorCode;
-import com.seatwise.inventory.dto.ShowInventoryResponse;
+import com.seatwise.show.dto.response.ShowInventoryResponse;
+import com.seatwise.show.entity.ShowInventory;
+import com.seatwise.show.repository.ShowInventoryRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

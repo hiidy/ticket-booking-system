@@ -1,10 +1,10 @@
-package com.seatwise.cache.local;
+package com.seatwise.show.cache.local;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
-import com.seatwise.cache.TicketCacheService;
-import com.seatwise.cache.config.CacheProperties;
+import com.seatwise.show.cache.TicketCacheService;
+import com.seatwise.show.cache.config.CacheProperties;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;

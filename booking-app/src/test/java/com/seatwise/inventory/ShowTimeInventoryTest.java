@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.seatwise.core.BusinessException;
+import com.seatwise.show.entity.ShowInventory;
 import com.seatwise.venue.entity.SeatGrade;
 import org.junit.jupiter.api.Test;
 

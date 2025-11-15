@@ -1,4 +1,4 @@
-package com.seatwise.cache.config;
+package com.seatwise.show.cache.config;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

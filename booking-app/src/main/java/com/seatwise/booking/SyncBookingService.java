@@ -1,7 +1,7 @@
 package com.seatwise.booking;
 
 import com.seatwise.booking.exception.RecoverableBookingException;
-import com.seatwise.cache.TicketCacheService;
+import com.seatwise.show.cache.TicketCacheService;
 import com.seatwise.core.ErrorCode;
 import java.util.List;
 import java.util.UUID;

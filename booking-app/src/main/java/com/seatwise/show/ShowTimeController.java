@@ -1,7 +1,9 @@
 package com.seatwise.show;
 
 import com.seatwise.booking.dto.BookingCreatedEvent;
-import com.seatwise.cache.TicketCacheService;
+import com.seatwise.show.cache.TicketCacheService;
+import com.seatwise.show.dto.response.ShowInventoryResponse;
+import com.seatwise.show.service.ShowInventoryService;
 import com.seatwise.show.service.ShowTimeService;
 import com.seatwise.show.dto.request.ShowSearchCondition;
 import com.seatwise.show.dto.request.ShowTimeCreateRequest;
@@ -58,6 +60,19 @@ public class ShowTimeController {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleBookingCreated(BookingCreatedEvent event) {
       cacheService.holdTickets(event.ticketIds(), event.memberId());
+    }
+  }
+
+  @RestController
+  @RequestMapping("/api/shows/{showId}/inventory")
+  @RequiredArgsConstructor
+  public static class ShowInventoryController {
+
+    private final ShowInventoryService showInventoryService;
+
+    @GetMapping
+    public ResponseEntity<List<ShowInventoryResponse>> getShowInventory(@PathVariable Long showId) {
+      return ResponseEntity.ok(showInventoryService.getShowInventory(showId));
     }
   }
 }

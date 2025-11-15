@@ -1,4 +1,4 @@
-package com.seatwise.cache;
+package com.seatwise.show.cache;
 
 import java.util.List;
 import java.util.Map;

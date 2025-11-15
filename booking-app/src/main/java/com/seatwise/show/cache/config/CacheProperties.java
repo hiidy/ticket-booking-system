@@ -1,4 +1,4 @@
-package com.seatwise.cache.config;
+package com.seatwise.show.cache.config;
 
 import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;

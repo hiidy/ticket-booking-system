@@ -3,7 +3,8 @@ package com.seatwise.cache.local;
 import static org.assertj.core.api.Assertions.*;
 
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
-import com.seatwise.cache.config.CacheProperties;
+import com.seatwise.show.cache.config.CacheProperties;
+import com.seatwise.show.cache.local.LocalTicketCacheService;
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;

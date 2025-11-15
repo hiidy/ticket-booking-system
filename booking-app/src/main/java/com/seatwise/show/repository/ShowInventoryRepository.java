@@ -1,5 +1,6 @@
-package com.seatwise.inventory;
+package com.seatwise.show.repository;
 
+import com.seatwise.show.entity.ShowInventory;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
