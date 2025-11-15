@@ -2,9 +2,11 @@ package com.seatwise.showtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.seatwise.show.Show;
-import com.seatwise.show.ShowRepository;
-import com.seatwise.show.ShowType;
+import com.seatwise.show.entity.Show;
+import com.seatwise.show.repository.ShowRepository;
+import com.seatwise.show.entity.ShowTime;
+import com.seatwise.show.entity.ShowType;
+import com.seatwise.show.repository.ShowTimeRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -15,7 +17,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 @DataJpaTest
 class ShowTimeRepositoryTest {
 
-  @Autowired ShowTimeRepository showTimeRepository;
+  @Autowired
+  ShowTimeRepository showTimeRepository;
   @Autowired ShowRepository showRepository;
 
   @Test

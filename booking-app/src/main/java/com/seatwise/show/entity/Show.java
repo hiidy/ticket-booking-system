@@ -1,4 +1,4 @@
-package com.seatwise.show;
+package com.seatwise.show.entity;
 
 import com.seatwise.core.jpa.BaseEntity;
 import jakarta.persistence.Entity;

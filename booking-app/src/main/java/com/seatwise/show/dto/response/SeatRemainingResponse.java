@@ -1,3 +1,3 @@
-package com.seatwise.showtime.dto.response;
+package com.seatwise.show.dto.response;
 
 public record SeatRemainingResponse(String grade, Integer remainingCount) {}

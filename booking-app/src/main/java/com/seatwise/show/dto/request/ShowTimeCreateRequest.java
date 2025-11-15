@@ -1,4 +1,4 @@
-package com.seatwise.showtime.dto.request;
+package com.seatwise.show.dto.request;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

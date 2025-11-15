@@ -1,6 +1,6 @@
-package com.seatwise.ticket.dto;
+package com.seatwise.show.dto.response;
 
-import com.seatwise.ticket.Ticket;
+import com.seatwise.show.entity.Ticket;
 import com.seatwise.venue.entity.SeatGrade;
 import java.time.LocalDateTime;
 

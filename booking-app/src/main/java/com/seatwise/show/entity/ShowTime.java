@@ -1,9 +1,8 @@
-package com.seatwise.showtime;
+package com.seatwise.show.entity;
 
 import com.seatwise.core.BusinessException;
 import com.seatwise.core.ErrorCode;
 import com.seatwise.core.jpa.BaseEntity;
-import com.seatwise.show.Show;
 import com.seatwise.venue.entity.Venue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

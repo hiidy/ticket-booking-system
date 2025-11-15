@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import com.seatwise.core.BusinessException;
 import com.seatwise.core.ErrorCode;
+import com.seatwise.show.entity.ShowTime;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;

@@ -1,4 +1,4 @@
-package com.seatwise.showtime.dto.response;
+package com.seatwise.show.dto.response;
 
 import com.seatwise.venue.entity.SeatGrade;
 

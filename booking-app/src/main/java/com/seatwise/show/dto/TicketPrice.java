@@ -1,4 +1,4 @@
-package com.seatwise.showtime.dto;
+package com.seatwise.show.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

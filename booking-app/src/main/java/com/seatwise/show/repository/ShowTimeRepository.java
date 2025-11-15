@@ -1,7 +1,8 @@
-package com.seatwise.showtime;
+package com.seatwise.show.repository;
 
-import com.seatwise.show.ShowType;
-import com.seatwise.showtime.dto.response.ShowSummaryQueryDto;
+import com.seatwise.show.dto.response.ShowSummaryQueryDto;
+import com.seatwise.show.entity.ShowTime;
+import com.seatwise.show.entity.ShowType;
 import io.lettuce.core.dynamic.annotation.Param;
 import java.time.LocalDate;
 import java.util.List;
@@ -22,7 +23,7 @@ public interface ShowTimeRepository
 
   @Query(
       """
-              select new com.seatwise.showtime.dto.response.ShowSummaryQueryDto(s.id, s.title, s.type, st.date, st.startTime, v.name)
+              select new com.seatwise.show.dto.response.ShowSummaryQueryDto(s.id, s.title, s.type, st.date, st.startTime, v.name)
               from ShowTime st
               join st.show s
               join st.venue v

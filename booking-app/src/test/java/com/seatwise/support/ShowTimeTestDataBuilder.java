@@ -1,8 +1,8 @@
 package com.seatwise.support;
 
-import com.seatwise.show.Show;
-import com.seatwise.showtime.ShowTime;
-import com.seatwise.showtime.ShowTimeRepository;
+import com.seatwise.show.entity.Show;
+import com.seatwise.show.entity.ShowTime;
+import com.seatwise.show.repository.ShowTimeRepository;
 import com.seatwise.venue.entity.Venue;
 import java.time.LocalDate;
 import java.time.LocalTime;

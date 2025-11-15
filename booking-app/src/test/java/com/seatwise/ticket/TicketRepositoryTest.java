@@ -2,8 +2,10 @@ package com.seatwise.ticket;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.seatwise.showtime.ShowTime;
-import com.seatwise.showtime.ShowTimeRepository;
+import com.seatwise.show.entity.ShowTime;
+import com.seatwise.show.entity.Ticket;
+import com.seatwise.show.repository.ShowTimeRepository;
+import com.seatwise.show.repository.TicketRepository;
 import com.seatwise.venue.entity.Seat;
 import com.seatwise.venue.entity.SeatGrade;
 import com.seatwise.venue.entity.SeatRepository;
@@ -17,7 +19,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 @DataJpaTest
 class TicketRepositoryTest {
 
-  @Autowired TicketRepository ticketRepository;
+  @Autowired
+  TicketRepository ticketRepository;
   @Autowired SeatRepository seatRepository;
   @Autowired ShowTimeRepository showTimeRepository;
 

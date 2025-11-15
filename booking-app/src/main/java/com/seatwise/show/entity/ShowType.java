@@ -1,4 +1,4 @@
-package com.seatwise.show;
+package com.seatwise.show.entity;
 
 import lombok.Getter;
 

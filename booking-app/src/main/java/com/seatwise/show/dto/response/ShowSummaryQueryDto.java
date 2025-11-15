@@ -1,6 +1,6 @@
-package com.seatwise.showtime.dto.response;
+package com.seatwise.show.dto.response;
 
-import com.seatwise.show.ShowType;
+import com.seatwise.show.entity.ShowType;
 import java.time.LocalDate;
 import java.time.LocalTime;
 

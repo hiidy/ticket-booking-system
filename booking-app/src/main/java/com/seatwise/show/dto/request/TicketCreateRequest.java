@@ -1,6 +1,6 @@
-package com.seatwise.ticket.dto;
+package com.seatwise.show.dto.request;
 
-import com.seatwise.showtime.dto.TicketPrice;
+import com.seatwise.show.dto.TicketPrice;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;

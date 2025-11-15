@@ -1,4 +1,4 @@
-package com.seatwise.showtime.dto.response;
+package com.seatwise.show.dto.response;
 
 public record ShowSummaryResponse(
     Long id, String title, String type, String startTime, String date, String venue) {
