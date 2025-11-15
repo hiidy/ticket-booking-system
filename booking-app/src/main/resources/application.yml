@@ -32,6 +32,12 @@ cache:
     read-through: true
     write-through: true
 
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
 management:
   endpoints:
     web:

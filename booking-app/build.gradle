@@ -17,6 +17,7 @@ dependencies {
     implementation 'org.springframework.retry:spring-retry'
     implementation 'org.codehaus.janino:janino'
 
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
     runtimeOnly 'com.mysql:mysql-connector-j'
     runtimeOnly 'com.h2database:h2'
