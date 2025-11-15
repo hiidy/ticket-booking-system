@@ -1,4 +1,4 @@
-package com.seatwise.booking.strategy;
+package com.seatwise.show.service.strategy;
 
 import java.util.List;
 import java.util.Map;

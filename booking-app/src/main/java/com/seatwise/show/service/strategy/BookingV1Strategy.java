@@ -1,6 +1,6 @@
-package com.seatwise.booking.strategy;
+package com.seatwise.show.service.strategy;
 
-import com.seatwise.booking.SyncBookingService;
+import com.seatwise.show.service.SyncBookingService;
 import com.seatwise.booking.dto.request.BookingRequest;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

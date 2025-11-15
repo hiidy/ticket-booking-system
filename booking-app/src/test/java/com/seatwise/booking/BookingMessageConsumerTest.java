@@ -11,6 +11,7 @@ import com.seatwise.booking.exception.BookingException;
 import com.seatwise.booking.messaging.BookingMessageConsumer;
 import com.seatwise.booking.messaging.StreamKeyGenerator;
 import com.seatwise.core.ErrorCode;
+import com.seatwise.show.service.ShowBookingService;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +32,7 @@ class BookingMessageConsumerTest {
   @Autowired private BookingMessageConsumer consumer;
   @Autowired private RedisTemplate<String, Object> objectRedisTemplate;
   @Autowired private RedissonClient redissonClient;
-  @MockBean private BookingService bookingService;
+  @MockBean private ShowBookingService showBookingService;
 
   private UUID requestId;
   private String streamKey;
@@ -60,7 +61,7 @@ class BookingMessageConsumerTest {
     String bookingId = "100";
     BookingMessage message =
         new BookingMessage(BookingMessageType.BOOKING, requestId.toString(), memberId, seatIds, 1L);
-    when(bookingService.createBooking(requestId, memberId, seatIds)).thenReturn(bookingId);
+    when(showBookingService.createBooking(requestId, memberId, seatIds)).thenReturn(bookingId);
 
     ObjectRecord<String, BookingMessage> messageRecord =
         StreamRecords.newRecord().in(streamKey).ofObject(message);
@@ -69,7 +70,7 @@ class BookingMessageConsumerTest {
     consumer.onMessage(messageRecord);
 
     // then
-    verify(bookingService).createBooking(requestId, memberId, seatIds);
+    verify(showBookingService).createBooking(requestId, memberId, seatIds);
 
     BookingStatusResponse expected = BookingStatusResponse.success(bookingId, requestId);
     assertThat(expected).isNotNull();
@@ -86,7 +87,7 @@ class BookingMessageConsumerTest {
     BookingMessage message =
         new BookingMessage(BookingMessageType.BOOKING, requestId.toString(), memberId, seatIds, 1L);
 
-    when(bookingService.createBooking(requestId, memberId, seatIds))
+    when(showBookingService.createBooking(requestId, memberId, seatIds))
         .thenThrow(new BookingException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY, requestId));
 
     ObjectRecord<String, BookingMessage> messageRecord =
@@ -96,7 +97,7 @@ class BookingMessageConsumerTest {
     consumer.onMessage(messageRecord);
 
     // then
-    verify(bookingService).createBooking(requestId, memberId, seatIds);
+    verify(showBookingService).createBooking(requestId, memberId, seatIds);
 
     BookingStatusResponse result = BookingStatusResponse.pending(requestId);
     assertThat(result.success()).isFalse();

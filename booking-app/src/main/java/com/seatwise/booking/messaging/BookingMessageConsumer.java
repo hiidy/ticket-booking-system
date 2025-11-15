@@ -1,9 +1,9 @@
 package com.seatwise.booking.messaging;
 
-import com.seatwise.booking.BookingService;
 import com.seatwise.booking.dto.BookingMessage;
 import com.seatwise.booking.dto.BookingMessageType;
 import com.seatwise.booking.exception.BookingException;
+import com.seatwise.show.service.ShowBookingService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import java.util.HashSet;
@@ -35,7 +35,7 @@ public class BookingMessageConsumer
       container;
   private final RedissonClient redissonClient;
   private final MessagingProperties properties;
-  private final BookingService bookingService;
+  private final ShowBookingService showBookingService;
   private final BookingMessageAckService bookingMessageAckService;
   private final Map<Integer, Subscription> activeSubscriptions = new ConcurrentHashMap<>();
   private final Map<Integer, RLock> locks = new ConcurrentHashMap<>();
@@ -117,21 +117,21 @@ public class BookingMessageConsumer
 
     if (request.type() == BookingMessageType.BOOKING) {
       try {
-        bookingService.createBooking(requestId, request.memberId(), request.ticketIds());
+        showBookingService.createBooking(requestId, request.memberId(), request.ticketIds());
       } catch (BookingException e) {
         log.warn(
             "예약 실패: requestId={}, error={}, memberId={}",
             requestId,
             e.getErrorCode(),
             request.memberId());
-        bookingService.createFailedBooking(requestId, request.memberId());
+        showBookingService.createFailedBooking(requestId, request.memberId());
       } finally {
         bookingMessageAckService.acknowledge(properties.getConsumerGroup(), message);
       }
     }
 
     if (request.type() == BookingMessageType.CLIENT_TIMEOUT_CANCEL) {
-      bookingService.cancelBookingWithoutRefund(requestId);
+      showBookingService.cancelBookingWithoutRefund(requestId);
     }
   }
 }

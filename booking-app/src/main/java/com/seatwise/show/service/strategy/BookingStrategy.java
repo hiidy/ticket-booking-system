@@ -1,4 +1,4 @@
-package com.seatwise.booking.strategy;
+package com.seatwise.show.service.strategy;
 
 import com.seatwise.booking.dto.request.BookingRequest;
 import java.util.UUID;

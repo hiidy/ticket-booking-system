@@ -1,4 +1,4 @@
-package com.seatwise.booking.strategy;
+package com.seatwise.show.service.strategy;
 
 public enum BookingVersion {
   V1("v1", "DB Lock 방식"),

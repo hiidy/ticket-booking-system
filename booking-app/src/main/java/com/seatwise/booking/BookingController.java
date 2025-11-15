@@ -8,8 +8,6 @@ import com.seatwise.booking.dto.request.BookingTimeoutRequest;
 import com.seatwise.booking.dto.response.BookingResponse;
 import com.seatwise.booking.dto.response.BookingStatusResponse;
 import com.seatwise.booking.messaging.BookingMessageProducer;
-import com.seatwise.booking.strategy.BookingContext;
-import com.seatwise.booking.strategy.BookingVersion;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,7 +34,6 @@ public class BookingController {
   private final BookingMessageProducer producer;
   private final BookingService bookingService;
   private final AsyncBookingService asyncBookingService;
-  private final BookingContext bookingContext;
 
   @Operation(summary = "예약 요청 생성", description = "비동기 방식으로 예약 요청을 생성하고 폴링 URL을 반환합니다")
   @PostMapping
@@ -56,22 +53,6 @@ public class BookingController {
             .toUriString();
 
     return new BookingResponse(pollingUrl, requestId.toString());
-  }
-
-  @Operation(summary = "예약 생성 v1", description = "DB 비관적락으로 예약 처리")
-  @PostMapping("/v1")
-  public String createBookingV1(
-      @Parameter(description = "멱등성 키", required = true) @RequestHeader("Idempotency-Key") UUID key,
-      @Valid @RequestBody BookingRequest request) {
-    return bookingContext.get(BookingVersion.V1.getVersion()).createBooking(key, request);
-  }
-
-  @Operation(summary = "예약 생성 v2", description = "Redis Lock으로 예약 처리")
-  @PostMapping("/v2")
-  public String createBookingV2(
-      @Parameter(description = "멱등성 키", required = true) @RequestHeader("Idempotency-Key") UUID key,
-      @Valid @RequestBody BookingRequest request) {
-    return bookingContext.get(BookingVersion.V2.getVersion()).createBooking(key, request);
   }
 
   @Operation(summary = "예약 상태 조회", description = "요청 ID로 예약 처리 상태를 조회합니다")

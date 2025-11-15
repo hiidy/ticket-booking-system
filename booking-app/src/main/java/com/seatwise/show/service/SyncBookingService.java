@@ -1,8 +1,8 @@
-package com.seatwise.booking;
+package com.seatwise.show.service;
 
 import com.seatwise.booking.exception.RecoverableBookingException;
-import com.seatwise.show.cache.TicketCacheService;
 import com.seatwise.core.ErrorCode;
+import com.seatwise.show.cache.TicketCacheService;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 public class SyncBookingService {
 
   private final TicketCacheService cacheService;
-  private final BookingService bookingService;
+  private final ShowBookingService showBookingService;
   private final RedissonClient redissonClient;
   private static final long LOCK_WAIT_TIME = 0;
   private static final long LOCK_LEASE_TIME = 300;
@@ -28,7 +28,7 @@ public class SyncBookingService {
     if (cacheService.hasUnavailableTickets(ticketIds, memberId)) {
       throw new RecoverableBookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
     }
-    return bookingService.createBookingWithLock(requestId, memberId, ticketIds);
+    return showBookingService.createBookingWithLock(requestId, memberId, ticketIds);
   }
 
   public String createWithRedisLock(UUID requestId, Long memberId, List<Long> ticketIds) {
@@ -41,7 +41,7 @@ public class SyncBookingService {
         throw new RecoverableBookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
       }
 
-      return bookingService.createBooking(requestId, memberId, ticketIds);
+      return showBookingService.createBooking(requestId, memberId, ticketIds);
 
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();

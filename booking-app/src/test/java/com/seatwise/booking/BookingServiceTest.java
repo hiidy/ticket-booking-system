@@ -8,6 +8,7 @@ import com.seatwise.core.ErrorCode;
 import com.seatwise.member.Member;
 import com.seatwise.member.MemberRepository;
 import com.seatwise.show.entity.ShowTime;
+import com.seatwise.show.service.ShowBookingService;
 import com.seatwise.support.ShowTimeTestDataBuilder;
 import com.seatwise.show.entity.Ticket;
 import com.seatwise.show.repository.TicketRepository;
@@ -28,7 +29,7 @@ class BookingServiceTest {
 
   Member member;
 
-  @Autowired private BookingService bookingService;
+  @Autowired private ShowBookingService showBookingService;
   @Autowired private TicketRepository ticketRepository;
   @Autowired private SeatRepository seatRepository;
   @Autowired private MemberRepository memberRepository;
@@ -56,7 +57,7 @@ class BookingServiceTest {
     Long ticketId = ticketRepository.findAll().get(0).getId();
 
     // when
-    String bookingId = bookingService.createBooking(requestId, member.getId(), List.of(ticketId));
+    String bookingId = showBookingService.createBooking(requestId, member.getId(), List.of(ticketId));
 
     // then
     TicketStatus status = ticketRepository.findById(ticketId).orElseThrow().getStatus();
@@ -71,7 +72,7 @@ class BookingServiceTest {
     Long memberId = member.getId();
 
     // when & then
-    assertThatThrownBy(() -> bookingService.createBooking(requestId, memberId, invalidTicketIds))
+    assertThatThrownBy(() -> showBookingService.createBooking(requestId, memberId, invalidTicketIds))
         .isInstanceOf(BookingException.class)
         .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SEAT_NOT_AVAILABLE);
   }
@@ -83,10 +84,10 @@ class BookingServiceTest {
     List<Long> ticketIds = List.of(ticketRepository.findAll().get(0).getId());
     Long memberId = member.getId();
 
-    bookingService.createBooking(duplicatedId, memberId, ticketIds);
+    showBookingService.createBooking(duplicatedId, memberId, ticketIds);
 
     // when & then
-    assertThatThrownBy(() -> bookingService.createBooking(duplicatedId, memberId, ticketIds))
+    assertThatThrownBy(() -> showBookingService.createBooking(duplicatedId, memberId, ticketIds))
         .isInstanceOf(BookingException.class)
         .hasFieldOrPropertyWithValue("errorCode", ErrorCode.DUPLICATE_IDEMPOTENCY_KEY);
   }
@@ -101,11 +102,11 @@ class BookingServiceTest {
     UUID firstRequestId = UUID.randomUUID();
     UUID secondRequestId = UUID.randomUUID();
 
-    bookingService.createBooking(firstRequestId, member.getId(), ticketIds);
+    showBookingService.createBooking(firstRequestId, member.getId(), ticketIds);
 
     // when & then
     assertThatThrownBy(
-            () -> bookingService.createBooking(secondRequestId, otherMemberId, ticketIds))
+            () -> showBookingService.createBooking(secondRequestId, otherMemberId, ticketIds))
         .isInstanceOf(BookingException.class)
         .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SEAT_NOT_AVAILABLE);
   }

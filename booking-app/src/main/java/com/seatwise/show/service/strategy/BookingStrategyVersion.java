@@ -1,4 +1,4 @@
-package com.seatwise.booking.strategy;
+package com.seatwise.show.service.strategy;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
