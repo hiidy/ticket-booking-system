@@ -26,7 +26,7 @@ public class ShowBookingController {
   @Operation(summary = "예약 생성 v1", description = "DB 비관적락으로 예약 처리")
   @PostMapping("/v1")
   public String createBookingV1(
-      @Parameter(description = "멱등성 키", required = true) @RequestHeader("Idempotency-Key") UUID key,
+      @Parameter(description = "멱등키", required = true) @RequestHeader("Idempotency-Key") UUID key,
       @Valid @RequestBody BookingRequest request) {
     return bookingContext.get(BookingVersion.V1.getVersion()).createBooking(key, request);
   }
@@ -34,7 +34,7 @@ public class ShowBookingController {
   @Operation(summary = "예약 생성 v2", description = "Redis Lock으로 예약 처리")
   @PostMapping("/v2")
   public String createBookingV2(
-      @Parameter(description = "멱등성 키", required = true) @RequestHeader("Idempotency-Key") UUID key,
+      @Parameter(description = "멱등키", required = true) @RequestHeader("Idempotency-Key") UUID key,
       @Valid @RequestBody BookingRequest request) {
     return bookingContext.get(BookingVersion.V2.getVersion()).createBooking(key, request);
   }

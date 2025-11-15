@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seatwise.booking.dto.BookingCreateCommand;
 import com.seatwise.booking.dto.request.BookingRequest;
 import com.seatwise.booking.messaging.BookingMessageProducer;
-import com.seatwise.show.service.SyncBookingService;
 import com.seatwise.show.service.strategy.BookingContext;
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +30,6 @@ class BookingControllerTest {
   @MockBean private BookingMessageProducer bookingMessageProducer;
   @MockBean private BookingService bookingService;
   @MockBean private AsyncBookingService asyncBookingService;
-  @MockBean private SyncBookingService syncBookingService;
   @MockBean private BookingContext bookingContext;
 
   @Test
@@ -40,8 +38,9 @@ class BookingControllerTest {
     BookingRequest bookingRequest = new BookingRequest(1L, List.of(1001L), 200L);
     UUID generatedRequestId = UUID.randomUUID();
 
-    given(asyncBookingService.createBookingRequest(
-        any(UUID.class), any(BookingCreateCommand.class)))
+    given(
+            asyncBookingService.createBookingRequest(
+                any(UUID.class), any(BookingCreateCommand.class)))
         .willReturn(generatedRequestId);
 
     // when & then

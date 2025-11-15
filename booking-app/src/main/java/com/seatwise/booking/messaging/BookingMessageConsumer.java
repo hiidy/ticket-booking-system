@@ -117,7 +117,7 @@ public class BookingMessageConsumer
 
     if (request.type() == BookingMessageType.BOOKING) {
       try {
-        showBookingService.createBooking(requestId, request.memberId(), request.ticketIds());
+        showBookingService.create(requestId, request.memberId(), request.ticketIds());
       } catch (BookingException e) {
         log.warn(
             "예약 실패: requestId={}, error={}, memberId={}",
@@ -131,7 +131,7 @@ public class BookingMessageConsumer
     }
 
     if (request.type() == BookingMessageType.CLIENT_TIMEOUT_CANCEL) {
-      showBookingService.cancelBookingWithoutRefund(requestId);
+      showBookingService.cancelWithoutRefund(requestId);
     }
   }
 }

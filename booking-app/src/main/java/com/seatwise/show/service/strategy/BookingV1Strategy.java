@@ -1,7 +1,7 @@
 package com.seatwise.show.service.strategy;
 
-import com.seatwise.show.service.SyncBookingService;
 import com.seatwise.booking.dto.request.BookingRequest;
+import com.seatwise.show.service.ShowBookingService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 
@@ -9,11 +9,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BookingV1Strategy implements BookingStrategy {
 
-  private final SyncBookingService syncBookingService;
+  private final ShowBookingService showBookingService;
 
   @Override
   public String createBooking(UUID idempotencyKey, BookingRequest request) {
-    return syncBookingService.createBookingWithDbLock(
+    return showBookingService.createWithLock(
         idempotencyKey, request.memberId(), request.ticketIds());
   }
 }

@@ -32,7 +32,7 @@ public class ShowBookingService {
   private final MemberRepository memberRepository;
 
   @Transactional
-  public String createBooking(UUID requestId, Long memberId, List<Long> ticketIds) {
+  public String create(UUID requestId, Long memberId, List<Long> ticketIds) {
     if (bookingRepository.existsByRequestId(requestId)) {
       throw new FatalBookingException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY, requestId);
     }
@@ -70,7 +70,7 @@ public class ShowBookingService {
   }
 
   @Transactional
-  public String createBookingWithLock(UUID requestId, Long memberId, List<Long> ticketIds) {
+  public String createWithLock(UUID requestId, Long memberId, List<Long> ticketIds) {
     Member member =
         memberRepository
             .findById(memberId)
@@ -114,7 +114,7 @@ public class ShowBookingService {
   }
 
   @Transactional
-  public void cancelBooking(Long memberId, Long bookingId) {
+  public void cancel(Long memberId, Long bookingId) {
     List<Ticket> tickets = ticketRepository.findTicketsByBookingId(bookingId);
 
     if (tickets.isEmpty()) {
@@ -126,7 +126,7 @@ public class ShowBookingService {
   }
 
   @Transactional
-  public void cancelBookingWithoutRefund(UUID requestId) {
+  public void cancelWithoutRefund(UUID requestId) {
     Optional<Booking> bookingOpt = bookingRepository.findByRequestId(requestId);
 
     if (bookingOpt.isEmpty()) {

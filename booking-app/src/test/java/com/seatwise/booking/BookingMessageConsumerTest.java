@@ -61,7 +61,7 @@ class BookingMessageConsumerTest {
     String bookingId = "100";
     BookingMessage message =
         new BookingMessage(BookingMessageType.BOOKING, requestId.toString(), memberId, seatIds, 1L);
-    when(showBookingService.createBooking(requestId, memberId, seatIds)).thenReturn(bookingId);
+    when(showBookingService.create(requestId, memberId, seatIds)).thenReturn(bookingId);
 
     ObjectRecord<String, BookingMessage> messageRecord =
         StreamRecords.newRecord().in(streamKey).ofObject(message);
@@ -70,7 +70,7 @@ class BookingMessageConsumerTest {
     consumer.onMessage(messageRecord);
 
     // then
-    verify(showBookingService).createBooking(requestId, memberId, seatIds);
+    verify(showBookingService).create(requestId, memberId, seatIds);
 
     BookingStatusResponse expected = BookingStatusResponse.success(bookingId, requestId);
     assertThat(expected).isNotNull();
@@ -87,7 +87,7 @@ class BookingMessageConsumerTest {
     BookingMessage message =
         new BookingMessage(BookingMessageType.BOOKING, requestId.toString(), memberId, seatIds, 1L);
 
-    when(showBookingService.createBooking(requestId, memberId, seatIds))
+    when(showBookingService.create(requestId, memberId, seatIds))
         .thenThrow(new BookingException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY, requestId));
 
     ObjectRecord<String, BookingMessage> messageRecord =
@@ -97,7 +97,7 @@ class BookingMessageConsumerTest {
     consumer.onMessage(messageRecord);
 
     // then
-    verify(showBookingService).createBooking(requestId, memberId, seatIds);
+    verify(showBookingService).create(requestId, memberId, seatIds);
 
     BookingStatusResponse result = BookingStatusResponse.pending(requestId);
     assertThat(result.success()).isFalse();
