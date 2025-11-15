@@ -1,15 +1,11 @@
 package com.seatwise.show;
 
-import com.seatwise.booking.dto.BookingCreatedEvent;
-import com.seatwise.show.cache.TicketCacheService;
-import com.seatwise.show.dto.response.ShowInventoryResponse;
-import com.seatwise.show.service.ShowInventoryService;
-import com.seatwise.show.service.ShowTimeService;
 import com.seatwise.show.dto.request.ShowSearchCondition;
 import com.seatwise.show.dto.request.ShowTimeCreateRequest;
 import com.seatwise.show.dto.response.ShowSummaryResponse;
 import com.seatwise.show.dto.response.ShowTimeCreateResponse;
 import com.seatwise.show.dto.response.ShowTimeSummaryResponse;
+import com.seatwise.show.service.ShowTimeService;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -17,9 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -49,30 +42,5 @@ public class ShowTimeController {
     List<ShowTimeSummaryResponse> dates =
         showTimeService.getAvailableDates(showTimeId, year, month);
     return ResponseEntity.ok(dates);
-  }
-
-  @Component
-  @RequiredArgsConstructor
-  public static class TicketEventListener {
-
-    private final TicketCacheService cacheService;
-
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleBookingCreated(BookingCreatedEvent event) {
-      cacheService.holdTickets(event.ticketIds(), event.memberId());
-    }
-  }
-
-  @RestController
-  @RequestMapping("/api/shows/{showId}/inventory")
-  @RequiredArgsConstructor
-  public static class ShowInventoryController {
-
-    private final ShowInventoryService showInventoryService;
-
-    @GetMapping
-    public ResponseEntity<List<ShowInventoryResponse>> getShowInventory(@PathVariable Long showId) {
-      return ResponseEntity.ok(showInventoryService.getShowInventory(showId));
-    }
   }
 }
