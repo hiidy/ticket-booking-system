@@ -31,7 +31,6 @@ public class BookingController {
   private final BookingMessageProducer producer;
   private final BookingService bookingService;
   private final AsyncBookingService asyncBookingService;
-  private final SyncBookingService syncBookingService;
   private final BookingContext bookingContext;
 
   @PostMapping
@@ -60,12 +59,12 @@ public class BookingController {
     return ResponseEntity.ok(response);
   }
 
-  @PostMapping("/sync/redis-lock")
-  public ResponseEntity<BookingStatusResponse> createBookingWithRedisLock(
+  @PostMapping("/v2")
+  public ResponseEntity<BookingStatusResponse> createBookingV2(
       @RequestHeader("Idempotency-Key") UUID key, @Valid @RequestBody BookingRequest request) {
-    Long bookingId =
-        syncBookingService.createWithRedisLock(key, request.memberId(), request.ticketIds());
-    return ResponseEntity.ok(BookingStatusResponse.success(bookingId, key));
+    BookingStatusResponse response =
+        bookingContext.get(BookingVersion.V2.getVersion()).createBooking(key, request);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/{requestId}/status")

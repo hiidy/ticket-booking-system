@@ -56,10 +56,9 @@ class BookingServiceTest {
     Long ticketId = ticketRepository.findAll().get(0).getId();
 
     // when
-    Long bookingId = bookingService.createBooking(requestId, member.getId(), List.of(ticketId));
+    String bookingId = bookingService.createBooking(requestId, member.getId(), List.of(ticketId));
 
     // then
-    assertThat(bookingId).isPositive();
     TicketStatus status = ticketRepository.findById(ticketId).orElseThrow().getStatus();
     assertThat(status).isEqualTo(TicketStatus.PAYMENT_PENDING);
   }

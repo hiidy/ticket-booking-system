@@ -34,7 +34,7 @@ public class BookingService {
   private final MemberRepository memberRepository;
 
   @Transactional
-  public Long createBooking(UUID requestId, Long memberId, List<Long> ticketIds) {
+  public String createBooking(UUID requestId, Long memberId, List<Long> ticketIds) {
     if (bookingRepository.existsByRequestId(requestId)) {
       throw new FatalBookingException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY, requestId);
     }
@@ -68,11 +68,11 @@ public class BookingService {
             ticket.assignBooking(savedBooking.getId(), bookingRequestTime, Duration.ofMinutes(10)));
 
     eventPublisher.publishEvent(new BookingCreatedEvent(ticketIds, memberId));
-    return savedBooking.getId();
+    return savedBooking.getId().toString();
   }
 
   @Transactional
-  public Long createBookingWithLock(UUID requestId, Long memberId, List<Long> ticketIds) {
+  public String createBookingWithLock(UUID requestId, Long memberId, List<Long> ticketIds) {
     Member member =
         memberRepository
             .findById(memberId)
@@ -101,7 +101,7 @@ public class BookingService {
 
     eventPublisher.publishEvent(new BookingCreatedEvent(ticketIds, memberId));
 
-    return savedBooking.getId();
+    return savedBooking.getId().toString();
   }
 
   @Transactional
@@ -149,7 +149,7 @@ public class BookingService {
     Booking booking = bookingRepository.findByRequestId(requestId).orElseThrow();
 
     if (booking.getStatus() == BookingStatus.SUCCESS) {
-      return BookingStatusResponse.success(booking.getId(), requestId);
+      return BookingStatusResponse.success(booking.getId().toString(), requestId);
     }
     return BookingStatusResponse.failed(requestId);
   }

@@ -2,9 +2,9 @@ package com.seatwise.booking.dto.response;
 
 import java.util.UUID;
 
-public record BookingStatusResponse(boolean success, Long bookingId, UUID requestId) {
+public record BookingStatusResponse(boolean success, String bookingId, UUID requestId) {
 
-  public static BookingStatusResponse success(Long bookingId, UUID requestId) {
+  public static BookingStatusResponse success(String bookingId, UUID requestId) {
     return new BookingStatusResponse(true, bookingId, requestId);
   }
 

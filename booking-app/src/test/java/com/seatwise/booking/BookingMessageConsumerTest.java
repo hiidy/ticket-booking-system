@@ -57,7 +57,7 @@ class BookingMessageConsumerTest {
     // given
     Long memberId = 1L;
     List<Long> seatIds = List.of(1L, 2L);
-    Long bookingId = 100L;
+    String bookingId = "100";
     BookingMessage message =
         new BookingMessage(BookingMessageType.BOOKING, requestId.toString(), memberId, seatIds, 1L);
     when(bookingService.createBooking(requestId, memberId, seatIds)).thenReturn(bookingId);

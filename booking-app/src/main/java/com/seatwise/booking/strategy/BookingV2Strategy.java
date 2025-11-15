@@ -6,16 +6,16 @@ import com.seatwise.booking.dto.response.BookingStatusResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 
-@BookingStrategyVersion("v1")
+@BookingStrategyVersion("v2")
 @RequiredArgsConstructor
-public class BookingV1Strategy implements BookingStrategy {
+public class BookingV2Strategy implements BookingStrategy {
 
   private final SyncBookingService syncBookingService;
 
   @Override
   public BookingStatusResponse createBooking(UUID idempotencyKey, BookingRequest request) {
     String bookingId =
-        syncBookingService.createBookingWithDbLock(
+        syncBookingService.createWithRedisLock(
             idempotencyKey, request.memberId(), request.ticketIds());
     return BookingStatusResponse.success(bookingId, idempotencyKey);
   }

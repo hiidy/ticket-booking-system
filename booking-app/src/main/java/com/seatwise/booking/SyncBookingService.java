@@ -24,14 +24,14 @@ public class SyncBookingService {
   private static final long LOCK_LEASE_TIME = 300;
   private static final TimeUnit LOCK_TIME_UNIT = TimeUnit.SECONDS;
 
-  public Long createBookingWithDbLock(UUID requestId, Long memberId, List<Long> ticketIds) {
+  public String createBookingWithDbLock(UUID requestId, Long memberId, List<Long> ticketIds) {
     if (cacheService.hasUnavailableTickets(ticketIds, memberId)) {
       throw new RecoverableBookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
     }
     return bookingService.createBookingWithLock(requestId, memberId, ticketIds);
   }
 
-  public Long createWithRedisLock(UUID requestId, Long memberId, List<Long> ticketIds) {
+  public String createWithRedisLock(UUID requestId, Long memberId, List<Long> ticketIds) {
     validateTicketAvailability(ticketIds, memberId, requestId);
 
     RLock multiLock = acquireMultiLock(ticketIds);
