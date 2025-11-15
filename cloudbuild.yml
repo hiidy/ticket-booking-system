@@ -1,44 +1,44 @@
 steps:
-  # Booking Platform 빌드
+  # Booking app 빌드
   - name: 'gcr.io/kaniko-project/executor:latest'
     args:
-      - '--dockerfile=booking-platform/Dockerfile'
+      - '--dockerfile=booking-app/Dockerfile'
       - '--context=dir://.'
-      - '--destination=asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/booking-platform:latest'
+      - '--destination=asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/booking-app:latest'
       - '--cache=true'
       - '--cache-ttl=336h'
-    id: 'build-booking-platform'
+    id: 'build-booking-app'
     waitFor: ['-']
 
   # Streams 모듈들 (현재는 주석 처리)
   # - name: 'gcr.io/kaniko-project/executor:latest'
   #   args:
-  #     - '--dockerfile=streams-api/Dockerfile'
+  #     - '--dockerfile=stream-api/Dockerfile'
   #     - '--context=dir://.'
-  #     - '--destination=asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/streams-api:latest'
+  #     - '--destination=asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/stream-api:latest'
   #     - '--cache=true'
   #     - '--cache-ttl=336h'
-  #   id: 'build-streams-api'
+  #   id: 'build-stream-api'
   #   waitFor: ['-']
 
   # - name: 'gcr.io/kaniko-project/executor:latest'
   #   args:
-  #     - '--dockerfile=booking-streams/Dockerfile'
+  #     - '--dockerfile=stream-booking/Dockerfile'
   #     - '--context=dir://.'
-  #     - '--destination=asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/booking-streams:latest'
+  #     - '--destination=asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/stream-booking:latest'
   #     - '--cache=true'
   #     - '--cache-ttl=336h'
-  #   id: 'build-booking-streams'
+  #   id: 'build-stream-booking'
   #   waitFor: ['-']
 
   # - name: 'gcr.io/kaniko-project/executor:latest'
   #   args:
-  #     - '--dockerfile=ticket-streams/Dockerfile'
+  #     - '--dockerfile=stream-ticket/Dockerfile'
   #     - '--context=dir://.'
-  #     - '--destination=asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/ticket-streams:latest'
+  #     - '--destination=asia-northeast3-docker.pkg.dev/$PROJECT_ID/ticket-booking/stream-ticket:latest'
   #     - '--cache=true'
   #     - '--cache-ttl=336h'
-  #   id: 'build-ticket-streams'
+  #   id: 'build-stream-ticket'
   #   waitFor: ['-']
 
 timeout: '1800s'
