@@ -1,4 +1,4 @@
-package com.seatwise.booking.dto.response;
+package com.seatwise.core.web;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;

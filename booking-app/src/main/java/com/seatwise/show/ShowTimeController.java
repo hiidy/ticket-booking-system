@@ -6,15 +6,16 @@ import com.seatwise.show.dto.response.ShowSummaryResponse;
 import com.seatwise.show.dto.response.ShowTimeCreateResponse;
 import com.seatwise.show.dto.response.ShowTimeSummaryResponse;
 import com.seatwise.show.service.ShowTimeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "공연 시간 관리", description = "공연 시간 생성 및 조회 관련 API")
 @RestController
 @RequestMapping("/api/showtimes")
 @RequiredArgsConstructor
@@ -22,25 +23,24 @@ public class ShowTimeController {
 
   private final ShowTimeService showTimeService;
 
+  @Operation(summary = "공연 시간 생성", description = "새로운 공연 시간 정보를 생성합니다")
   @PostMapping
-  public ResponseEntity<Void> createShowTime(
+  public ShowTimeCreateResponse createShowTime(
       @Valid @RequestBody ShowTimeCreateRequest createRequest) {
-    ShowTimeCreateResponse response = showTimeService.createShowTime(createRequest);
-    return ResponseEntity.created(URI.create("/api/showtimes/" + response.id())).build();
+    return showTimeService.createShowTime(createRequest);
   }
 
+  @Operation(summary = "공연 시간 검색", description = "조건에 맞는 공연 시간 목록을 검색합니다")
   @GetMapping
-  public ResponseEntity<Slice<ShowSummaryResponse>> searchShowTimes(
+  public Slice<ShowSummaryResponse> searchShowTimes(
       @ModelAttribute ShowSearchCondition condition, Pageable pageable) {
-    Slice<ShowSummaryResponse> responses = showTimeService.searchShowTimes(condition, pageable);
-    return ResponseEntity.ok(responses);
+    return showTimeService.searchShowTimes(condition, pageable);
   }
 
+  @Operation(summary = "월별 공연 날짜 조회", description = "특정 공연의 특정 월별 예매 가능 날짜를 조회합니다")
   @GetMapping("/{showTimeId}/dates")
-  public ResponseEntity<List<ShowTimeSummaryResponse>> getShowDatesByMonth(
+  public List<ShowTimeSummaryResponse> getShowDatesByMonth(
       @PathVariable Long showTimeId, @RequestParam int year, @RequestParam int month) {
-    List<ShowTimeSummaryResponse> dates =
-        showTimeService.getAvailableDates(showTimeId, year, month);
-    return ResponseEntity.ok(dates);
+    return showTimeService.getAvailableDates(showTimeId, year, month);
   }
 }

@@ -1,6 +1,6 @@
-package com.seatwise.booking.advice;
+package com.seatwise.core.advice;
 
-import com.seatwise.booking.dto.response.ApiResponse;
+import com.seatwise.core.web.ApiResponse;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
