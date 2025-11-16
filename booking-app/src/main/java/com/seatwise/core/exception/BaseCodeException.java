@@ -1,5 +1,6 @@
-package com.seatwise.core;
+package com.seatwise.core.exception;
 
+import com.seatwise.core.BaseCode;
 import lombok.Getter;
 
 @Getter

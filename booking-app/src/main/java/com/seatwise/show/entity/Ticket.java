@@ -1,8 +1,8 @@
 package com.seatwise.show.entity;
 
-import com.seatwise.core.BusinessException;
+import com.seatwise.core.exception.BusinessException;
 import com.seatwise.core.BaseCode;
-import com.seatwise.core.jpa.BaseEntity;
+import com.seatwise.core.BaseEntity;
 import com.seatwise.venue.entity.Seat;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

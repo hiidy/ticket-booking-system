@@ -1,6 +1,6 @@
 package com.seatwise.show.service;
 
-import com.seatwise.core.BusinessException;
+import com.seatwise.core.exception.BusinessException;
 import com.seatwise.core.BaseCode;
 import com.seatwise.show.dto.response.ShowInventoryResponse;
 import com.seatwise.show.entity.ShowInventory;

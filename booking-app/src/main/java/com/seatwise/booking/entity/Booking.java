@@ -1,6 +1,6 @@
 package com.seatwise.booking.entity;
 
-import com.seatwise.core.jpa.BaseEntity;
+import com.seatwise.core.BaseEntity;
 import com.seatwise.member.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

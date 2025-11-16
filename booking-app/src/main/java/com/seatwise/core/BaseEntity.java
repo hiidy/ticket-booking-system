@@ -1,4 +1,4 @@
-package com.seatwise.core.jpa;
+package com.seatwise.core;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;

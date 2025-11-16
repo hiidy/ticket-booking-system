@@ -1,8 +1,8 @@
 package com.seatwise.core.advice;
 
 import com.seatwise.core.BaseCode;
-import com.seatwise.core.BaseCodeException;
-import com.seatwise.core.web.ApiResponse;
+import com.seatwise.core.exception.BaseCodeException;
+import com.seatwise.core.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;

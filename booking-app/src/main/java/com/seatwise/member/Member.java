@@ -1,6 +1,6 @@
 package com.seatwise.member;
 
-import com.seatwise.core.jpa.BaseEntity;
+import com.seatwise.core.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

@@ -1,6 +1,6 @@
 package com.seatwise.venue.entity;
 
-import com.seatwise.core.jpa.BaseEntity;
+import com.seatwise.core.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

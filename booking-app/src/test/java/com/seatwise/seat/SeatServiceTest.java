@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.seatwise.annotation.ServiceTest;
-import com.seatwise.core.BusinessException;
+import com.seatwise.core.exception.BusinessException;
 import com.seatwise.core.BaseCode;
 import com.seatwise.venue.SeatService;
 import com.seatwise.venue.entity.Seat;

@@ -1,6 +1,6 @@
 package com.seatwise.show.entity;
 
-import com.seatwise.core.BusinessException;
+import com.seatwise.core.exception.BusinessException;
 import com.seatwise.core.BaseCode;
 import com.seatwise.venue.entity.SeatGrade;
 import jakarta.persistence.Entity;

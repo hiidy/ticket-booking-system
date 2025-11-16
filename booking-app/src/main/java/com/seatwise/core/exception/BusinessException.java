@@ -1,4 +1,6 @@
-package com.seatwise.core;
+package com.seatwise.core.exception;
+
+import com.seatwise.core.BaseCode;
 
 public class BusinessException extends BaseCodeException {
 

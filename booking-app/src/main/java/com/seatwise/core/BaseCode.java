@@ -2,9 +2,6 @@ package com.seatwise.core;
 
 import lombok.Getter;
 
-/**
- * 기본 응답 코드
- */
 @Getter
 public enum BaseCode {
 

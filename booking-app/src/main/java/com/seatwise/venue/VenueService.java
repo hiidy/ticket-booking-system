@@ -1,6 +1,6 @@
 package com.seatwise.venue;
 
-import com.seatwise.core.BusinessException;
+import com.seatwise.core.exception.BusinessException;
 import com.seatwise.core.BaseCode;
 import com.seatwise.venue.entity.Venue;
 import com.seatwise.venue.entity.VenueRepository;

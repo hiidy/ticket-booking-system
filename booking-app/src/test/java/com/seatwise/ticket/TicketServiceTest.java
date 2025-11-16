@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 import com.seatwise.annotation.ServiceTest;
-import com.seatwise.core.BusinessException;
+import com.seatwise.core.exception.BusinessException;
 import com.seatwise.show.entity.Show;
 import com.seatwise.show.entity.ShowType;
 import com.seatwise.show.entity.ShowTime;

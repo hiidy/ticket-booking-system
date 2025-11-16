@@ -1,4 +1,4 @@
-package com.seatwise.core.jpa;
+package com.seatwise.core.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;

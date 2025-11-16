@@ -1,6 +1,5 @@
-package com.seatwise.core.web;
+package com.seatwise.core;
 
-import com.seatwise.core.BaseCode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import lombok.Data;
