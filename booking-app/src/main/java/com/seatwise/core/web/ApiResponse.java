@@ -1,5 +1,6 @@
 package com.seatwise.core.web;
 
+import com.seatwise.core.BaseCode;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import lombok.Data;
@@ -11,10 +12,10 @@ import lombok.Builder;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "API 응답 표준 구조")
+@Schema(description = "기본 API 응답 템플릿")
 public class ApiResponse<T> implements Serializable {
 
-  @Schema(description = "응답 코드 (0: 성공, 그외: 실패)")
+  @Schema(description = "응답 코드 (0: 성공 / 나머지 : 실패)")
   private Integer code;
 
   @Schema(description = "응답 메시지")
@@ -24,19 +25,40 @@ public class ApiResponse<T> implements Serializable {
   private T data;
 
   public static <T> ApiResponse<T> ok() {
-    return ApiResponse.<T>builder().code(0).build();
+    return ApiResponse.<T>builder()
+        .code(BaseCode.SUCCESS.getCode())
+        .message(BaseCode.SUCCESS.getMessage())
+        .build();
   }
 
   public static <T> ApiResponse<T> ok(T data) {
-    return ApiResponse.<T>builder().code(0).data(data).build();
+    return ApiResponse.<T>builder()
+        .code(BaseCode.SUCCESS.getCode())
+        .message(BaseCode.SUCCESS.getMessage())
+        .data(data)
+        .build();
   }
 
   public static <T> ApiResponse<T> ok(T data, String message) {
-    return ApiResponse.<T>builder().code(0).message(message).data(data).build();
+    return ApiResponse.<T>builder()
+        .code(BaseCode.SUCCESS.getCode())
+        .message(message)
+        .data(data)
+        .build();
+  }
+
+  public static <T> ApiResponse<T> error(BaseCode baseCode) {
+    return ApiResponse.<T>builder()
+        .code(baseCode.getCode())
+        .message(baseCode.getMessage())
+        .build();
   }
 
   public static <T> ApiResponse<T> error(String message) {
-    return ApiResponse.<T>builder().code(-100).message(message).build();
+    return ApiResponse.<T>builder()
+        .code(BaseCode.SYSTEM_ERROR.getCode())
+        .message(message)
+        .build();
   }
 
   public static <T> ApiResponse<T> error(Integer code, String message) {

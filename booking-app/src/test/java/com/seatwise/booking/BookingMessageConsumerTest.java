@@ -10,7 +10,7 @@ import com.seatwise.booking.dto.response.BookingStatusResponse;
 import com.seatwise.booking.exception.BookingException;
 import com.seatwise.booking.messaging.BookingMessageConsumer;
 import com.seatwise.booking.messaging.StreamKeyGenerator;
-import com.seatwise.core.ErrorCode;
+import com.seatwise.core.BaseCode;
 import com.seatwise.show.service.ShowBookingService;
 import java.util.List;
 import java.util.UUID;
@@ -88,7 +88,7 @@ class BookingMessageConsumerTest {
         new BookingMessage(BookingMessageType.BOOKING, requestId.toString(), memberId, seatIds, 1L);
 
     when(showBookingService.create(requestId, memberId, seatIds))
-        .thenThrow(new BookingException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY, requestId));
+        .thenThrow(new BookingException(BaseCode.DUPLICATE_IDEMPOTENCY_KEY, requestId));
 
     ObjectRecord<String, BookingMessage> messageRecord =
         StreamRecords.newRecord().in(streamKey).ofObject(message);

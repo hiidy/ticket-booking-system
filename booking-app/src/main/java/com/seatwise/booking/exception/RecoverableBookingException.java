@@ -1,10 +1,10 @@
 package com.seatwise.booking.exception;
 
-import com.seatwise.core.ErrorCode;
+import com.seatwise.core.BaseCode;
 import java.util.UUID;
 
 public class RecoverableBookingException extends BookingException {
-  public RecoverableBookingException(ErrorCode errorCode, UUID requestId) {
-    super(errorCode, requestId);
+  public RecoverableBookingException(BaseCode baseCode, UUID requestId) {
+    super(baseCode, requestId);
   }
 }

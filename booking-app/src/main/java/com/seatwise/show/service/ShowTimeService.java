@@ -1,7 +1,7 @@
 package com.seatwise.show.service;
 
 import com.seatwise.core.BusinessException;
-import com.seatwise.core.ErrorCode;
+import com.seatwise.core.BaseCode;
 import com.seatwise.show.entity.Show;
 import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.show.entity.ShowTime;
@@ -36,12 +36,12 @@ public class ShowTimeService {
     Show show =
         showRepository
             .findById(request.showId())
-            .orElseThrow(() -> new BusinessException(ErrorCode.EVENT_NOT_FOUND));
+            .orElseThrow(() -> new BusinessException(BaseCode.EVENT_NOT_FOUND));
 
     Venue venue =
         venueRepository
             .findById(request.venueId())
-            .orElseThrow(() -> new BusinessException(ErrorCode.VENUE_NOT_FOUND));
+            .orElseThrow(() -> new BusinessException(BaseCode.VENUE_NOT_FOUND));
 
     ShowTime newShowTime =
         new ShowTime(show, venue, request.date(), request.startTime(), request.endTime());
@@ -55,7 +55,7 @@ public class ShowTimeService {
             .anyMatch(existingShow -> existingShow.isOverlapping(newShowTime));
 
     if (hasOverlap) {
-      throw new BusinessException(ErrorCode.DUPLICATE_SHOW);
+      throw new BusinessException(BaseCode.DUPLICATE_SHOW);
     }
   }
 

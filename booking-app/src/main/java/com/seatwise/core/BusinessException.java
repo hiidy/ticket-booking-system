@@ -1,8 +1,8 @@
 package com.seatwise.core;
 
-public class BusinessException extends ErrorCodeException {
+public class BusinessException extends BaseCodeException {
 
-  public BusinessException(ErrorCode errorCode) {
-    super(errorCode);
+  public BusinessException(BaseCode baseCode) {
+    super(baseCode);
   }
 }

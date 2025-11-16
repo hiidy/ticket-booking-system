@@ -1,7 +1,7 @@
 package com.seatwise.show.entity;
 
 import com.seatwise.core.BusinessException;
-import com.seatwise.core.ErrorCode;
+import com.seatwise.core.BaseCode;
 import com.seatwise.core.jpa.BaseEntity;
 import com.seatwise.venue.entity.Seat;
 import jakarta.persistence.Entity;
@@ -84,7 +84,7 @@ public class Ticket extends BaseEntity {
 
   private void validatePrice(Integer price) {
     if (price < 0) {
-      throw new BusinessException(ErrorCode.INVALID_SEAT_PRICE);
+      throw new BusinessException(BaseCode.INVALID_SEAT_PRICE);
     }
   }
 }

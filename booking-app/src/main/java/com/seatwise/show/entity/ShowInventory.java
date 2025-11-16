@@ -1,7 +1,7 @@
 package com.seatwise.show.entity;
 
 import com.seatwise.core.BusinessException;
-import com.seatwise.core.ErrorCode;
+import com.seatwise.core.BaseCode;
 import com.seatwise.venue.entity.SeatGrade;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -42,7 +42,7 @@ public class ShowInventory {
 
   public void decreaseStock(int count) {
     if (availableCount <= 0) {
-      throw new BusinessException(ErrorCode.NO_AVAILABLE_STOCK);
+      throw new BusinessException(BaseCode.NO_AVAILABLE_STOCK);
     }
     this.availableCount -= count;
   }

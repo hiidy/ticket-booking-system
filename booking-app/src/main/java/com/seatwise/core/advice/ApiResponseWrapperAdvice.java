@@ -1,14 +1,19 @@
 package com.seatwise.core.advice;
 
+import com.seatwise.core.BaseCode;
+import com.seatwise.core.BaseCodeException;
 import com.seatwise.core.web.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class ApiResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
 
@@ -33,15 +38,43 @@ public class ApiResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
       return body;
     }
 
+    // 이미 ApiResponse 형태이면 그대로 반환
     if (body instanceof ApiResponse) {
       return body;
     }
 
+    // 예외 처리
+    if (body instanceof BaseCodeException) {
+      BaseCodeException exception = (BaseCodeException) body;
+      log.warn("Handled {} : {}", exception.getClass().getSimpleName(), exception.getBaseCode().name(), exception);
+      return ApiResponse.error(exception.getBaseCode());
+    }
+
+    // 일반 예외 처리
+    if (body instanceof Exception) {
+      Exception exception = (Exception) body;
+      log.error("Unhandled exception: ", exception);
+      return ApiResponse.error(BaseCode.SYSTEM_ERROR);
+    }
+
+    // 정상 응답 처리
     if (body == null || returnType.getParameterType().equals(Void.class)) {
       return ApiResponse.ok("처리가 완료되었습니다");
     }
 
     return ApiResponse.ok(body);
+  }
+
+  @ExceptionHandler(Exception.class)
+  public ApiResponse<Void> handleException(Exception e) {
+    log.error("Unhandled exception: ", e);
+    return ApiResponse.error(BaseCode.SYSTEM_ERROR);
+  }
+
+  @ExceptionHandler(BaseCodeException.class)
+  public ApiResponse<Void> handleBaseCodeException(BaseCodeException e) {
+    log.warn("Handled {} : {}", e.getClass().getSimpleName(), e.getBaseCode().name(), e);
+    return ApiResponse.error(e.getBaseCode());
   }
 
   private boolean isSwaggerRequest(ServerHttpRequest request) {

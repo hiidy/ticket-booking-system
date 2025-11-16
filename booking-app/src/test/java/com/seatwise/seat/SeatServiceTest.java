@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.seatwise.annotation.ServiceTest;
 import com.seatwise.core.BusinessException;
-import com.seatwise.core.ErrorCode;
+import com.seatwise.core.BaseCode;
 import com.seatwise.venue.SeatService;
 import com.seatwise.venue.entity.Seat;
 import com.seatwise.venue.entity.SeatGrade;
@@ -75,6 +75,6 @@ class SeatServiceTest {
     // when & then
     assertThatThrownBy(() -> seatService.createSeat(request))
         .isInstanceOf(BusinessException.class)
-        .hasMessage(ErrorCode.DUPLICATE_SEAT_NUMBER.getMessage());
+        .hasMessage(BaseCode.DUPLICATE_SEAT_NUMBER.getMessage());
   }
 }

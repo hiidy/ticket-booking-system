@@ -1,7 +1,7 @@
 package com.seatwise.show.service;
 
 import com.seatwise.core.BusinessException;
-import com.seatwise.core.ErrorCode;
+import com.seatwise.core.BaseCode;
 import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.show.dto.request.ShowRequest;
 import com.seatwise.show.dto.response.ShowCreateResponse;
@@ -27,6 +27,6 @@ public class ShowService {
     return showRepository
         .findById(eventId)
         .map(ShowResponse::from)
-        .orElseThrow(() -> new BusinessException(ErrorCode.EVENT_NOT_FOUND));
+        .orElseThrow(() -> new BusinessException(BaseCode.EVENT_NOT_FOUND));
   }
 }

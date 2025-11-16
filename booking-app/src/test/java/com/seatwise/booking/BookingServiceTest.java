@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import com.seatwise.annotation.ServiceTest;
 import com.seatwise.booking.exception.BookingException;
-import com.seatwise.core.ErrorCode;
+import com.seatwise.core.BaseCode;
 import com.seatwise.member.Member;
 import com.seatwise.member.MemberRepository;
 import com.seatwise.show.entity.ShowTime;
@@ -74,7 +74,7 @@ class BookingServiceTest {
     // when & then
     assertThatThrownBy(() -> showBookingService.create(requestId, memberId, invalidTicketIds))
         .isInstanceOf(BookingException.class)
-        .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SEAT_NOT_AVAILABLE);
+        .hasFieldOrPropertyWithValue("baseCode", BaseCode.SEAT_NOT_AVAILABLE);
   }
 
   @Test
@@ -89,7 +89,7 @@ class BookingServiceTest {
     // when & then
     assertThatThrownBy(() -> showBookingService.create(duplicatedId, memberId, ticketIds))
         .isInstanceOf(BookingException.class)
-        .hasFieldOrPropertyWithValue("errorCode", ErrorCode.DUPLICATE_IDEMPOTENCY_KEY);
+        .hasFieldOrPropertyWithValue("baseCode", BaseCode.DUPLICATE_IDEMPOTENCY_KEY);
   }
 
   @Test
@@ -108,6 +108,6 @@ class BookingServiceTest {
     assertThatThrownBy(
             () -> showBookingService.create(secondRequestId, otherMemberId, ticketIds))
         .isInstanceOf(BookingException.class)
-        .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SEAT_NOT_AVAILABLE);
+        .hasFieldOrPropertyWithValue("baseCode", BaseCode.SEAT_NOT_AVAILABLE);
   }
 }

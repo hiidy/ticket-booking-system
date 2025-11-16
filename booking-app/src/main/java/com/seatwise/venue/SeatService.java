@@ -1,7 +1,7 @@
 package com.seatwise.venue;
 
 import com.seatwise.core.BusinessException;
-import com.seatwise.core.ErrorCode;
+import com.seatwise.core.BaseCode;
 import com.seatwise.venue.entity.Seat;
 import com.seatwise.venue.entity.SeatGrade;
 import com.seatwise.venue.entity.SeatRepository;
@@ -28,7 +28,7 @@ public class SeatService {
     Venue venue =
         venueRepository
             .findById(request.venueId())
-            .orElseThrow(() -> new BusinessException(ErrorCode.VENUE_NOT_FOUND));
+            .orElseThrow(() -> new BusinessException(BaseCode.VENUE_NOT_FOUND));
 
     List<Integer> existsSeatNumbers =
         seatRepository.findByVenueId(request.venueId()).stream().map(Seat::getSeatNumber).toList();
@@ -64,7 +64,7 @@ public class SeatService {
     boolean hasDuplicate = incoming.stream().anyMatch(existing::contains);
 
     if (hasDuplicate) {
-      throw new BusinessException(ErrorCode.DUPLICATE_SEAT_NUMBER);
+      throw new BusinessException(BaseCode.DUPLICATE_SEAT_NUMBER);
     }
   }
 }

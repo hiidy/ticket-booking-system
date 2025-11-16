@@ -5,7 +5,7 @@ import com.seatwise.booking.entity.Booking;
 import com.seatwise.booking.entity.BookingRepository;
 import com.seatwise.booking.exception.FatalBookingException;
 import com.seatwise.booking.exception.RecoverableBookingException;
-import com.seatwise.core.ErrorCode;
+import com.seatwise.core.BaseCode;
 import com.seatwise.member.Member;
 import com.seatwise.member.MemberRepository;
 import com.seatwise.show.entity.Ticket;
@@ -34,27 +34,27 @@ public class ShowBookingService {
   @Transactional
   public String create(UUID requestId, Long memberId, List<Long> ticketIds) {
     if (bookingRepository.existsByRequestId(requestId)) {
-      throw new FatalBookingException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY, requestId);
+      throw new FatalBookingException(BaseCode.DUPLICATE_IDEMPOTENCY_KEY, requestId);
     }
 
     Member member =
         memberRepository
             .findById(memberId)
-            .orElseThrow(() -> new FatalBookingException(ErrorCode.MEMBER_NOT_FOUND, requestId));
+            .orElseThrow(() -> new FatalBookingException(BaseCode.MEMBER_NOT_FOUND, requestId));
 
     LocalDateTime bookingRequestTime = LocalDateTime.now();
 
     List<Ticket> tickets = ticketRepository.findAllAvailableSeats(ticketIds, bookingRequestTime);
 
     if (tickets.size() != ticketIds.size()) {
-      throw new RecoverableBookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
+      throw new RecoverableBookingException(BaseCode.SEAT_NOT_AVAILABLE, requestId);
     }
 
     boolean anyUnavailable =
         tickets.stream().anyMatch(ticket -> !ticket.canAssignBooking(bookingRequestTime));
 
     if (anyUnavailable) {
-      throw new RecoverableBookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
+      throw new RecoverableBookingException(BaseCode.SEAT_NOT_AVAILABLE, requestId);
     }
 
     int totalAmount = tickets.stream().map(Ticket::getPrice).reduce(0, Integer::sum);
@@ -74,7 +74,7 @@ public class ShowBookingService {
     Member member =
         memberRepository
             .findById(memberId)
-            .orElseThrow(() -> new FatalBookingException(ErrorCode.MEMBER_NOT_FOUND, requestId));
+            .orElseThrow(() -> new FatalBookingException(BaseCode.MEMBER_NOT_FOUND, requestId));
 
     LocalDateTime bookingRequestTime = LocalDateTime.now();
 
@@ -82,12 +82,12 @@ public class ShowBookingService {
     try {
       tickets = ticketRepository.findAllAvailableSeatsWithLock(ticketIds, bookingRequestTime);
     } catch (org.springframework.dao.PessimisticLockingFailureException e) {
-      throw new RecoverableBookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
+      throw new RecoverableBookingException(BaseCode.SEAT_NOT_AVAILABLE, requestId);
     }
 
     if (tickets.size() != ticketIds.size()
         || tickets.stream().anyMatch(t -> !t.canAssignBooking(bookingRequestTime))) {
-      throw new RecoverableBookingException(ErrorCode.SEAT_NOT_AVAILABLE, requestId);
+      throw new RecoverableBookingException(BaseCode.SEAT_NOT_AVAILABLE, requestId);
     }
 
     int totalAmount = tickets.stream().mapToInt(Ticket::getPrice).sum();
@@ -107,7 +107,7 @@ public class ShowBookingService {
     Member member =
         memberRepository
             .findById(memberId)
-            .orElseThrow(() -> new FatalBookingException(ErrorCode.MEMBER_NOT_FOUND, requestId));
+            .orElseThrow(() -> new FatalBookingException(BaseCode.MEMBER_NOT_FOUND, requestId));
 
     Booking booking = Booking.failed(requestId, member);
     bookingRepository.save(booking);

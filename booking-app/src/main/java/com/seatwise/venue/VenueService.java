@@ -1,7 +1,7 @@
 package com.seatwise.venue;
 
 import com.seatwise.core.BusinessException;
-import com.seatwise.core.ErrorCode;
+import com.seatwise.core.BaseCode;
 import com.seatwise.venue.entity.Venue;
 import com.seatwise.venue.entity.VenueRepository;
 import com.seatwise.venue.dto.request.VenueCreateRequest;
@@ -17,7 +17,7 @@ public class VenueService {
   public Venue findById(Long id) {
     return venueRepository
         .findById(id)
-        .orElseThrow(() -> new BusinessException(ErrorCode.VENUE_NOT_FOUND));
+        .orElseThrow(() -> new BusinessException(BaseCode.VENUE_NOT_FOUND));
   }
 
   public Long createVenue(VenueCreateRequest request) {

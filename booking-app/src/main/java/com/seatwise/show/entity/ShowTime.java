@@ -1,7 +1,7 @@
 package com.seatwise.show.entity;
 
 import com.seatwise.core.BusinessException;
-import com.seatwise.core.ErrorCode;
+import com.seatwise.core.BaseCode;
 import com.seatwise.core.jpa.BaseEntity;
 import com.seatwise.venue.entity.Venue;
 import jakarta.persistence.Entity;
@@ -53,7 +53,7 @@ public class ShowTime extends BaseEntity {
 
   public void validateTimes(LocalTime startTime, LocalTime endTime) {
     if (startTime.isAfter(endTime)) {
-      throw new BusinessException(ErrorCode.INVALID_SHOW_TIME);
+      throw new BusinessException(BaseCode.INVALID_SHOW_TIME);
     }
   }
 

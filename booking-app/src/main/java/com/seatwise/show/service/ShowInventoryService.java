@@ -1,7 +1,7 @@
 package com.seatwise.show.service;
 
 import com.seatwise.core.BusinessException;
-import com.seatwise.core.ErrorCode;
+import com.seatwise.core.BaseCode;
 import com.seatwise.show.dto.response.ShowInventoryResponse;
 import com.seatwise.show.entity.ShowInventory;
 import com.seatwise.show.repository.ShowInventoryRepository;
@@ -32,7 +32,7 @@ public class ShowInventoryService {
     ShowInventory showInventory =
         showInventoryRepository
             .findById(id)
-            .orElseThrow(() -> new BusinessException(ErrorCode.NO_AVAILABLE_STOCK));
+            .orElseThrow(() -> new BusinessException(BaseCode.NO_AVAILABLE_STOCK));
 
     showInventory.decreaseStock(decreaseCount);
   }

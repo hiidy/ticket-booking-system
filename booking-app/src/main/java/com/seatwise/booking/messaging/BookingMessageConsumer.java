@@ -122,7 +122,7 @@ public class BookingMessageConsumer
         log.warn(
             "예약 실패: requestId={}, error={}, memberId={}",
             requestId,
-            e.getErrorCode(),
+            e.getBaseCode(),
             request.memberId());
         showBookingService.createFailedBooking(requestId, request.memberId());
       } finally {
