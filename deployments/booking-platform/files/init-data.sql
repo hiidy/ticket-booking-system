@@ -11,21 +11,12 @@ SET CHARACTER_SET_RESULTS = utf8mb4;
 
 USE ticket_booking;
 
--- 데이터가 이미 있는지 확인하는 변수 설정
-SET @data_exists = 0;
-
--- 공연장 데이터가 있는지 확인
-SELECT COUNT(*)
-INTO @venue_count
+-- 데이터가 이미 있는지 확인
+SELECT COUNT(*) as venue_count
 FROM venue
 WHERE id = 1;
-IF @venue_count > 0 THEN
-SET @data_exists = 1;
-END IF;
 
--- 데이터가 없을 경우에만 생성
-IF @data_exists = 0 THEN
-
+-- 공연장 데이터가 없을 경우에만 생성 (INSERT IGNORE 사용)
 SELECT 'Load Test 데이터 생성 시작...' as message;
 
 -- 1. 공연장 정보 생성 (단일 공연장)
@@ -161,7 +152,3 @@ ORDER BY FIELD(s.section_group, 'G1', 'G2', 'G3', 'P', 'R'), s.section_id
 LIMIT 20;
 
 SELECT 'Load Test 데이터 생성 완료!' as message;
-
-ELSE
-SELECT 'Load Test 데이터가 이미 존재합니다. 생성을 건너뜁니다.' as message;
-END IF;
