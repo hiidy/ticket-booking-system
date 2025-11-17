@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "booking-platform.mysql.fullname" . }}
+  name: {{ include "booking-app.mysql.fullname" . }}
   labels:
-    {{- include "booking-platform.labels" . | nindent 4 }}
+    {{- include "booking-app.labels" . | nindent 4 }}
     app.kubernetes.io/component: mysql
 spec:
   ports:
@@ -12,27 +12,27 @@ spec:
       targetPort: 3306
   clusterIP: None
   selector:
-    {{- include "booking-platform.selectorLabels" . | nindent 4 }}
+    {{- include "booking-app.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: mysql
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "booking-platform.mysql.fullname" . }}
+  name: {{ include "booking-app.mysql.fullname" . }}
   labels:
-    {{- include "booking-platform.labels" . | nindent 4 }}
+    {{- include "booking-app.labels" . | nindent 4 }}
     app.kubernetes.io/component: mysql
 spec:
-  serviceName: {{ include "booking-platform.mysql.fullname" . }}
+  serviceName: {{ include "booking-app.mysql.fullname" . }}
   replicas: 1
   selector:
     matchLabels:
-      {{- include "booking-platform.selectorLabels" . | nindent 6 }}
+      {{- include "booking-app.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: mysql
   template:
     metadata:
       labels:
-        {{- include "booking-platform.selectorLabels" . | nindent 8 }}
+        {{- include "booking-app.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: mysql
     spec:
       containers:
@@ -62,7 +62,7 @@ spec:
       volumes:
         - name: init-script
           configMap:
-            name: {{ include "booking-platform.mysql.fullname" . }}-init
+            name: {{ include "booking-app.mysql.fullname" . }}-init
   volumeClaimTemplates:
     - metadata:
         name: mysql-data

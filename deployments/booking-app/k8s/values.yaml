@@ -27,7 +27,7 @@ mysql:
     size: 10Gi
     storageClass: standard-rwo
   rootPassword: "root"
-  database: "booking_system"
+  database: "ticket_booking"
   username: "booking_user"
   password: "booking_pass"
   resources:
@@ -56,7 +56,7 @@ redis:
 bookingPlatform:
   replicaCount: 1
   image:
-    repository: asia-northeast3-docker.pkg.dev/gifted-slice-475903-c6/ticket-booking/booking-platform
+    repository: asia-northeast3-docker.pkg.dev/gifted-slice-475903-c6/ticket-booking/booking-app
     tag: "latest"
     pullPolicy: Always
 
@@ -88,8 +88,8 @@ ingress:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
-  hosts: []
-  tls: []
+  hosts: [ ]
+  tls: [ ]
 
 # Health check 설정
 probes:

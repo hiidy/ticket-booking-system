@@ -45,7 +45,7 @@ resource "helm_release" "nginx_ingress" {
 
 # Booking Platform Helm Release
 resource "helm_release" "booking_platform" {
-  name      = "booking-platform"
+  name      = "booking-app"
   chart     = "${path.module}/../k8s"
   namespace = "default"
 

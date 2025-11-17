@@ -1,6 +1,6 @@
 apiVersion: v2
-name: booking-platform
-description: A Helm chart for booking platform with Nginx, MySQL and Redis
+name: booking-app
+description: A Helm chart for booking app with Nginx, MySQL and Redis
 type: application
 version: 0.1.0
 appVersion: "1.0.0"

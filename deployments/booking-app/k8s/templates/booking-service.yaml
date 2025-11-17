@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "booking-platform.fullname" . }}
+  name: {{ include "booking-app.fullname" . }}
   labels:
-    {{- include "booking-platform.labels" . | nindent 4 }}
-    app.kubernetes.io/component: booking-platform
+    {{- include "booking-app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: booking-app
 spec:
   type: {{ .Values.bookingPlatform.service.type }}
   ports:
@@ -13,5 +13,5 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "booking-platform.selectorLabels" . | nindent 4 }}
-    app.kubernetes.io/component: booking-platform
+    {{- include "booking-app.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: booking-app

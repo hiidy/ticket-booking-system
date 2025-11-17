@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "booking-app.fullname" . }}-config
+  labels:
+    {{- include "booking-app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: booking-app
+data:
+  DB_HOST: {{ include "booking-app.mysql.fullname" . }}
+  DB_PORT: "3306"
+  DB_NAME: {{ .Values.mysql.database | quote }}
+  REDIS_HOST: {{ include "booking-app.redis.fullname" . }}
+  REDIS_PORT: "6379"
