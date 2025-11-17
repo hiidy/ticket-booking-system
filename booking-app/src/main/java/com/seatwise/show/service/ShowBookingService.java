@@ -60,7 +60,6 @@ public class ShowBookingService {
     int totalAmount = tickets.stream().map(Ticket::getPrice).reduce(0, Integer::sum);
     Booking booking = Booking.success(requestId, member, totalAmount);
     Booking savedBooking = bookingRepository.save(booking);
-    log.info("booking 저장 : {}", booking.getId());
     tickets.forEach(
         ticket ->
             ticket.assignBooking(savedBooking.getId(), bookingRequestTime, Duration.ofMinutes(10)));
