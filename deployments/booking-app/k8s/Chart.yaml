@@ -10,3 +10,7 @@ dependencies:
     version: 4.11.3
     repository: https://kubernetes.github.io/ingress-nginx
     condition: nginx.enabled
+  - name: ingress-nginx
+    alias: ingress-nginx-internal
+    version: 4.11.3
+    repository: https://kubernetes.github.io/ingress-nginx

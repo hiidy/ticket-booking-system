@@ -1,19 +1,19 @@
-{{- if .Values.ingress.enabled }}
+{{- if .Values.internalIngress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "booking-app.fullname" . }}
+  name: {{ include "booking-app.fullname" . }}-internal
   labels:
     {{- include "booking-app.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
+  {{- with .Values.internalIngress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  ingressClassName: {{ .Values.ingress.className }}
-  {{- if .Values.ingress.tls }}
+  ingressClassName: {{ .Values.internalIngress.className }}
+  {{- if .Values.internalIngress.tls }}
   tls:
-    {{- range .Values.ingress.tls }}
+    {{- range .Values.internalIngress.tls }}
     - hosts:
         {{- range .hosts }}
         - {{ . | quote }}
@@ -22,8 +22,8 @@ spec:
     {{- end }}
   {{- end }}
   rules:
-    {{- if .Values.ingress.hosts }}
-    {{- range .Values.ingress.hosts }}
+    {{- if .Values.internalIngress.hosts }}
+    {{- range .Values.internalIngress.hosts }}
     - host: {{ .host | quote }}
       http:
         paths:

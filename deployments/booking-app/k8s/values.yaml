@@ -7,6 +7,10 @@ ingress-nginx:
       type: LoadBalancer
       annotations:
         cloud.google.com/load-balancer-type: "External"
+    ingressClassResource:
+      name: nginx
+      enabled: true
+      default: true
     metrics:
       enabled: true
     resources:
@@ -16,6 +20,36 @@ ingress-nginx:
       limits:
         cpu: 500m
         memory: 1Gi
+
+# Internal Ingress Nginx Controller
+ingress-nginx-internal:
+  enabled: true
+  controller:
+    service:
+      type: LoadBalancer
+      annotations:
+        cloud.google.com/load-balancer-type: "Internal"
+    ingressClassResource:
+      name: nginx-internal
+      enabled: true
+      default: false
+      controllerValue: k8s.io/ingress-nginx-internal
+    admissionWebhooks:
+      enabled: false
+      patch:
+        enabled: false
+      certificate:
+        enabled: false
+      failurePolicy: Ignore
+    metrics:
+      enabled: true
+    resources:
+      requests:
+        cpu: 2000m
+        memory: 2Gi
+      limits:
+        cpu: 4000m
+        memory: 4Gi
 
 # MySQL
 mysql:
@@ -32,11 +66,11 @@ mysql:
   password: "booking_pass"
   resources:
     requests:
-      cpu: "500m"
-      memory: "1Gi"
+      cpu: 2000m
+      memory: 4Gi
     limits:
-      cpu: "1000m"
-      memory: "2Gi"
+      cpu: 4000m
+      memory: 8Gi
 
 # Redis 설정
 redis:
@@ -46,15 +80,15 @@ redis:
     tag: "7-alpine"
   resources:
     requests:
-      cpu: "250m"
-      memory: "512Mi"
+      cpu: 2000m
+      memory: 8Gi
     limits:
-      cpu: "500m"
-      memory: "1Gi"
+      cpu: 4000m
+      memory: 16Gi
 
 # Booking Platform 설정
 bookingPlatform:
-  replicaCount: 1
+  replicaCount: 5
   image:
     repository: asia-northeast3-docker.pkg.dev/gifted-slice-475903-c6/ticket-booking/booking-app
     tag: "latest"
@@ -81,10 +115,20 @@ bookingPlatform:
 
   queuePartitionCount: 32
 
-# Ingress 설정
+# External Ingress 설정
 ingress:
   enabled: true
   className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  hosts: [ ]
+  tls: [ ]
+
+# Internal Ingress 설정
+internalIngress:
+  enabled: true
+  className: nginx-internal
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
