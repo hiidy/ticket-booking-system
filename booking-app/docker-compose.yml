@@ -4,7 +4,7 @@ services:
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
-      MYSQL_DATABASE: booking_system
+      MYSQL_DATABASE: ticket_booking
       MYSQL_USER: ${DB_USERNAME:-booking_user}
       MYSQL_PASSWORD: ${DB_PASSWORD:-booking_pass}
       TZ: UTC
@@ -13,6 +13,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./src/main/resources/sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./src/main/resources/sql/data.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
   redis:
     image: redis:7-alpine
     container_name: redis

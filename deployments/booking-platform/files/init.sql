@@ -39,7 +39,7 @@ CREATE TABLE seat
     seat_number   INT         NOT NULL,
     section_id    VARCHAR(20) NOT NULL,
     section_group VARCHAR(10) NOT NULL,
-    grade         VARCHAR(50) NOT NULL,
+    grade         ENUM('VIP', 'R', 'S', 'A') NOT NULL,
     created_at    TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -60,7 +60,7 @@ CREATE TABLE booking
     request_id   BINARY(16) UNIQUE,
     member_id    BIGINT      NOT NULL,
     total_amount INT         NOT NULL,
-    status       VARCHAR(50) NOT NULL,
+    status       ENUM('PENDING', 'FAILED', 'SUCCESS') NOT NULL,
     timestamp    TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_at   TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at   TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -73,7 +73,7 @@ CREATE TABLE ticket
     seat_id         BIGINT       NOT NULL,
     booking_id      BIGINT,
     price           INT          NOT NULL,
-    status          VARCHAR(100) NOT NULL,
+    status          ENUM('AVAILABLE', 'PAYMENT_PENDING', 'BOOKED', 'CANCELLED') NOT NULL,
     expiration_time TIMESTAMP,
     created_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -97,9 +97,10 @@ CREATE TABLE stream_message
 );
 
 -- 인덱스 생성
-CREATE INDEX show_type_index ON `show` (type);
 CREATE INDEX ticket_show_time_id_seat_id_status_index ON ticket (show_time_id, seat_id, status);
 CREATE INDEX idx_show_date_show_id ON show_time (date, show_id);
 CREATE INDEX idx_inventory_show_id_grade ON inventory (show_id, grade);
 CREATE INDEX idx_booking_request_id ON booking (request_id);
 CREATE INDEX idx_ticket_booking_id ON ticket (booking_id);
+
+SELECT '테이블 스키마 생성 완료!' as message;
