@@ -31,11 +31,19 @@ public class ShowBookingController {
     return bookingContext.get(BookingVersion.V1.getVersion()).createBooking(key, request);
   }
 
-  @Operation(summary = "예약 생성 v2", description = "Redis Lock으로 예약 처리")
+  @Operation(summary = "예약 생성 v2", description = "Normal MultiLock으로 예약 처리")
   @PostMapping("/v2")
   public String createBookingV2(
       @Parameter(description = "멱등키", required = true) @RequestHeader("Idempotency-Key") UUID key,
       @Valid @RequestBody BookingRequest request) {
     return bookingContext.get(BookingVersion.V2.getVersion()).createBooking(key, request);
+  }
+
+  @Operation(summary = "예약 생성 v21", description = "Redis Faster Multi lock")
+  @PostMapping("/v21")
+  public String createBookingV21(
+      @Parameter(description = "멱등키", required = true) @RequestHeader("Idempotency-Key") UUID key,
+      @Valid @RequestBody BookingRequest request) {
+    return bookingContext.get(BookingVersion.V21.getVersion()).createBooking(key, request);
   }
 }
