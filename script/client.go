@@ -133,11 +133,8 @@ func sendRequest(id int, clients []*http.Client, payload []byte, stats *ShardedS
 		}
 	}
 
-	// 히스토그램 업데이트
-	bucket := latencyMs / 10
-	if bucket >= 20 {
-		bucket = 20
-	}
+	// 히스토그램 업데이트 (로그 스케일 버킷)
+	bucket := getLogBucket(latencyMs)
 	atomic.AddInt64(&shard.histogram[bucket], 1)
 
 	// 상태 코드 기록

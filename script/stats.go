@@ -22,9 +22,9 @@ type StatsShard struct {
 	minLatency int64
 	maxLatency int64
 	sumLatency int64
-	histogram  [21]int64 // 0-10ms, 10-20ms, ..., 200ms+
+	histogram  [231]int64 // 로그 스케일: 0-10ms(10개), 10-100ms(90개), 100-1000ms(90개), 1000-5000ms(40개), 5000ms+(1개)
 
-	_ [64 - (11*8+21*8)%64]byte // 캐시 라인 패딩
+	_ [64 - (11*8+231*8)%64]byte // 캐시 라인 패딩
 }
 
 type ShardedStats struct {
@@ -92,11 +92,11 @@ func (s *ShardedStats) aggregate() (sent, completed, success, fail, status2xx, s
 }
 
 func (s *ShardedStats) calculatePercentiles() (p50, p95, p99 int64) {
-	totalCounts := make([]int64, 21)
+	totalCounts := make([]int64, 231)
 
 	// 모든 샤드의 히스토그램 합산
 	for i := range s.shards {
-		for j := 0; j < 21; j++ {
+		for j := 0; j < 231; j++ {
 			totalCounts[j] += atomic.LoadInt64(&s.shards[i].histogram[j])
 		}
 	}
@@ -122,13 +122,13 @@ func (s *ShardedStats) calculatePercentiles() (p50, p95, p99 int64) {
 		cumulative += count
 
 		if p50 == 0 && cumulative >= p50Target {
-			p50 = int64(bucket*10 + 5) // 버킷 중간값
+			p50 = estimateLatency(bucket)
 		}
 		if p95 == 0 && cumulative >= p95Target {
-			p95 = int64(bucket*10 + 5)
+			p95 = estimateLatency(bucket)
 		}
 		if p99 == 0 && cumulative >= p99Target {
-			p99 = int64(bucket*10 + 5)
+			p99 = estimateLatency(bucket)
 			break
 		}
 	}
