@@ -56,6 +56,10 @@ management:
       environment: ${SPRING_PROFILES_ACTIVE:unknown}
       instance: ${HOSTNAME:unknown}-${server.port}
       region: ${AWS_REGION:ap-northeast-2}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
 
 ---
 spring:
