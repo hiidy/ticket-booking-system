@@ -22,7 +22,8 @@ public class ApiResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
       MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
 
     return !returnType.getParameterType().equals(ApiResponse.class)
-        && !isSwaggerEndpoint(returnType);
+        && !isSwaggerEndpoint(returnType)
+        && !isActuatorEndpoint(returnType);
   }
 
   @Override
@@ -34,7 +35,7 @@ public class ApiResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
       ServerHttpRequest request,
       ServerHttpResponse response) {
 
-    if (isSwaggerRequest(request)) {
+    if (isSwaggerRequest(request) || isActuatorRequest(request)) {
       return body;
     }
 
@@ -44,15 +45,13 @@ public class ApiResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
     }
 
     // 예외 처리
-    if (body instanceof BaseCodeException) {
-      BaseCodeException exception = (BaseCodeException) body;
+    if (body instanceof BaseCodeException exception) {
       log.warn("Handled {} : {}", exception.getClass().getSimpleName(), exception.getBaseCode().name(), exception);
       return ApiResponse.error(exception.getBaseCode());
     }
 
     // 일반 예외 처리
-    if (body instanceof Exception) {
-      Exception exception = (Exception) body;
+    if (body instanceof Exception exception) {
       log.error("Unhandled exception: ", exception);
       return ApiResponse.error(BaseCode.SYSTEM_ERROR);
     }
@@ -80,20 +79,41 @@ public class ApiResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
   private boolean isSwaggerRequest(ServerHttpRequest request) {
     String path = request.getURI().getPath();
     return path != null && (
-        path.contains("/swagger")
+        path.contains("/swagger-ui")
+        || path.contains("/swagger-resources")
         || path.contains("/v3/api-docs")
         || path.contains("/api-docs")
+        || path.contains("/webjars/springfox-swagger-ui")
+        || path.contains("/webjars/swagger-ui")
     );
+  }
+
+  private boolean isActuatorRequest(ServerHttpRequest request) {
+    String path = request.getURI().getPath();
+    return path != null && path.contains("/actuator");
   }
 
   private boolean isSwaggerEndpoint(MethodParameter returnType) {
     String declaringClassName = returnType.getDeclaringClass().getSimpleName();
-    String methodName = returnType.getMethod().getName();
 
-    return declaringClassName != null && (
-        declaringClassName.contains("OpenApi")
-        || declaringClassName.contains("Swagger")
-        || (methodName != null && methodName.contains("openapi"))
-    );
+    if (returnType.getMethod() != null) {
+      String methodName = returnType.getMethod().getName();
+      return declaringClassName.contains("OpenApi")
+          || declaringClassName.contains("Swagger")
+          || methodName.contains("openapi");
+    }
+
+    return declaringClassName.contains("OpenApi")
+        || declaringClassName.contains("Swagger");
+  }
+
+  private boolean isActuatorEndpoint(MethodParameter returnType) {
+    String declaringClassName = returnType.getDeclaringClass().getSimpleName();
+
+    return declaringClassName.contains("Actuator")
+        || declaringClassName.contains("Health")
+        || declaringClassName.contains("Info")
+        || declaringClassName.contains("Metrics")
+        || declaringClassName.contains("Environment");
   }
 }
