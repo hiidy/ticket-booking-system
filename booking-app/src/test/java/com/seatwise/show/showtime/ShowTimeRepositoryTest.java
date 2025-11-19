@@ -1,4 +1,4 @@
-package com.seatwise.showtime;
+package com.seatwise.show.showtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

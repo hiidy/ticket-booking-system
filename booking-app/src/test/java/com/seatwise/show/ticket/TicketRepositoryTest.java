@@ -1,4 +1,4 @@
-package com.seatwise.ticket;
+package com.seatwise.show.ticket;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

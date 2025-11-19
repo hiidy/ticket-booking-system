@@ -46,4 +46,12 @@ public class ShowBookingController {
       @Valid @RequestBody BookingRequest request) {
     return bookingContext.get(BookingVersion.V21.getVersion()).createBooking(key, request);
   }
+
+  @Operation(summary = "예약 생성 v3", description = "Local Lock + Redisson Lock")
+  @PostMapping("/v3")
+  public String createBookingV3(
+      @Parameter(description = "멱등키", required = true) @RequestHeader("Idempotency-Key") UUID key,
+      @Valid @RequestBody BookingRequest request) {
+    return bookingContext.get(BookingVersion.V3.getVersion()).createBooking(key, request);
+  }
 }
