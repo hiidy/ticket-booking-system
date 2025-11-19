@@ -3,10 +3,7 @@ package com.seatwise.booking;
 import com.seatwise.booking.dto.BookingCreateCommand;
 import com.seatwise.booking.dto.BookingMessage;
 import com.seatwise.booking.dto.BookingMessageType;
-import com.seatwise.booking.exception.RecoverableBookingException;
 import com.seatwise.booking.messaging.BookingMessageProducer;
-import com.seatwise.show.cache.TicketCacheService;
-import com.seatwise.core.BaseCode;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -17,7 +14,6 @@ import org.springframework.stereotype.Service;
 public class AsyncBookingService {
 
   private final BookingMessageProducer producer;
-  private final TicketCacheService cacheService;
   private final RedisTemplate<String, String> redisTemplate;
   private static final String KEY = "booking:request:";
 
@@ -29,10 +25,6 @@ public class AsyncBookingService {
     }
 
     UUID requestId = UUID.randomUUID();
-
-    if (cacheService.hasUnavailableTickets(command.ticketIds(), command.memberId())) {
-      throw new RecoverableBookingException(BaseCode.SEAT_NOT_AVAILABLE, requestId);
-    }
 
     producer.sendMessage(
         new BookingMessage(

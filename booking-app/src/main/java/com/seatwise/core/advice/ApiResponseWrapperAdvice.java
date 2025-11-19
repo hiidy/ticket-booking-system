@@ -1,12 +1,16 @@
 package com.seatwise.core.advice;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seatwise.core.BaseCode;
 import com.seatwise.core.exception.BaseCodeException;
 import com.seatwise.core.ApiResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,8 +18,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestControllerAdvice
 public class ApiResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
+
+    private final ObjectMapper objectMapper;
 
   @Override
   public boolean supports(
@@ -39,26 +46,20 @@ public class ApiResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
       return body;
     }
 
-    // 이미 ApiResponse 형태이면 그대로 반환
     if (body instanceof ApiResponse) {
-      return body;
+        return body;
     }
 
-    // 예외 처리
-    if (body instanceof BaseCodeException exception) {
-      log.warn("Handled {} : {}", exception.getClass().getSimpleName(), exception.getBaseCode().name(), exception);
-      return ApiResponse.error(exception.getBaseCode());
+    if (selectedConverterType.equals(StringHttpMessageConverter.class)) {
+        try {
+            return objectMapper.writeValueAsString(ApiResponse.ok(body));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("String response wrapping failed", e);
+        }
     }
 
-    // 일반 예외 처리
-    if (body instanceof Exception exception) {
-      log.error("Unhandled exception: ", exception);
-      return ApiResponse.error(BaseCode.SYSTEM_ERROR);
-    }
-
-    // 정상 응답 처리
-    if (body == null || returnType.getParameterType().equals(Void.class)) {
-      return ApiResponse.ok("처리가 완료되었습니다");
+    if (body == null) {
+         return ApiResponse.ok("처리가 완료되었습니다.");
     }
 
     return ApiResponse.ok(body);
