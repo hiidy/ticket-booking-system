@@ -32,10 +32,10 @@ public class TicketController {
     return ticketService.createTickets(showTimeId, request);
   }
 
-  @Operation(summary = "티켓 목록 조회", description = "특정 공연 시간의 티켓 목록을 조회합니다")
-  @GetMapping("/{showTimeId}/seats")
-  public List<TicketResponse> getTickets(@PathVariable Long showTimeId) {
-    return ticketService.getTickets(showTimeId);
+  @Operation(summary = "티켓 목록 조회", description = "특정 공연의 티켓 목록을 조회합니다")
+  @GetMapping("/{showId}/availability")
+  public List<TicketResponse> getTickets(@PathVariable Long showId) {
+    return ticketService.getTickets(showId);
   }
 
   @Operation(summary = "좌석 가용성 조회", description = "공연 시간별 등급별 좌석 가용성을 조회합니다")

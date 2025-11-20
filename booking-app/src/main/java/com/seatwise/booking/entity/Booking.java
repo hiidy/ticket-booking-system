@@ -1,18 +1,16 @@
 package com.seatwise.booking.entity;
 
 import com.seatwise.core.BaseEntity;
-import com.seatwise.member.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -34,9 +32,8 @@ public class Booking extends BaseEntity {
   @Column(name = "request_id", columnDefinition = "BINARY(16)")
   private UUID requestId;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "member_id")
-  private Member member;
+  @Column(name = "member_id")
+  private Long memberId;
 
   private int totalAmount;
 
@@ -44,24 +41,30 @@ public class Booking extends BaseEntity {
   @Column(name = "status")
   private BookingStatus status;
 
-  public Booking(UUID requestId, Member member, int totalAmount) {
-    this.requestId = requestId;
-    this.member = member;
+  public Booking(UUID requestId, Long memberId, int totalAmount, BookingStatus status) {
+    this.requestId = Objects.requireNonNull(requestId, "requestID는 필수");
+    this.memberId = Objects.requireNonNull(memberId, "memberId는 필수");
     this.totalAmount = totalAmount;
+    this.status = status != null ? status : BookingStatus.PENDING;
   }
 
-  private Booking(UUID requestId, Member member, int totalAmount, BookingStatus status) {
-    this.requestId = requestId;
-    this.member = member;
-    this.totalAmount = totalAmount;
-    this.status = status;
+  public static Booking createNew(UUID requestId, Long memberId, int totalAmount) {
+    return new Booking(requestId, memberId, totalAmount, BookingStatus.PENDING);
   }
 
-  public static Booking success(UUID requestId, Member member, int totalAmount) {
-    return new Booking(requestId, member, totalAmount, BookingStatus.SUCCESS);
+  public Booking markAsSuccess() {
+    this.status = BookingStatus.SUCCESS;
+    return this;
   }
 
-  public static Booking failed(UUID requestId, Member member) {
-    return new Booking(requestId, member, 0, BookingStatus.FAILED);
+  public Booking markAsFailed() {
+    this.status = BookingStatus.FAILED;
+    this.totalAmount = 0;
+    return this;
+  }
+
+  public Booking markAsCancelled() {
+    this.status = BookingStatus.CANCELLED;
+    return this;
   }
 }

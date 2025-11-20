@@ -1,14 +1,14 @@
 package com.seatwise.show.service;
 
-import com.seatwise.core.exception.BusinessException;
 import com.seatwise.core.BaseCode;
+import com.seatwise.core.exception.BusinessException;
+import com.seatwise.show.dto.request.TicketCreateRequest;
+import com.seatwise.show.dto.response.SeatAvailabilityResponse;
+import com.seatwise.show.dto.response.TicketResponse;
 import com.seatwise.show.entity.Show;
 import com.seatwise.show.entity.Ticket;
 import com.seatwise.show.repository.ShowRepository;
-import com.seatwise.show.dto.response.SeatAvailabilityResponse;
 import com.seatwise.show.repository.TicketRepository;
-import com.seatwise.show.dto.request.TicketCreateRequest;
-import com.seatwise.show.dto.response.TicketResponse;
 import com.seatwise.venue.entity.SeatRepository;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -25,7 +25,6 @@ public class TicketService {
   private final SeatRepository seatRepository;
 
   public List<Long> createTickets(Long showId, TicketCreateRequest request) {
-
     Show show =
         showRepository
             .findById(showId)
@@ -45,6 +44,11 @@ public class TicketService {
 
     List<Ticket> savedTickets = ticketRepository.saveAll(tickets);
     return savedTickets.stream().map(Ticket::getId).toList();
+  }
+
+  public List<TicketResponse> getAvailableTickets(Long showId, Long sectionId) {
+
+    return null;
   }
 
   public List<TicketResponse> getTickets(Long showId) {

@@ -1,6 +1,7 @@
 package com.seatwise.show.repository;
 
 import com.seatwise.show.dto.response.SeatAvailabilityResponse;
+import com.seatwise.show.entity.Show;
 import com.seatwise.show.entity.Ticket;
 import io.lettuce.core.dynamic.annotation.Param;
 import jakarta.persistence.LockModeType;

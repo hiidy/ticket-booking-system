@@ -1,19 +1,15 @@
 package com.seatwise.show.service;
 
-import com.seatwise.booking.dto.BookingCreatedEvent;
-import com.seatwise.booking.entity.Booking;
-import com.seatwise.booking.entity.BookingRepository;
+import com.seatwise.booking.BookingService;
 import com.seatwise.booking.exception.FatalBookingException;
 import com.seatwise.booking.exception.RecoverableBookingException;
 import com.seatwise.core.BaseCode;
-import com.seatwise.member.Member;
 import com.seatwise.member.MemberRepository;
 import com.seatwise.show.entity.Ticket;
 import com.seatwise.show.repository.TicketRepository;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,25 +21,39 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ShowBookingService {
 
-  private final BookingRepository bookingRepository;
+  private final BookingService bookingService;
   private final TicketRepository ticketRepository;
   private final MemberRepository memberRepository;
 
   @Transactional
   public String create(UUID requestId, Long memberId, List<Long> ticketIds) {
-    if (bookingRepository.existsByRequestId(requestId)) {
-      throw new FatalBookingException(BaseCode.DUPLICATE_IDEMPOTENCY_KEY, requestId);
+    // 1. 멤버 존재 여부 확인
+    if (!memberRepository.existsById(memberId)) {
+      throw new FatalBookingException(BaseCode.MEMBER_NOT_FOUND, requestId);
     }
-
-    Member member =
-        memberRepository
-            .findById(memberId)
-            .orElseThrow(() -> new FatalBookingException(BaseCode.MEMBER_NOT_FOUND, requestId));
 
     LocalDateTime bookingRequestTime = LocalDateTime.now();
 
+    // 2. 티켓 가용성 확인
     List<Ticket> tickets = ticketRepository.findAllAvailableSeats(ticketIds, bookingRequestTime);
+    validateTicketAvailability(tickets, ticketIds, bookingRequestTime, requestId);
 
+    // 3. 예매 생성 (BookingService에 위임)
+    int totalAmount = tickets.stream().mapToInt(Ticket::getPrice).sum();
+    Long savedBookingId = bookingService.createBooking(requestId, memberId, totalAmount);
+
+    // 4. 티켓 상태 변경
+    tickets.forEach(
+        ticket -> ticket.assignBooking(savedBookingId, bookingRequestTime, Duration.ofMinutes(10)));
+
+    return savedBookingId.toString();
+  }
+
+  private void validateTicketAvailability(
+      List<Ticket> tickets,
+      List<Long> ticketIds,
+      LocalDateTime bookingRequestTime,
+      UUID requestId) {
     if (tickets.size() != ticketIds.size()) {
       throw new RecoverableBookingException(BaseCode.SEAT_NOT_AVAILABLE, requestId);
     }
@@ -54,26 +64,18 @@ public class ShowBookingService {
     if (anyUnavailable) {
       throw new RecoverableBookingException(BaseCode.SEAT_NOT_AVAILABLE, requestId);
     }
-
-    int totalAmount = tickets.stream().map(Ticket::getPrice).reduce(0, Integer::sum);
-    Booking booking = Booking.success(requestId, member, totalAmount);
-    Booking savedBooking = bookingRepository.save(booking);
-    tickets.forEach(
-        ticket ->
-            ticket.assignBooking(savedBooking.getId(), bookingRequestTime, Duration.ofMinutes(10)));
-
-    return savedBooking.getId().toString();
   }
 
   @Transactional
   public String createWithLock(UUID requestId, Long memberId, List<Long> ticketIds) {
-    Member member =
-        memberRepository
-            .findById(memberId)
-            .orElseThrow(() -> new FatalBookingException(BaseCode.MEMBER_NOT_FOUND, requestId));
+    // 1. 멤버 존재 여부 확인
+    if (!memberRepository.existsById(memberId)) {
+      throw new FatalBookingException(BaseCode.MEMBER_NOT_FOUND, requestId);
+    }
 
     LocalDateTime bookingRequestTime = LocalDateTime.now();
 
+    // 2. 락 획득 및 티켓 확인
     List<Ticket> tickets;
     try {
       tickets = ticketRepository.findAllAvailableSeatsWithLock(ticketIds, bookingRequestTime);
@@ -81,34 +83,34 @@ public class ShowBookingService {
       throw new RecoverableBookingException(BaseCode.SEAT_NOT_AVAILABLE, requestId);
     }
 
+    // 3. 티켓 가용성 검증
     if (tickets.size() != ticketIds.size()
         || tickets.stream().anyMatch(t -> !t.canAssignBooking(bookingRequestTime))) {
       throw new RecoverableBookingException(BaseCode.SEAT_NOT_AVAILABLE, requestId);
     }
 
+    // 4. 예매 생성 (BookingService에 위임)
     int totalAmount = tickets.stream().mapToInt(Ticket::getPrice).sum();
-    Booking booking = Booking.success(requestId, member, totalAmount);
-    Booking savedBooking = bookingRepository.save(booking);
+    Long savedBookingId = bookingService.createBooking(requestId, memberId, totalAmount);
 
+    // 5. 티켓 상태 변경
     tickets.forEach(
-        t -> t.assignBooking(savedBooking.getId(), bookingRequestTime, Duration.ofMinutes(10)));
+        t -> t.assignBooking(savedBookingId, bookingRequestTime, Duration.ofMinutes(10)));
 
-    return savedBooking.getId().toString();
+    return savedBookingId.toString();
   }
 
   @Transactional
   public void createFailedBooking(UUID requestId, Long memberId) {
-    Member member =
-        memberRepository
-            .findById(memberId)
-            .orElseThrow(() -> new FatalBookingException(BaseCode.MEMBER_NOT_FOUND, requestId));
+    if (!memberRepository.existsById(memberId)) {
+      throw new FatalBookingException(BaseCode.MEMBER_NOT_FOUND, requestId);
+    }
 
-    Booking booking = Booking.failed(requestId, member);
-    bookingRepository.save(booking);
+    bookingService.createFailedBooking(requestId, memberId);
   }
 
   @Transactional
-  public void cancel(Long memberId, Long bookingId) {
+  public void cancelTickets(Long bookingId) {
     List<Ticket> tickets = ticketRepository.findTicketsByBookingId(bookingId);
 
     if (tickets.isEmpty()) {
@@ -116,24 +118,11 @@ public class ShowBookingService {
     }
 
     tickets.forEach(Ticket::cancelBooking);
-    bookingRepository.deleteById(bookingId);
   }
 
   @Transactional
   public void cancelWithoutRefund(UUID requestId) {
-    Optional<Booking> bookingOpt = bookingRepository.findByRequestId(requestId);
-
-    if (bookingOpt.isEmpty()) {
-      log.debug("정리할 예약이 없음: requestId={}", requestId);
-      return;
-    }
-
-    Booking booking = bookingOpt.get();
-    List<Ticket> tickets = ticketRepository.findTicketsByBookingId(booking.getId());
-
-    tickets.forEach(Ticket::cancelBooking);
-    bookingRepository.deleteById(booking.getId());
-
-    log.info("만료된 예약 정리: requestId={}, bookingId={}", requestId, booking.getId());
+    // TODO: 만료된 예매 정리 로직 구현 필요
+    log.debug("만료된 예약 정리 요청: requestId={}", requestId);
   }
 }

@@ -93,13 +93,24 @@ class BookingServiceTest {
   void shouldThrow_whenDuplicateIdempotencyKeyUsed() {
     // given
     UUID duplicatedId = UUID.randomUUID();
-    List<Long> ticketIds = List.of(ticketRepository.findAll().get(0).getId());
     Long memberId = member.getId();
 
-    showBookingService.create(duplicatedId, memberId, ticketIds);
+    Seat seat1 = Seat.builder().seatNumber(1).grade(SeatGrade.A).build();
+    Seat seat2 = Seat.builder().seatNumber(2).grade(SeatGrade.A).build();
+    seatRepository.saveAll(List.of(seat1, seat2));
+
+    Show show = showData.build();
+    Ticket ticket1 = Ticket.createAvailable(show, seat1, 40000);
+    Ticket ticket2 = Ticket.createAvailable(show, seat2, 40000);
+    ticketRepository.saveAll(List.of(ticket1, ticket2));
+
+    List<Long> firstTicketIds = List.of(ticket1.getId());
+    List<Long> secondTicketIds = List.of(ticket2.getId());
+
+    showBookingService.create(duplicatedId, memberId, firstTicketIds);
 
     // when & then
-    assertThatThrownBy(() -> showBookingService.create(duplicatedId, memberId, ticketIds))
+    assertThatThrownBy(() -> showBookingService.create(duplicatedId, memberId, secondTicketIds))
         .isInstanceOf(BookingException.class)
         .hasFieldOrPropertyWithValue("baseCode", BaseCode.DUPLICATE_IDEMPOTENCY_KEY);
   }
