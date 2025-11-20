@@ -17,20 +17,12 @@ CREATE TABLE `show`
     title       VARCHAR(100) NOT NULL,
     description TEXT         NOT NULL,
     type        VARCHAR(50)  NOT NULL,
+    venue_id    BIGINT       NOT NULL,
+    date        DATE         NOT NULL,
+    start_time  TIME         NOT NULL,
+    end_time    TIME         NOT NULL,
     created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE show_time
-(
-    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
-    show_id    BIGINT    NOT NULL,
-    venue_id   BIGINT    NOT NULL,
-    date       DATE      NOT NULL,
-    start_time TIME      NOT NULL,
-    end_time   TIME      NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE seat
@@ -69,7 +61,7 @@ CREATE TABLE booking
 CREATE TABLE ticket
 (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
-    show_time_id    BIGINT       NOT NULL,
+    show_id         BIGINT       NOT NULL,
     seat_id         BIGINT       NOT NULL,
     booking_id      BIGINT,
     price           INT          NOT NULL,
@@ -98,8 +90,10 @@ CREATE TABLE stream_message
 
 -- 인덱스 생성
 CREATE INDEX show_type_index ON `show` (type);
-CREATE INDEX ticket_show_time_id_seat_id_status_index ON ticket (show_time_id, seat_id, status);
-CREATE INDEX idx_show_date_show_id ON show_time (date, show_id);
+CREATE INDEX show_venue_id_index ON `show` (venue_id);
+CREATE INDEX show_date_index ON `show` (date);
+CREATE INDEX show_datetime_index ON `show` (date, start_time);
+CREATE INDEX ticket_show_id_seat_id_status_index ON ticket (show_id, seat_id, status);
 CREATE INDEX idx_inventory_show_id_grade ON inventory (show_id, grade);
 CREATE INDEX idx_booking_request_id ON booking (request_id);
 CREATE INDEX idx_ticket_booking_id ON ticket (booking_id);

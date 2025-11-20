@@ -31,8 +31,8 @@ public class Ticket extends BaseEntity {
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "show_time_id")
-  private ShowTime showTime;
+  @JoinColumn(name = "show_id")
+  private Show show;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "seat_id")
@@ -47,17 +47,17 @@ public class Ticket extends BaseEntity {
 
   private LocalDateTime expirationTime;
 
-  private Ticket(ShowTime showTime, Seat seat, Integer price, TicketStatus status) {
+  private Ticket(Show show, Seat seat, Integer price, TicketStatus status) {
     validatePrice(price);
-    this.showTime = showTime;
+    this.show = show;
     this.seat = seat;
     this.bookingId = null;
     this.price = price;
     this.status = status;
   }
 
-  public static Ticket createAvailable(ShowTime showTime, Seat seat, Integer price) {
-    return new Ticket(showTime, seat, price, TicketStatus.AVAILABLE);
+  public static Ticket createAvailable(Show show, Seat seat, Integer price) {
+    return new Ticket(show, seat, price, TicketStatus.AVAILABLE);
   }
 
   public boolean canAssignBooking(LocalDateTime now) {

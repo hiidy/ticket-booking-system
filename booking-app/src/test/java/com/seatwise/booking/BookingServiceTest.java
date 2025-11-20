@@ -7,15 +7,18 @@ import com.seatwise.booking.exception.BookingException;
 import com.seatwise.core.BaseCode;
 import com.seatwise.member.Member;
 import com.seatwise.member.MemberRepository;
-import com.seatwise.show.entity.ShowTime;
+import com.seatwise.show.entity.Show;
+import com.seatwise.show.entity.ShowType;
 import com.seatwise.show.service.ShowBookingService;
-import com.seatwise.support.ShowTimeTestDataBuilder;
+import com.seatwise.support.ShowTestDataBuilder;
+import com.seatwise.support.VenueTestDataBuilder;
 import com.seatwise.show.entity.Ticket;
 import com.seatwise.show.repository.TicketRepository;
 import com.seatwise.show.entity.TicketStatus;
 import com.seatwise.venue.entity.Seat;
 import com.seatwise.venue.entity.SeatGrade;
 import com.seatwise.venue.entity.SeatRepository;
+import com.seatwise.venue.entity.Venue;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -33,18 +36,27 @@ class BookingServiceTest {
   @Autowired private TicketRepository ticketRepository;
   @Autowired private SeatRepository seatRepository;
   @Autowired private MemberRepository memberRepository;
-  @Autowired private ShowTimeTestDataBuilder showTimeTestDataBuilder;
+  @Autowired private ShowTestDataBuilder showData;
+  @Autowired private VenueTestDataBuilder venueData;
 
   @BeforeEach
   void setUp() {
     LocalDate date = LocalDate.of(2025, 1, 1);
     LocalTime startTime = LocalTime.of(18, 0);
     LocalTime endTime = LocalTime.of(20, 0);
-    ShowTime showTime = showTimeTestDataBuilder.withTime(startTime, endTime).withDate(date).build();
+
+    Venue venue = venueData.withName("테스트 장소").withToTalSeat(100).build();
+    Show show = showData
+        .withTitle("테스트 공연")
+        .withType(ShowType.CONCERT)
+        .withVenue(venue)
+        .withDate(date)
+        .withTime(startTime, endTime)
+        .build();
 
     Seat seat = Seat.builder().seatNumber(1).grade(SeatGrade.A).build();
     seatRepository.save(seat);
-    ticketRepository.save(Ticket.createAvailable(showTime, seat, 40000));
+    ticketRepository.save(Ticket.createAvailable(show, seat, 40000));
 
     member = new Member("테스트유저", "abcd@gmail.com", "1234");
     memberRepository.save(member);

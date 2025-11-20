@@ -14,8 +14,8 @@ import org.springframework.data.jpa.repository.QueryHints;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
-  @Query("SELECT t FROM Ticket t JOIN FETCH t.seat s WHERE t.showTime.id = :showTimeId")
-  List<Ticket> findAllByShowTimeId(@Param("showTimeId") Long showTimeId);
+  @Query("SELECT t FROM Ticket t JOIN FETCH t.seat s WHERE t.show.id = :showId")
+  List<Ticket> findAllByShowId(@Param("showId") Long showId);
 
   @Query(
       """
@@ -26,11 +26,11 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
           )
           FROM Ticket t
           JOIN t.seat s
-          WHERE t.showTime.id = :showTimeId
+          WHERE t.show.id = :showId
           GROUP BY s.grade
           """)
-  List<SeatAvailabilityResponse> findTicketAvailabilityByShowTimeId(
-      @Param("showTimeId") Long showTimeId);
+  List<SeatAvailabilityResponse> findTicketAvailabilityByShowId(
+      @Param("showId") Long showId);
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query(

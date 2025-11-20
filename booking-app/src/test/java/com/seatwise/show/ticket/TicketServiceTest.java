@@ -8,14 +8,12 @@ import com.seatwise.annotation.ServiceTest;
 import com.seatwise.core.exception.BusinessException;
 import com.seatwise.show.entity.Show;
 import com.seatwise.show.entity.ShowType;
-import com.seatwise.show.entity.ShowTime;
 import com.seatwise.show.dto.TicketPrice;
 import com.seatwise.show.entity.Ticket;
 import com.seatwise.show.entity.TicketStatus;
 import com.seatwise.show.repository.TicketRepository;
 import com.seatwise.show.service.TicketService;
 import com.seatwise.support.ShowTestDataBuilder;
-import com.seatwise.support.ShowTimeTestDataBuilder;
 import com.seatwise.support.VenueTestDataBuilder;
 import com.seatwise.show.dto.request.TicketCreateRequest;
 import com.seatwise.show.dto.response.TicketResponse;
@@ -37,11 +35,10 @@ class TicketServiceTest {
   @Autowired private TicketService ticketService;
   @Autowired private SeatRepository seatRepository;
   @Autowired private TicketRepository ticketRepository;
-  @Autowired private ShowTimeTestDataBuilder showData;
-  @Autowired private ShowTestDataBuilder eventData;
+  @Autowired private ShowTestDataBuilder showData;
   @Autowired private VenueTestDataBuilder venueData;
 
-  private ShowTime showTime;
+  private Show show;
   private List<Seat> seats;
 
   @BeforeEach
@@ -51,21 +48,21 @@ class TicketServiceTest {
     LocalTime endTime = LocalTime.of(14, 0);
 
     Venue venue = venueData.withName("기본 장소").withToTalSeat(500).build();
-    Show show = eventData.withTitle("기본 공연").withType(ShowType.MUSICAL).build();
 
-    showTime =
+    show =
         showData
-            .withEvent(show)
+            .withTitle("기본 공연")
+            .withType(ShowType.MUSICAL)
             .withVenue(venue)
-            .withTime(startTime, endTime)
             .withDate(date)
+            .withTime(startTime, endTime)
             .build();
 
     seats = createSeats(5);
   }
 
   @Test
-  void shouldCreateTickets_whenValidShowTimeAndSeatRangeProvided() {
+  void shouldCreateTickets_whenValidShowAndSeatRangeProvided() {
     // given
     Long startSeatId = seats.get(0).getId();
     Long endSeatId = seats.get(4).getId();
@@ -73,7 +70,7 @@ class TicketServiceTest {
     TicketCreateRequest request = new TicketCreateRequest(List.of(ticketPrice));
 
     // when
-    List<Long> ticketIds = ticketService.createTickets(showTime.getId(), request);
+    List<Long> ticketIds = ticketService.createTickets(show.getId(), request);
 
     // then
     assertThat(ticketIds).hasSize(5);
@@ -88,7 +85,7 @@ class TicketServiceTest {
   }
 
   @Test
-  void shouldThrowException_whenCreatingTicketsWithInvalidShowTimeId() {
+  void shouldThrowException_whenCreatingTicketsWithInvalidShowId() {
     // given
     Long invalidId = 9999L;
     TicketPrice ticketPrice = new TicketPrice(seats.get(0).getId(), seats.get(4).getId(), 50000);
@@ -100,20 +97,16 @@ class TicketServiceTest {
   }
 
   @Test
-  void shouldReturnDetailedSeatInfo_whenFetchingTicketsByValidShowTimeId() {
+  void shouldReturnDetailedSeatInfo_whenFetchingTicketsByValidShowId() {
     // given
     LocalDate date = LocalDate.of(2024, 1, 1);
     LocalTime startTime = LocalTime.of(15, 0);
     Venue venue = venueData.withName("test-venue").withToTalSeat(1000).build();
-    Show show =
-        eventData
+    Show testShow =
+        showData
             .withTitle("지킬 앤 하이드")
             .withDescription("test-desc")
             .withType(ShowType.MUSICAL)
-            .build();
-    showTime =
-        showData
-            .withEvent(show)
             .withVenue(venue)
             .withDate(date)
             .withTime(startTime, startTime.plusHours(2))
@@ -126,12 +119,12 @@ class TicketServiceTest {
 
     ticketRepository.saveAll(
         List.of(
-            Ticket.createAvailable(showTime, vip1, 40000),
-            Ticket.createAvailable(showTime, vip2, 40000),
-            Ticket.createAvailable(showTime, rSeat, 20000)));
+            Ticket.createAvailable(testShow, vip1, 40000),
+            Ticket.createAvailable(testShow, vip2, 40000),
+            Ticket.createAvailable(testShow, rSeat, 20000)));
 
     // when
-    List<TicketResponse> result = ticketService.getTickets(showTime.getId());
+    List<TicketResponse> result = ticketService.getTickets(testShow.getId());
 
     // then
     assertThat(result)

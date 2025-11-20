@@ -2,9 +2,9 @@ package com.seatwise.show.service;
 
 import com.seatwise.core.exception.BusinessException;
 import com.seatwise.core.BaseCode;
-import com.seatwise.show.entity.ShowTime;
+import com.seatwise.show.entity.Show;
 import com.seatwise.show.entity.Ticket;
-import com.seatwise.show.repository.ShowTimeRepository;
+import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.show.dto.response.SeatAvailabilityResponse;
 import com.seatwise.show.repository.TicketRepository;
 import com.seatwise.show.dto.request.TicketCreateRequest;
@@ -21,13 +21,13 @@ import org.springframework.stereotype.Service;
 public class TicketService {
 
   private final TicketRepository ticketRepository;
-  private final ShowTimeRepository showTimeRepository;
+  private final ShowRepository showRepository;
   private final SeatRepository seatRepository;
 
   public List<Long> createTickets(Long showId, TicketCreateRequest request) {
 
-    ShowTime showTime =
-        showTimeRepository
+    Show show =
+        showRepository
             .findById(showId)
             .orElseThrow(() -> new BusinessException(BaseCode.SHOW_NOT_FOUND));
 
@@ -38,7 +38,7 @@ public class TicketService {
                     seatRepository
                         .findByIdBetween(ticketPrice.startSeatId(), ticketPrice.endSeatId())
                         .stream()
-                        .map(seat -> Ticket.createAvailable(showTime, seat, ticketPrice.price()))
+                        .map(seat -> Ticket.createAvailable(show, seat, ticketPrice.price()))
                         .toList())
             .flatMap(Collection::stream)
             .toList();
@@ -48,7 +48,7 @@ public class TicketService {
   }
 
   public List<TicketResponse> getTickets(Long showId) {
-    List<Ticket> tickets = ticketRepository.findAllByShowTimeId(showId);
+    List<Ticket> tickets = ticketRepository.findAllByShowId(showId);
     LocalDateTime requestTime = LocalDateTime.now();
     if (tickets.isEmpty()) {
       throw new BusinessException(BaseCode.TICKET_NOT_FOUND);
@@ -57,6 +57,6 @@ public class TicketService {
   }
 
   public List<SeatAvailabilityResponse> getTicketAvailabilityByGrade(Long showId) {
-    return ticketRepository.findTicketAvailabilityByShowTimeId(showId);
+    return ticketRepository.findTicketAvailabilityByShowId(showId);
   }
 }

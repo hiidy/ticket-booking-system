@@ -14,14 +14,9 @@ USE ticket_booking;
 INSERT IGNORE INTO venue (id, name, total_seats, created_at, updated_at)
 VALUES (1, '올림픽 파크 아레나', 45000, NOW(), NOW());
 
--- 2. 인기 공연  생성
-INSERT IGNORE INTO `show` (id, title, description, type, created_at, updated_at)
-VALUES (1, '슈퍼스타 K 페스티벌 2025', '한국 최고의 K-POP 아티스트들이 함께하는 초대형 페스티벌', 'CONCERT', NOW(), NOW());
-
--- 3. 공연 시간 생성
-INSERT IGNORE INTO show_time (id, show_id, venue_id, date, start_time, end_time, created_at,
-                              updated_at)
-VALUES (1, 1, 1, CURDATE() + INTERVAL 30 DAY, '19:00:00', '23:00:00', NOW(), NOW());
+-- 2. 인기 공연  생성 (ShowTime과 통합)
+INSERT IGNORE INTO `show` (id, title, description, type, venue_id, date, start_time, end_time, created_at, updated_at)
+VALUES (1, '슈퍼스타 K 페스티벌 2025', '한국 최고의 K-POP 아티스트들이 함께하는 초대형 페스티벌', 'CONCERT', 1, CURDATE() + INTERVAL 30 DAY, '19:00:00', '23:00:00', NOW(), NOW());
 
 -- 4. 100만명 회원 데이터 생성
 SET SESSION cte_max_recursion_depth = 1000000;
@@ -74,9 +69,9 @@ FROM (WITH RECURSIVE numbers(n) AS (SELECT 1
       FROM numbers) AS seat_numbers;
 
 -- 6. 45000개 티켓 생성 (모든 좌석에 대해 AVAILABLE 상태)
-INSERT IGNORE INTO ticket (id, show_time_id, seat_id, price, status, created_at, updated_at)
+INSERT IGNORE INTO ticket (id, show_id, seat_id, price, status, created_at, updated_at)
 SELECT s.id,
-       1,    -- show_time_id
+       1,    -- show_id
        s.id, -- seat_id
        CASE s.grade
            WHEN 'VIP' THEN 200000
@@ -97,9 +92,6 @@ FROM venue
 UNION ALL
 SELECT '공연 정보', CONCAT('총 ', COUNT(*), '개')
 FROM `show`
-UNION ALL
-SELECT '공연 시간 정보', CONCAT('총 ', COUNT(*), '개')
-FROM show_time
 UNION ALL
 SELECT '회원 정보', CONCAT('총 ', COUNT(*), '명')
 FROM member
