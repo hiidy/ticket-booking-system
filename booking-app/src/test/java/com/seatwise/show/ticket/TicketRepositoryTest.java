@@ -33,15 +33,14 @@ class TicketRepositoryTest {
     venueRepository.save(venue);
 
     Show show =
-        Show.builder()
-            .title("Test Show")
-            .description("Test Description")
-            .type(ShowType.CONCERT)
-            .venue(venue)
-            .date(LocalDate.of(2025, 1, 1))
-            .startTime(LocalTime.of(14, 0))
-            .endTime(LocalTime.of(15, 0))
-            .build();
+        new Show(
+            "Test Show",
+            "Test Description",
+            ShowType.CONCERT,
+            venue,
+            LocalDate.of(2025, 1, 1),
+            LocalTime.of(14, 0),
+            LocalTime.of(15, 0));
     showRepository.save(show);
 
     Seat seat1 = new Seat("A", "1", venue);
@@ -70,15 +69,14 @@ class TicketRepositoryTest {
     venueRepository.save(venue);
 
     Show show =
-        Show.builder()
-            .title("Test Show")
-            .description("Test Description")
-            .type(ShowType.CONCERT)
-            .venue(venue)
-            .date(LocalDate.of(2025, 1, 1))
-            .startTime(LocalTime.of(14, 0))
-            .endTime(LocalTime.of(15, 0))
-            .build();
+        new Show(
+            "Test Show",
+            "Test Description",
+            ShowType.CONCERT,
+            venue,
+            LocalDate.of(2025, 1, 1),
+            LocalTime.of(14, 0),
+            LocalTime.of(15, 0));
     showRepository.save(show);
 
     Seat seat1 = new Seat("A", "1", venue);

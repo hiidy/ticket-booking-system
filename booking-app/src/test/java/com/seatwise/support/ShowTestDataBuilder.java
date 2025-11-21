@@ -57,16 +57,7 @@ public class ShowTestDataBuilder {
   }
 
   public Show build() {
-    Show show =
-        Show.builder()
-            .title(title)
-            .description(description)
-            .type(type)
-            .venue(venue)
-            .date(date)
-            .startTime(startTime)
-            .endTime(endTime)
-            .build();
+    Show show = new Show(title, description, type, venue, date, startTime, endTime);
     return showRepository.save(show);
   }
 }
