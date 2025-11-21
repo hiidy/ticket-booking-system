@@ -38,7 +38,7 @@ public class ShowBookingService {
     List<Ticket> tickets = ticketRepository.findAllAvailableSeats(ticketIds, bookingRequestTime);
     validateTicketAvailability(tickets, ticketIds, bookingRequestTime, requestId);
 
-    // 3. 예매 생성 (BookingService에 위임)
+    // 3. 예매 생성
     int totalAmount = tickets.stream().mapToInt(Ticket::getPrice).sum();
     Long savedBookingId = bookingService.createBooking(requestId, memberId, totalAmount);
 
@@ -89,7 +89,7 @@ public class ShowBookingService {
       throw new RecoverableBookingException(BaseCode.SEAT_NOT_AVAILABLE, requestId);
     }
 
-    // 4. 예매 생성 (BookingService에 위임)
+    // 4. 예매 생성
     int totalAmount = tickets.stream().mapToInt(Ticket::getPrice).sum();
     Long savedBookingId = bookingService.createBooking(requestId, memberId, totalAmount);
 

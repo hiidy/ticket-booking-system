@@ -25,15 +25,27 @@ CREATE TABLE `show`
     updated_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+CREATE TABLE section
+(
+    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    show_id         BIGINT       NOT NULL,
+    section_name    VARCHAR(100) NOT NULL,
+    section_type    VARCHAR(50)  NOT NULL,
+    base_price      INT          NOT NULL,
+    total_seats     INT          NOT NULL,
+    available_seats INT          NOT NULL,
+    created_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 CREATE TABLE seat
 (
-    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
-    seat_number   INT         NOT NULL,
-    section_id    VARCHAR(20) NOT NULL,
-    section_group VARCHAR(10) NOT NULL,
-    grade         VARCHAR(50) NOT NULL,
-    created_at    TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    row_name   VARCHAR(10) NOT NULL,
+    col_name   VARCHAR(10) NOT NULL,
+    venue_id   BIGINT      NOT NULL,
+    created_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE member
@@ -64,6 +76,7 @@ CREATE TABLE ticket
     show_id         BIGINT       NOT NULL,
     seat_id         BIGINT       NOT NULL,
     booking_id      BIGINT,
+    section_id      BIGINT,
     price           INT          NOT NULL,
     status          VARCHAR(100) NOT NULL,
     expiration_time TIMESTAMP,
@@ -88,7 +101,6 @@ CREATE TABLE stream_message
     status      VARCHAR(50) NOT NULL
 );
 
--- 인덱스 생성
 CREATE INDEX show_type_index ON `show` (type);
 CREATE INDEX show_venue_id_index ON `show` (venue_id);
 CREATE INDEX show_date_index ON `show` (date);

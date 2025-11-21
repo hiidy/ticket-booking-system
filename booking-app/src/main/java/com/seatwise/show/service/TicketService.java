@@ -37,7 +37,7 @@ public class TicketService {
                     seatRepository
                         .findByIdBetween(ticketPrice.startSeatId(), ticketPrice.endSeatId())
                         .stream()
-                        .map(seat -> Ticket.createAvailable(show, seat, ticketPrice.price()))
+                        .map(seat -> Ticket.createAvailable(show, seat, null, ticketPrice.price()))
                         .toList())
             .flatMap(Collection::stream)
             .toList();
@@ -46,8 +46,10 @@ public class TicketService {
     return savedTickets.stream().map(Ticket::getId).toList();
   }
 
-  public List<TicketResponse> getAvailableTickets(Long showId, Long sectionId) {
+  public List<TicketResponse> getTicketAvailability(Long showId, Long sectionId) {
+    // 캐시에서 ticket availability 조회
 
+    // db에서 조회
     return null;
   }
 

@@ -11,9 +11,10 @@ public class SwaggerConfig {
   @Bean
   public OpenAPI openAPI() {
     return new OpenAPI()
-        .info(new Info()
-            .title("Ticket Booking System API")
-            .description("좌석 예약 시스템 API 문서")
-            .version("1.0.0"));
+        .info(
+            new Info()
+                .title("Ticket Booking System API")
+                .description("좌석 예약 시스템 API 문서")
+                .version("1.0.0"));
   }
 }

@@ -1,8 +1,8 @@
 package com.seatwise.show.entity;
 
-import com.seatwise.core.exception.BusinessException;
 import com.seatwise.core.BaseCode;
 import com.seatwise.core.BaseEntity;
+import com.seatwise.core.exception.BusinessException;
 import com.seatwise.venue.entity.Seat;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -38,6 +38,8 @@ public class Ticket extends BaseEntity {
   @JoinColumn(name = "seat_id")
   private Seat seat;
 
+  private Long sectionId;
+
   private Long bookingId;
 
   private Integer price;
@@ -47,17 +49,18 @@ public class Ticket extends BaseEntity {
 
   private LocalDateTime expirationTime;
 
-  private Ticket(Show show, Seat seat, Integer price, TicketStatus status) {
+  private Ticket(Show show, Seat seat, Long sectionId, Integer price, TicketStatus status) {
     validatePrice(price);
     this.show = show;
     this.seat = seat;
+    this.sectionId = sectionId;
     this.bookingId = null;
     this.price = price;
     this.status = status;
   }
 
-  public static Ticket createAvailable(Show show, Seat seat, Integer price) {
-    return new Ticket(show, seat, price, TicketStatus.AVAILABLE);
+  public static Ticket createAvailable(Show show, Seat seat, Long sectionId, Integer price) {
+    return new Ticket(show, seat, sectionId, price, TicketStatus.AVAILABLE);
   }
 
   public boolean canAssignBooking(LocalDateTime now) {

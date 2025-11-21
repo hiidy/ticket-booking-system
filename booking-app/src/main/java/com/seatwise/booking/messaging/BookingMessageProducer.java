@@ -4,7 +4,6 @@ import com.seatwise.booking.dto.BookingMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.RedisConnectionFailureException;
-import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,8 +31,6 @@ public class BookingMessageProducer {
     ObjectRecord<String, BookingMessage> objectRecord =
         StreamRecords.newRecord().in(streamKey).ofObject(message);
 
-    redisTemplate
-        .opsForStream(new Jackson2HashMapper(true))
-        .add(objectRecord);
+    redisTemplate.opsForStream(new Jackson2HashMapper(true)).add(objectRecord);
   }
 }

@@ -2,8 +2,6 @@ package com.seatwise.venue.entity;
 
 import com.seatwise.core.BaseEntity;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,24 +22,16 @@ public class Seat extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private int seatNumber;
+  private String rowName;
 
-  private String sectionId;
-
-  private String sectionGroup;
-
-  @Enumerated(EnumType.STRING)
-  private SeatGrade grade;
+  private String colName;
 
   @ManyToOne(fetch = FetchType.LAZY)
   private Venue venue;
 
-  @Builder
-  public Seat(int seatNumber, String sectionId, String sectionGroup, SeatGrade grade, Venue venue) {
-    this.seatNumber = seatNumber;
-    this.sectionId = sectionId;
-    this.sectionGroup = sectionGroup;
-    this.grade = grade;
+  public Seat(String rowName, String colName, Venue venue) {
+    this.rowName = rowName;
+    this.colName = colName;
     this.venue = venue;
   }
 }

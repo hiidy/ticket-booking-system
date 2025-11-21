@@ -2,9 +2,9 @@ package com.seatwise.core.advice;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.seatwise.core.ApiResponse;
 import com.seatwise.core.BaseCode;
 import com.seatwise.core.exception.BaseCodeException;
-import com.seatwise.core.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
@@ -22,7 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 @RestControllerAdvice
 public class ApiResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
 
-    private final ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
   @Override
   public boolean supports(
@@ -47,19 +47,19 @@ public class ApiResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
     }
 
     if (body instanceof ApiResponse) {
-        return body;
+      return body;
     }
 
     if (selectedConverterType.equals(StringHttpMessageConverter.class)) {
-        try {
-            return objectMapper.writeValueAsString(ApiResponse.ok(body));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("String response wrapping failed", e);
-        }
+      try {
+        return objectMapper.writeValueAsString(ApiResponse.ok(body));
+      } catch (JsonProcessingException e) {
+        throw new RuntimeException("String response wrapping failed", e);
+      }
     }
 
     if (body == null) {
-         return ApiResponse.ok("처리가 완료되었습니다.");
+      return ApiResponse.ok("처리가 완료되었습니다.");
     }
 
     return ApiResponse.ok(body);
@@ -79,14 +79,13 @@ public class ApiResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
 
   private boolean isSwaggerRequest(ServerHttpRequest request) {
     String path = request.getURI().getPath();
-    return path != null && (
-        path.contains("/swagger-ui")
-        || path.contains("/swagger-resources")
-        || path.contains("/v3/api-docs")
-        || path.contains("/api-docs")
-        || path.contains("/webjars/springfox-swagger-ui")
-        || path.contains("/webjars/swagger-ui")
-    );
+    return path != null
+        && (path.contains("/swagger-ui")
+            || path.contains("/swagger-resources")
+            || path.contains("/v3/api-docs")
+            || path.contains("/api-docs")
+            || path.contains("/webjars/springfox-swagger-ui")
+            || path.contains("/webjars/swagger-ui"));
   }
 
   private boolean isActuatorRequest(ServerHttpRequest request) {
@@ -104,8 +103,7 @@ public class ApiResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
           || methodName.contains("openapi");
     }
 
-    return declaringClassName.contains("OpenApi")
-        || declaringClassName.contains("Swagger");
+    return declaringClassName.contains("OpenApi") || declaringClassName.contains("Swagger");
   }
 
   private boolean isActuatorEndpoint(MethodParameter returnType) {

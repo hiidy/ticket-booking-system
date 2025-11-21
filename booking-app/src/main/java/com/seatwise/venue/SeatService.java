@@ -1,15 +1,14 @@
 package com.seatwise.venue;
 
-import com.seatwise.core.exception.BusinessException;
 import com.seatwise.core.BaseCode;
+import com.seatwise.core.exception.BusinessException;
+import com.seatwise.venue.dto.request.SeatCreateRequest;
+import com.seatwise.venue.dto.request.SeatRangeRequest;
+import com.seatwise.venue.dto.response.SeatCreateResponse;
 import com.seatwise.venue.entity.Seat;
-import com.seatwise.venue.entity.SeatGrade;
 import com.seatwise.venue.entity.SeatRepository;
 import com.seatwise.venue.entity.Venue;
 import com.seatwise.venue.entity.VenueRepository;
-import com.seatwise.venue.dto.request.SeatCreateRequest;
-import com.seatwise.venue.dto.request.SeatGradeRangeRequest;
-import com.seatwise.venue.dto.response.SeatCreateResponse;
 import java.util.List;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
@@ -30,41 +29,40 @@ public class SeatService {
             .findById(request.venueId())
             .orElseThrow(() -> new BusinessException(BaseCode.VENUE_NOT_FOUND));
 
-    List<Integer> existsSeatNumbers =
-        seatRepository.findByVenueId(request.venueId()).stream().map(Seat::getSeatNumber).toList();
-    List<Integer> newSeatNumbers = extractSeatNumbers(request.seatTypeRanges());
+    // 기존 좌석 확인
+    List<Seat> existingSeats = seatRepository.findByVenueId(request.venueId());
 
-    validateNewSeatNumbers(existsSeatNumbers, newSeatNumbers);
+    // 새로운 좌석 생성
+    List<Seat> newSeats = createSeatsFromRanges(request.seatRanges(), venue);
 
-    List<Seat> seats =
-        request.seatTypeRanges().stream()
-            .flatMap(
-                range ->
-                    IntStream.rangeClosed(range.startNumber(), range.endNumber())
-                        .mapToObj(
-                            seatNumber ->
-                                Seat.builder()
-                                    .venue(venue)
-                                    .seatNumber(seatNumber)
-                                    .grade(SeatGrade.valueOf(range.grade()))
-                                    .build()))
-            .toList();
+    // 중복 좌석 확인
+    validateSeatDuplicates(existingSeats, newSeats);
 
-    List<Seat> savedSeats = seatRepository.saveAll(seats);
+    List<Seat> savedSeats = seatRepository.saveAll(newSeats);
     return SeatCreateResponse.from(savedSeats);
   }
 
-  private List<Integer> extractSeatNumbers(List<SeatGradeRangeRequest> request) {
-    return request.stream()
-        .flatMap(range -> IntStream.rangeClosed(range.startNumber(), range.endNumber()).boxed())
+  private List<Seat> createSeatsFromRanges(List<SeatRangeRequest> seatRanges, Venue venue) {
+    return seatRanges.stream()
+        .flatMap(
+            range ->
+                IntStream.rangeClosed(range.startCol(), range.endCol())
+                    .mapToObj(col -> new Seat(range.rowName(), String.valueOf(col), venue)))
         .toList();
   }
 
-  private void validateNewSeatNumbers(List<Integer> existing, List<Integer> incoming) {
-    boolean hasDuplicate = incoming.stream().anyMatch(existing::contains);
+  private void validateSeatDuplicates(List<Seat> existingSeats, List<Seat> newSeats) {
+    for (Seat newSeat : newSeats) {
+      boolean hasDuplicate =
+          existingSeats.stream()
+              .anyMatch(
+                  existing ->
+                      existing.getRowName().equals(newSeat.getRowName())
+                          && existing.getColName().equals(newSeat.getColName()));
 
-    if (hasDuplicate) {
-      throw new BusinessException(BaseCode.DUPLICATE_SEAT_NUMBER);
+      if (hasDuplicate) {
+        throw new BusinessException(BaseCode.DUPLICATE_SEAT_NUMBER);
+      }
     }
   }
 }

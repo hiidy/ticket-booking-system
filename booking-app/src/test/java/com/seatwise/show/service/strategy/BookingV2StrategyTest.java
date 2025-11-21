@@ -14,12 +14,12 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(MockitoExtension.class)
 class BookingV2StrategyTest {
@@ -30,8 +30,7 @@ class BookingV2StrategyTest {
   @Mock private RLock seatLock2;
   @Mock private RLock multiLock;
 
-  @InjectMocks
-  private BookingV2Strategy bookingV2Strategy;
+  @InjectMocks private BookingV2Strategy bookingV2Strategy;
 
   private UUID testIdempotencyKey;
   private BookingRequest testRequest;
@@ -51,8 +50,7 @@ class BookingV2StrategyTest {
     given(redissonClient.getLock("lock:seat:2")).willReturn(seatLock2);
     given(redissonClient.getMultiLock(seatLock1, seatLock2)).willReturn(multiLock);
 
-    given(multiLock.tryLock(0L, 300L, TimeUnit.SECONDS))
-        .willReturn(true);
+    given(multiLock.tryLock(0L, 300L, TimeUnit.SECONDS)).willReturn(true);
     given(showBookingService.create(eq(testIdempotencyKey), eq(1L), eq(List.of(2L, 1L))))
         .willReturn("BOOKING-123");
 
@@ -78,8 +76,7 @@ class BookingV2StrategyTest {
     given(redissonClient.getLock("lock:seat:2")).willReturn(seatLock2);
     given(redissonClient.getMultiLock(seatLock1, seatLock2)).willReturn(multiLock);
 
-    given(multiLock.tryLock(0L, 300L, TimeUnit.SECONDS))
-        .willReturn(false);
+    given(multiLock.tryLock(0L, 300L, TimeUnit.SECONDS)).willReturn(false);
 
     // When & Then
     assertThatThrownBy(() -> bookingV2Strategy.createBooking(testIdempotencyKey, testRequest))
@@ -91,7 +88,8 @@ class BookingV2StrategyTest {
 
   @Test
   @DisplayName("예매 실패 - 티켓 락 획득 중 인터럽트 발생 시 LOCK_ACQUISITION_TIMEOUT 예외")
-  void throws_lock_acquisition_timeout_when_interrupted_during_ticket_lock() throws InterruptedException {
+  void throws_lock_acquisition_timeout_when_interrupted_during_ticket_lock()
+      throws InterruptedException {
     // Given
     given(redissonClient.getLock("lock:seat:1")).willReturn(seatLock1);
     given(redissonClient.getLock("lock:seat:2")).willReturn(seatLock2);

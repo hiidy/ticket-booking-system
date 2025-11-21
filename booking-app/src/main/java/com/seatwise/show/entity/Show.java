@@ -1,8 +1,8 @@
 package com.seatwise.show.entity;
 
-import com.seatwise.core.exception.BusinessException;
 import com.seatwise.core.BaseCode;
 import com.seatwise.core.BaseEntity;
+import com.seatwise.core.exception.BusinessException;
 import com.seatwise.venue.entity.Venue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -49,8 +49,14 @@ public class Show extends BaseEntity {
   private LocalTime endTime;
 
   @Builder
-  public Show(String title, String description, ShowType type, Venue venue,
-              LocalDate date, LocalTime startTime, LocalTime endTime) {
+  public Show(
+      String title,
+      String description,
+      ShowType type,
+      Venue venue,
+      LocalDate date,
+      LocalTime startTime,
+      LocalTime endTime) {
     this.title = title;
     this.description = description;
     this.type = type;
@@ -83,8 +89,10 @@ public class Show extends BaseEntity {
   }
 
   private boolean isTimeOverlapping(Show other) {
-    if (this.startTime == null || this.endTime == null ||
-        other.getStartTime() == null || other.getEndTime() == null) {
+    if (this.startTime == null
+        || this.endTime == null
+        || other.getStartTime() == null
+        || other.getEndTime() == null) {
       return false;
     }
     return !(this.endTime.isBefore(other.startTime) || this.startTime.isAfter(other.endTime));

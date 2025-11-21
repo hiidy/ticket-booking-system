@@ -6,19 +6,18 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import com.seatwise.annotation.ServiceTest;
 import com.seatwise.core.exception.BusinessException;
+import com.seatwise.show.dto.TicketPrice;
+import com.seatwise.show.dto.request.TicketCreateRequest;
+import com.seatwise.show.dto.response.TicketResponse;
 import com.seatwise.show.entity.Show;
 import com.seatwise.show.entity.ShowType;
-import com.seatwise.show.dto.TicketPrice;
 import com.seatwise.show.entity.Ticket;
 import com.seatwise.show.entity.TicketStatus;
 import com.seatwise.show.repository.TicketRepository;
 import com.seatwise.show.service.TicketService;
 import com.seatwise.support.ShowTestDataBuilder;
 import com.seatwise.support.VenueTestDataBuilder;
-import com.seatwise.show.dto.request.TicketCreateRequest;
-import com.seatwise.show.dto.response.TicketResponse;
 import com.seatwise.venue.entity.Seat;
-import com.seatwise.venue.entity.SeatGrade;
 import com.seatwise.venue.entity.SeatRepository;
 import com.seatwise.venue.entity.Venue;
 import java.time.LocalDate;
@@ -112,16 +111,16 @@ class TicketServiceTest {
             .withTime(startTime, startTime.plusHours(2))
             .build();
 
-    Seat vip1 = Seat.builder().seatNumber(1).venue(venue).grade(SeatGrade.VIP).build();
-    Seat vip2 = Seat.builder().seatNumber(2).venue(venue).grade(SeatGrade.VIP).build();
-    Seat rSeat = Seat.builder().seatNumber(3).venue(venue).grade(SeatGrade.R).build();
+    Seat vip1 = new Seat("VIP", "1", venue);
+    Seat vip2 = new Seat("VIP", "2", venue);
+    Seat rSeat = new Seat("R", "3", venue);
     seatRepository.saveAll(List.of(vip1, vip2, rSeat));
 
     ticketRepository.saveAll(
         List.of(
-            Ticket.createAvailable(testShow, vip1, 40000),
-            Ticket.createAvailable(testShow, vip2, 40000),
-            Ticket.createAvailable(testShow, rSeat, 20000)));
+            Ticket.createAvailable(testShow, vip1, 1L, 40000),
+            Ticket.createAvailable(testShow, vip2, 1L, 40000),
+            Ticket.createAvailable(testShow, rSeat, 2L, 20000)));
 
     // when
     List<TicketResponse> result = ticketService.getTickets(testShow.getId());
@@ -129,17 +128,23 @@ class TicketServiceTest {
     // then
     assertThat(result)
         .hasSize(3)
-        .extracting("seatNumber", "seatGrade", "status", "isLocked")
+        .extracting("seatNumber", "status", "isLocked")
         .containsExactlyInAnyOrder(
-            tuple(1, SeatGrade.VIP, "예매 가능", true),
-            tuple(2, SeatGrade.VIP, "예매 가능", true),
-            tuple(3, SeatGrade.R, "예매 가능", true));
+            tuple("VIP-1", "예매 가능", true),
+            tuple("VIP-2", "예매 가능", true),
+            tuple("R-3", "예매 가능", true));
   }
 
   private List<Seat> createSeats(int count) {
+    Venue venue = venueData.withName("Test Venue").withToTalSeat(count).build();
     return seatRepository.saveAll(
         IntStream.rangeClosed(1, count)
-            .mapToObj(i -> Seat.builder().seatNumber(i).build())
+            .mapToObj(
+                i ->
+                    new Seat(
+                        String.valueOf((char) ('A' + (i - 1) / 10)),
+                        String.valueOf((i - 1) % 10 + 1),
+                        venue))
             .toList());
   }
 }

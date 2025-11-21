@@ -2,10 +2,10 @@ package com.seatwise.core;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
@@ -47,17 +47,11 @@ public class ApiResponse<T> implements Serializable {
   }
 
   public static <T> ApiResponse<T> error(BaseCode baseCode) {
-    return ApiResponse.<T>builder()
-        .code(baseCode.getCode())
-        .message(baseCode.getMessage())
-        .build();
+    return ApiResponse.<T>builder().code(baseCode.getCode()).message(baseCode.getMessage()).build();
   }
 
   public static <T> ApiResponse<T> error(String message) {
-    return ApiResponse.<T>builder()
-        .code(BaseCode.SYSTEM_ERROR.getCode())
-        .message(message)
-        .build();
+    return ApiResponse.<T>builder().code(BaseCode.SYSTEM_ERROR.getCode()).message(message).build();
   }
 
   public static <T> ApiResponse<T> error(Integer code, String message) {

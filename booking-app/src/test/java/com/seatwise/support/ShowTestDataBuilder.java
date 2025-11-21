@@ -1,8 +1,8 @@
 package com.seatwise.support;
 
 import com.seatwise.show.entity.Show;
-import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.show.entity.ShowType;
+import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.venue.entity.Venue;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -57,15 +57,16 @@ public class ShowTestDataBuilder {
   }
 
   public Show build() {
-    Show show = Show.builder()
-        .title(title)
-        .description(description)
-        .type(type)
-        .venue(venue)
-        .date(date)
-        .startTime(startTime)
-        .endTime(endTime)
-        .build();
+    Show show =
+        Show.builder()
+            .title(title)
+            .description(description)
+            .type(type)
+            .venue(venue)
+            .date(date)
+            .startTime(startTime)
+            .endTime(endTime)
+            .build();
     return showRepository.save(show);
   }
 }

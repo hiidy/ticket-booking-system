@@ -2,7 +2,6 @@ package com.seatwise.booking.messaging.rebalancer;
 
 import com.seatwise.booking.messaging.StreamKeyGenerator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.connection.RedisStreamCommands.XAddOptions;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,8 +17,6 @@ public class RebalanceMessageProducer {
   public void sendRebalanceMessage(RebalanceMessage message) {
     ObjectRecord<String, RebalanceMessage> objectRecord =
         StreamRecords.newRecord().in(StreamKeyGenerator.getRebalanceUpdateKey()).ofObject(message);
-    redisTemplate
-        .opsForStream(new Jackson2HashMapper(true))
-        .add(objectRecord);
+    redisTemplate.opsForStream(new Jackson2HashMapper(true)).add(objectRecord);
   }
 }

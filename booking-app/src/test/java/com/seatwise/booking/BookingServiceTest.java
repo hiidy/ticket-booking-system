@@ -9,14 +9,13 @@ import com.seatwise.member.Member;
 import com.seatwise.member.MemberRepository;
 import com.seatwise.show.entity.Show;
 import com.seatwise.show.entity.ShowType;
+import com.seatwise.show.entity.Ticket;
+import com.seatwise.show.entity.TicketStatus;
+import com.seatwise.show.repository.TicketRepository;
 import com.seatwise.show.service.ShowBookingService;
 import com.seatwise.support.ShowTestDataBuilder;
 import com.seatwise.support.VenueTestDataBuilder;
-import com.seatwise.show.entity.Ticket;
-import com.seatwise.show.repository.TicketRepository;
-import com.seatwise.show.entity.TicketStatus;
 import com.seatwise.venue.entity.Seat;
-import com.seatwise.venue.entity.SeatGrade;
 import com.seatwise.venue.entity.SeatRepository;
 import com.seatwise.venue.entity.Venue;
 import java.time.LocalDate;
@@ -46,17 +45,18 @@ class BookingServiceTest {
     LocalTime endTime = LocalTime.of(20, 0);
 
     Venue venue = venueData.withName("테스트 장소").withToTalSeat(100).build();
-    Show show = showData
-        .withTitle("테스트 공연")
-        .withType(ShowType.CONCERT)
-        .withVenue(venue)
-        .withDate(date)
-        .withTime(startTime, endTime)
-        .build();
+    Show show =
+        showData
+            .withTitle("테스트 공연")
+            .withType(ShowType.CONCERT)
+            .withVenue(venue)
+            .withDate(date)
+            .withTime(startTime, endTime)
+            .build();
 
-    Seat seat = Seat.builder().seatNumber(1).grade(SeatGrade.A).build();
+    Seat seat = new Seat("A", "1", venue);
     seatRepository.save(seat);
-    ticketRepository.save(Ticket.createAvailable(show, seat, 40000));
+    ticketRepository.save(Ticket.createAvailable(show, seat, 1L, 40000));
 
     member = new Member("테스트유저", "abcd@gmail.com", "1234");
     memberRepository.save(member);
@@ -95,13 +95,14 @@ class BookingServiceTest {
     UUID duplicatedId = UUID.randomUUID();
     Long memberId = member.getId();
 
-    Seat seat1 = Seat.builder().seatNumber(1).grade(SeatGrade.A).build();
-    Seat seat2 = Seat.builder().seatNumber(2).grade(SeatGrade.A).build();
+    Venue venue = venueData.withName("테스트 장소").withToTalSeat(100).build();
+    Seat seat1 = new Seat("A", "1", venue);
+    Seat seat2 = new Seat("A", "2", venue);
     seatRepository.saveAll(List.of(seat1, seat2));
 
     Show show = showData.build();
-    Ticket ticket1 = Ticket.createAvailable(show, seat1, 40000);
-    Ticket ticket2 = Ticket.createAvailable(show, seat2, 40000);
+    Ticket ticket1 = Ticket.createAvailable(show, seat1, 1L, 40000);
+    Ticket ticket2 = Ticket.createAvailable(show, seat2, 1L, 40000);
     ticketRepository.saveAll(List.of(ticket1, ticket2));
 
     List<Long> firstTicketIds = List.of(ticket1.getId());
@@ -128,8 +129,7 @@ class BookingServiceTest {
     showBookingService.create(firstRequestId, member.getId(), ticketIds);
 
     // when & then
-    assertThatThrownBy(
-            () -> showBookingService.create(secondRequestId, otherMemberId, ticketIds))
+    assertThatThrownBy(() -> showBookingService.create(secondRequestId, otherMemberId, ticketIds))
         .isInstanceOf(BookingException.class)
         .hasFieldOrPropertyWithValue("baseCode", BaseCode.SEAT_NOT_AVAILABLE);
   }

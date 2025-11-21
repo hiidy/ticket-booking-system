@@ -1,7 +1,6 @@
 package com.seatwise.show.repository;
 
 import com.seatwise.show.dto.response.SeatAvailabilityResponse;
-import com.seatwise.show.entity.Show;
 import com.seatwise.show.entity.Ticket;
 import io.lettuce.core.dynamic.annotation.Param;
 import jakarta.persistence.LockModeType;
@@ -20,18 +19,17 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
   @Query(
       """
-          SELECT new com.seatwise.show.dto.response.SeatAvailabilityResponse(
-              s.grade,
-              COUNT(t),
-              SUM(CASE WHEN t.status IN ('AVAILABLE','PAYMENT_PENDING') THEN 1 ELSE 0 END)
-          )
-          FROM Ticket t
-          JOIN t.seat s
-          WHERE t.show.id = :showId
-          GROUP BY s.grade
-          """)
-  List<SeatAvailabilityResponse> findTicketAvailabilityByShowId(
-      @Param("showId") Long showId);
+              SELECT new com.seatwise.show.dto.response.SeatAvailabilityResponse(
+                  s.rowName,
+                  COUNT(t),
+                  SUM(CASE WHEN t.status IN ('AVAILABLE','PAYMENT_PENDING') THEN 1 ELSE 0 END)
+              )
+              FROM Ticket t
+              JOIN t.seat s
+              WHERE t.show.id = :showId
+              GROUP BY s.rowName
+              """)
+  List<SeatAvailabilityResponse> findTicketAvailabilityByShowId(@Param("showId") Long showId);
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query(

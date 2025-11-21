@@ -8,8 +8,9 @@ import com.seatwise.show.entity.Ticket;
 import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.show.repository.TicketRepository;
 import com.seatwise.venue.entity.Seat;
-import com.seatwise.venue.entity.SeatGrade;
 import com.seatwise.venue.entity.SeatRepository;
+import com.seatwise.venue.entity.Venue;
+import com.seatwise.venue.entity.VenueRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -20,31 +21,35 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 @DataJpaTest
 class TicketRepositoryTest {
 
-  @Autowired
-  TicketRepository ticketRepository;
+  @Autowired TicketRepository ticketRepository;
   @Autowired SeatRepository seatRepository;
   @Autowired ShowRepository showRepository;
+  @Autowired VenueRepository venueRepository;
 
   @Test
   void shouldFindAllTicketsByShowId_whenTicketsExist() {
     // given
-    Show show = Show.builder()
-        .title("Test Show")
-        .description("Test Description")
-        .type(ShowType.CONCERT)
-        .date(LocalDate.of(2025, 1, 1))
-        .startTime(LocalTime.of(14, 0))
-        .endTime(LocalTime.of(15, 0))
-        .build();
+    Venue venue = new Venue("Test Venue", 100);
+    venueRepository.save(venue);
+
+    Show show =
+        Show.builder()
+            .title("Test Show")
+            .description("Test Description")
+            .type(ShowType.CONCERT)
+            .venue(venue)
+            .date(LocalDate.of(2025, 1, 1))
+            .startTime(LocalTime.of(14, 0))
+            .endTime(LocalTime.of(15, 0))
+            .build();
     showRepository.save(show);
 
-    Seat seat1 = Seat.builder().seatNumber(1).grade(SeatGrade.VIP).build();
-    Seat seat2 = Seat.builder().seatNumber(2).grade(SeatGrade.VIP).build();
-
+    Seat seat1 = new Seat("A", "1", venue);
+    Seat seat2 = new Seat("A", "2", venue);
     seatRepository.saveAll(List.of(seat1, seat2));
 
-    Ticket ticket1 = Ticket.createAvailable(show, seat1, 40000);
-    Ticket ticket2 = Ticket.createAvailable(show, seat2, 40000);
+    Ticket ticket1 = Ticket.createAvailable(show, seat1, 1L, 40000);
+    Ticket ticket2 = Ticket.createAvailable(show, seat2, 1L, 40000);
     ticketRepository.saveAll(List.of(ticket1, ticket2));
 
     // when
@@ -52,30 +57,37 @@ class TicketRepositoryTest {
 
     // then
     assertThat(tickets).hasSize(2);
-    assertThat(tickets.get(0).getSeat().getSeatNumber()).isEqualTo(1);
-    assertThat(tickets.get(1).getSeat().getSeatNumber()).isEqualTo(2);
+    assertThat(tickets.get(0).getSeat().getRowName()).isEqualTo("A");
+    assertThat(tickets.get(0).getSeat().getColName()).isEqualTo("1");
+    assertThat(tickets.get(1).getSeat().getRowName()).isEqualTo("A");
+    assertThat(tickets.get(1).getSeat().getColName()).isEqualTo("2");
   }
 
   @Test
   void shouldFindOnlyAssignedTickets_whenSomeSeatsAreUnassigned() {
     // given
-    Show show = Show.builder()
-        .title("Test Show")
-        .description("Test Description")
-        .type(ShowType.CONCERT)
-        .date(LocalDate.of(2025, 1, 1))
-        .startTime(LocalTime.of(14, 0))
-        .endTime(LocalTime.of(15, 0))
-        .build();
+    Venue venue = new Venue("Test Venue", 100);
+    venueRepository.save(venue);
+
+    Show show =
+        Show.builder()
+            .title("Test Show")
+            .description("Test Description")
+            .type(ShowType.CONCERT)
+            .venue(venue)
+            .date(LocalDate.of(2025, 1, 1))
+            .startTime(LocalTime.of(14, 0))
+            .endTime(LocalTime.of(15, 0))
+            .build();
     showRepository.save(show);
 
-    Seat seat1 = Seat.builder().seatNumber(1).grade(SeatGrade.VIP).build();
-    Seat seat2 = Seat.builder().seatNumber(2).grade(SeatGrade.VIP).build();
-    Seat seat3 = Seat.builder().seatNumber(3).grade(SeatGrade.VIP).build();
+    Seat seat1 = new Seat("A", "1", venue);
+    Seat seat2 = new Seat("A", "2", venue);
+    Seat seat3 = new Seat("A", "3", venue);
     seatRepository.saveAll(List.of(seat1, seat2, seat3));
 
-    Ticket ticket1 = Ticket.createAvailable(show, seat1, 40000);
-    Ticket ticket2 = Ticket.createAvailable(show, seat2, 40000);
+    Ticket ticket1 = Ticket.createAvailable(show, seat1, 1L, 40000);
+    Ticket ticket2 = Ticket.createAvailable(show, seat2, 1L, 40000);
     ticketRepository.saveAll(List.of(ticket1, ticket2));
     // seat3에는 ticket 없음
 
@@ -84,7 +96,9 @@ class TicketRepositoryTest {
 
     // then
     assertThat(tickets).hasSize(2);
-    assertThat(tickets.get(0).getSeat().getSeatNumber()).isEqualTo(1);
-    assertThat(tickets.get(1).getSeat().getSeatNumber()).isEqualTo(2);
+    assertThat(tickets.get(0).getSeat().getRowName()).isEqualTo("A");
+    assertThat(tickets.get(0).getSeat().getColName()).isEqualTo("1");
+    assertThat(tickets.get(1).getSeat().getRowName()).isEqualTo("A");
+    assertThat(tickets.get(1).getSeat().getColName()).isEqualTo("2");
   }
 }

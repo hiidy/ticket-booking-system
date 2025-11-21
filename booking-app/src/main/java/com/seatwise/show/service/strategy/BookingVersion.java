@@ -16,5 +16,4 @@ public enum BookingVersion {
     this.version = version;
     this.description = description;
   }
-
 }
