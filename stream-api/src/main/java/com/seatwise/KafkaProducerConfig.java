@@ -20,9 +20,7 @@ public class KafkaProducerConfig {
 
   @Bean
   public ProducerFactory<String, BookingRequestAvro> bookingRequestProducerFactory() {
-    return new DefaultKafkaProducerFactory<>(
-        kafkaProperties.buildProducerProperties(null)
-    );
+    return new DefaultKafkaProducerFactory<>(kafkaProperties.buildProducerProperties(null));
   }
 
   @Bean
@@ -33,9 +31,7 @@ public class KafkaProducerConfig {
 
   @Bean
   public ProducerFactory<String, TicketCreateAvro> ticketProducerFactory() {
-    return new DefaultKafkaProducerFactory<>(
-        kafkaProperties.buildProducerProperties(null)
-    );
+    return new DefaultKafkaProducerFactory<>(kafkaProperties.buildProducerProperties(null));
   }
 
   @Bean

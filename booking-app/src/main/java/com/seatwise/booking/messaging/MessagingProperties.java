@@ -11,14 +11,11 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 @Getter
 public class MessagingProperties {
 
-  @Min(value = 1, message = "샤드 수는 최소 1 이상이어야 합니다.")
-  private final int partitionCount;
+  @Min(value = 1, message = "샤드 수는 최소 1 이상이어야 합니다.") private final int partitionCount;
 
-  @Min(value = 1, message = "인스턴스 수는 최소 1 이상이어야 합니다.")
-  private final int instanceCount;
+  @Min(value = 1, message = "인스턴스 수는 최소 1 이상이어야 합니다.") private final int instanceCount;
 
-  @NotBlank(message = "소비자 그룹 이름은 필수입니다.")
-  private final String consumerGroup;
+  @NotBlank(message = "소비자 그룹 이름은 필수입니다.") private final String consumerGroup;
 
   @ConstructorBinding
   public MessagingProperties(

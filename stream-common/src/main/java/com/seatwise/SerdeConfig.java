@@ -55,11 +55,12 @@ public class SerdeConfig {
 
   private <T extends SpecificRecord> Serde<T> avroSerde() {
     SpecificAvroSerde<T> serde = new SpecificAvroSerde<>();
-    serde.configure(Map.of(
-        "schema.registry.url", schemaRegistryUrl,
-        "basic.auth.credentials.source", "USER_INFO",
-        "basic.auth.user.info", basicAuthUserInfo
-    ), false);
+    serde.configure(
+        Map.of(
+            "schema.registry.url", schemaRegistryUrl,
+            "basic.auth.credentials.source", "USER_INFO",
+            "basic.auth.user.info", basicAuthUserInfo),
+        false);
     return serde;
   }
 }

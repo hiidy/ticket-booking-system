@@ -42,9 +42,9 @@ public class BookingRequestProcessor
     log.info("Generated ticketIds: {}", ticketIds);
 
     // 캐시 검증
-//    if (!validateTicketsInCache(ticketIds)) {
-//      return;
-//    }
+    //    if (!validateTicketsInCache(ticketIds)) {
+    //      return;
+    //    }
 
     BookingCommandAvro command =
         BookingCommandAvro.newBuilder()
