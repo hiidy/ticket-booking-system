@@ -2,6 +2,9 @@ package com.seatwise.show.service;
 
 import com.seatwise.core.BaseCode;
 import com.seatwise.core.exception.BusinessException;
+import com.seatwise.redis.RedisKeyBuilder;
+import com.seatwise.redis.RedisKeys;
+import com.seatwise.show.dto.TicketAvailability;
 import com.seatwise.show.dto.request.TicketCreateRequest;
 import com.seatwise.show.dto.response.SeatAvailabilityResponse;
 import com.seatwise.show.dto.response.TicketResponse;
@@ -11,6 +14,7 @@ import com.seatwise.show.repository.ShowRepository;
 import com.seatwise.show.repository.TicketRepository;
 import com.seatwise.venue.entity.SeatRepository;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +27,7 @@ public class TicketService {
   private final TicketRepository ticketRepository;
   private final ShowRepository showRepository;
   private final SeatRepository seatRepository;
+  private final TicketCacheData ticketCacheData;
 
   public List<Long> createTickets(Long showId, TicketCreateRequest request) {
     Show show =
@@ -46,11 +51,29 @@ public class TicketService {
     return savedTickets.stream().map(Ticket::getId).toList();
   }
 
-  public List<TicketResponse> getTicketAvailability(Long showId, Long sectionId) {
+  public List<TicketAvailability> getTicketAvailabilityBySection(Long showId, Long sectionId) {
     // 캐시에서 ticket availability 조회
-
+    List<TicketAvailability> ticketCache = getTicketAvailabilityByCache(showId, sectionId);
+    if (!ticketCache.isEmpty()) {
+      return ticketCache;
+    }
     // db에서 조회
     return null;
+  }
+
+  public List<TicketAvailability> getTicketAvailabilityByCache(Long showId, Long sectionId) {
+    String availableKey =
+        RedisKeyBuilder.createRedisKey(RedisKeys.TICKET_AVAILABLE, showId, sectionId);
+    String bookedKey = RedisKeyBuilder.createRedisKey(RedisKeys.TICKET_BOOKED, showId, sectionId);
+    String lockedKey = RedisKeyBuilder.createRedisKey(RedisKeys.TICKET_LOCKED, showId, sectionId);
+
+    List<TicketAvailability> result = new ArrayList<>();
+
+    result.addAll(ticketCacheData.getData(availableKey));
+    result.addAll(ticketCacheData.getData(bookedKey));
+    result.addAll(ticketCacheData.getData(lockedKey));
+
+    return result;
   }
 
   public List<TicketResponse> getTickets(Long showId) {
