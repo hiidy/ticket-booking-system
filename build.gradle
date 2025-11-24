@@ -50,6 +50,11 @@ subprojects {
             removeUnusedImports()
             formatAnnotations()
         }
+
+        format 'yaml', {
+            target '.github/**/*.yml', '*.yaml', '*.yml'
+            prettier(['prettier': '3.0.3'])
+        }
     }
 
     tasks.withType(Test).configureEach {
