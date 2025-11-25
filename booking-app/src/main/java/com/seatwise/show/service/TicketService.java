@@ -58,7 +58,19 @@ public class TicketService {
       return ticketCache;
     }
     // db에서 조회
-    return null;
+    List<Ticket> tickets = ticketRepository.findTicketsByShowIdAndSectionId(showId, sectionId);
+
+    return tickets.stream()
+        .map(
+            ticket ->
+                new TicketAvailability(
+                    ticket.getId(),
+                    showId,
+                    sectionId,
+                    ticket.getSeat().getRowName(),
+                    ticket.getSeat().getColName(),
+                    ticket.getStatus()))
+        .toList();
   }
 
   public List<TicketAvailability> getTicketAvailabilityByCache(Long showId, Long sectionId) {

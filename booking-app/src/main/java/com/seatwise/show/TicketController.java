@@ -1,5 +1,6 @@
 package com.seatwise.show;
 
+import com.seatwise.show.dto.TicketAvailability;
 import com.seatwise.show.dto.request.TicketCreateRequest;
 import com.seatwise.show.dto.response.SeatAvailabilityResponse;
 import com.seatwise.show.dto.response.TicketResponse;
@@ -36,6 +37,13 @@ public class TicketController {
   @GetMapping("/{showId}/availability")
   public List<TicketResponse> getTickets(@PathVariable Long showId) {
     return ticketService.getTickets(showId);
+  }
+
+  @Operation(summary = "공연 섹션별 티켓 가용성 조회", description = "특정 공연의 섹션별 티켓 현황을 조회합니다")
+  @GetMapping("/sections/availability")
+  public List<TicketAvailability> getTicketsBySection(
+      @RequestParam Long showId, @RequestParam Long sectionId) {
+    return ticketService.getTicketAvailabilityBySection(showId, sectionId);
   }
 
   @Operation(summary = "좌석 가용성 조회", description = "공연 시간별 등급별 좌석 가용성을 조회합니다")

@@ -44,4 +44,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
       @Param("ticketIds") List<Long> ticketIds, @Param("currentTime") LocalDateTime currentTime);
 
   List<Ticket> findTicketsByBookingId(Long id);
+
+  @Query(
+      "SELECT t FROM Ticket t JOIN FETCH t.seat s WHERE t.show.id = :showId AND t.sectionId = :sectionId")
+  List<Ticket> findTicketsByShowIdAndSectionId(Long showId, Long sectionId);
 }
