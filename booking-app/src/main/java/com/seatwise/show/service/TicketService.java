@@ -2,6 +2,7 @@ package com.seatwise.show.service;
 
 import com.seatwise.core.BaseCode;
 import com.seatwise.core.exception.BusinessException;
+import com.seatwise.redis.RedisCache;
 import com.seatwise.redis.RedisKeyBuilder;
 import com.seatwise.redis.RedisKeys;
 import com.seatwise.show.dto.TicketAvailability;
@@ -17,7 +18,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,6 +32,8 @@ public class TicketService {
   private final ShowRepository showRepository;
   private final SeatRepository seatRepository;
   private final TicketCacheData ticketCacheData;
+  private final RedissonClient redissonClient;
+  private final RedisCache redisCache;
 
   public List<Long> createTickets(Long showId, TicketCreateRequest request) {
     Show show =
@@ -57,20 +63,46 @@ public class TicketService {
     if (!ticketCache.isEmpty()) {
       return ticketCache;
     }
-    // db에서 조회
-    List<Ticket> tickets = ticketRepository.findTicketsByShowIdAndSectionId(showId, sectionId);
 
-    return tickets.stream()
-        .map(
-            ticket ->
-                new TicketAvailability(
-                    ticket.getId(),
-                    showId,
-                    sectionId,
-                    ticket.getSeat().getRowName(),
-                    ticket.getSeat().getColName(),
-                    ticket.getStatus()))
-        .toList();
+    // 분산락으로 캐시 스탬피드 방지
+    String lockKey = String.format("ticket_lock:%d:%d", showId, sectionId);
+    RLock lock = redissonClient.getLock(lockKey);
+
+    try {
+      if (lock.tryLock(1, TimeUnit.SECONDS)) {
+        // 락 획득 후 다시 캐시 확인 (Double-Checked Locking)
+        ticketCache = getTicketAvailabilityByCache(showId, sectionId);
+        if (!ticketCache.isEmpty()) {
+          return ticketCache;
+        }
+        List<Ticket> tickets = ticketRepository.findTicketsByShowIdAndSectionId(showId, sectionId);
+        List<TicketAvailability> ticketAvailabilities =
+            tickets.stream()
+                .map(
+                    ticket ->
+                        new TicketAvailability(
+                            ticket.getId(),
+                            showId,
+                            sectionId,
+                            ticket.getSeat().getRowName(),
+                            ticket.getSeat().getColName(),
+                            ticket.getStatus()))
+                .toList();
+
+        cacheTicketAvailabilities(showId, sectionId, ticketAvailabilities);
+
+        return ticketAvailabilities;
+      } else {
+        return getTicketAvailabilityByCache(showId, sectionId);
+      }
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      return getTicketAvailabilityByCache(showId, sectionId);
+    } finally {
+      if (lock.isHeldByCurrentThread()) {
+        lock.unlock();
+      }
+    }
   }
 
   public List<TicketAvailability> getTicketAvailabilityByCache(Long showId, Long sectionId) {
@@ -99,5 +131,29 @@ public class TicketService {
 
   public List<SeatAvailabilityResponse> getTicketAvailabilityByGrade(Long showId) {
     return ticketRepository.findTicketAvailabilityByShowId(showId);
+  }
+
+  private void cacheTicketAvailabilities(
+      Long showId, Long sectionId, List<TicketAvailability> ticketAvailabilities) {
+    for (TicketAvailability ticket : ticketAvailabilities) {
+      String cacheKey;
+
+      switch (ticket.status()) {
+        case AVAILABLE:
+          cacheKey = RedisKeyBuilder.createRedisKey(RedisKeys.TICKET_AVAILABLE, showId, sectionId);
+          break;
+        case BOOKED:
+          cacheKey = RedisKeyBuilder.createRedisKey(RedisKeys.TICKET_BOOKED, showId, sectionId);
+          break;
+        case PAYMENT_PENDING:
+          cacheKey = RedisKeyBuilder.createRedisKey(RedisKeys.TICKET_LOCKED, showId, sectionId);
+          break;
+        default:
+          continue;
+      }
+
+      String field = String.valueOf(ticket.ticketId());
+      redisCache.putHash(cacheKey, field, ticket, 30, TimeUnit.MINUTES);
+    }
   }
 }
