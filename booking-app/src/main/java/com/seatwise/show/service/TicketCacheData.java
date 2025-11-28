@@ -5,7 +5,6 @@ import com.seatwise.redis.RedisCache;
 import com.seatwise.show.dto.TicketAvailability;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -23,10 +22,7 @@ public class TicketCacheData {
       return new ArrayList<>();
     }
 
-    return values.stream()
-        .map(Object::toString)
-        .map(this::parseJsonToTicketAvailability)
-        .collect(Collectors.toList());
+    return values.stream().map(Object::toString).map(this::parseJsonToTicketAvailability).toList();
   }
 
   private TicketAvailability parseJsonToTicketAvailability(String json) {

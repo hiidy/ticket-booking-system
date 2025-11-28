@@ -1,32 +1,31 @@
 spring:
   profiles:
-    active: local
+    active: test
 
-cache:
-  local:
-    enabled: true
-    max-size: 10000
-    expire-after-write: 10m
-    record-stats: true
-  redis:
-    enabled: true
-    ticket-hold-ttl: 10m
-  multi-level:
-    enabled: true
-    invalidation-channel: cache:invalidation
-    read-through: true
-    write-through: true
+bloom-filter:
+  enabled: true
+  filters:
+    ticket:
+      expected-insertions: 100000
+      false-probability: 0.1
+
+queue:
+  consumer-group: 'bookingGroup'
+  instance-count: 1
+  partition-count: 4
 
 ---
 spring:
   config:
     activate:
-      on-profile: local
+      on-profile: test
   application:
     instance-id: ${HOSTNAME:localhost}-${server.port:8080}
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -36,32 +35,4 @@ spring:
         format_sql: false
   data:
     redis:
-      port: 6370
-
----
-spring:
-  config:
-    activate:
-      on-profile: test-mysql
-  application:
-    instance-idx: 0
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/ticket_test?useSSL=true&serverTimezone=UTC&characterEncoding=UTF-8
-    username: root
-    password: root
-  jpa:
-    hibernate:
-      ddl-auto: none
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:sql/test-schema.sql
-queue:
-  consumer-group: 'bookingGroup'
-  instance-count: 1
-  partition-count: 4
+      host: localhost

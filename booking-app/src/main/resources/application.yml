@@ -17,21 +17,6 @@ queue:
   instance-count: ${QUEUE_INSTANCE_COUNT:1}
   partition-count: ${QUEUE_PARTITION_COUNT:32}
 
-cache:
-  local:
-    enabled: true
-    max-size: 10000
-    ttl: 10m
-    record-stats: true
-  redis:
-    enabled: true
-    ticket-hold-ttl: 10m
-  multi-level:
-    enabled: true
-    invalidation-channel: cache:invalidation
-    read-through: true
-    write-through: true
-
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -60,7 +45,12 @@ management:
     metrics:
       export:
         enabled: true
-
+bloom-filter:
+  enabled: true
+  filters:
+    ticket:
+      expected-insertions: 100000
+      false-probability: 0.1
 ---
 spring:
   config:
@@ -77,15 +67,14 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       auto-commit: false
-
 ---
 spring:
   config:
     activate:
-      on-profile: test
+      on-profile: prod
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
+      host: ${REDIS_HOST}
       port: ${REDIS_PORT:6379}
   datasource:
     url: jdbc:mysql://${DB_HOST}:${DB_PORT:3306}/ticket_booking?serverTimezone=UTC&tcpKeepAlive=true
@@ -94,3 +83,6 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       auto-commit: false
+  jpa:
+    hibernate:
+      ddl-auto: validate

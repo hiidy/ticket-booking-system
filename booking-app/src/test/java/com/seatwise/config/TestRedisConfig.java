@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import redis.embedded.RedisServer;
 
-@Profile("local")
+@Profile("test")
 @Configuration
 public class TestRedisConfig {
 
