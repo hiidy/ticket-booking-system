@@ -1,18 +1,18 @@
 plugins {
-    id 'org.springframework.boot'
-    id 'io.spring.dependency-management'
+	id 'org.springframework.boot'
+	id 'io.spring.dependency-management'
 }
 
 dependencies {
-    implementation project(':stream-common')
+	implementation project(':stream-common')
 
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.kafka:spring-kafka-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.kafka:spring-kafka-test'
 }
 
 tasks.named('bootJar') {
-    archiveBaseName = 'stream-ticket'
+	archiveBaseName = 'stream-ticket'
 }

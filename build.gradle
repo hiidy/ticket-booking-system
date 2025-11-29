@@ -51,9 +51,21 @@ subprojects {
             formatAnnotations()
         }
 
+        groovyGradle {
+            target '*.gradle', '**/*.gradle'
+            greclipse()
+        }
+
         format 'yaml', {
             target '.github/**/*.yml', '*.yaml', '*.yml'
-            prettier(['prettier': '3.0.3'])
+            prettier(['prettier': '3.7.2'])
+        }
+
+        format 'misc', {
+            target '.gitattributes', '.gitignore', '**/*.properties'
+            trimTrailingWhitespace()
+            leadingTabsToSpaces(4)
+            endWithNewline()
         }
     }
 

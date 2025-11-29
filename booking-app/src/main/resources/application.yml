@@ -51,6 +51,12 @@ bloom-filter:
     ticket:
       expected-insertions: 100000
       false-probability: 0.1
+    show:
+      expected-insertions: 100
+      false-probability: 0.1
+    section:
+      expected-insertions: 100
+      false-probability: 0.1
 ---
 spring:
   config:
