@@ -17,8 +17,9 @@ public enum BaseCode {
   // 3000-3999: 공연/프로그램 관련
   EVENT_NOT_FOUND(3001, "이벤트를 찾을 수 없습니다."),
   VENUE_NOT_FOUND(3002, "장소를 찾을 수 없습니다."),
-  SHOW_NOT_FOUND(3003, "진행 시간을 찾을 수 없습니다."),
-  DUPLICATE_SHOW(3004, "이벤트 시간이 중복됐습니다."),
+  SHOW_NOT_FOUND(3003, "공연을 찾을 수 없습니다."),
+  SECTION_NOT_FOUND(3004, "섹션을 찾을 수 없습니다."),
+  DUPLICATE_SHOW(3005, "이벤트 시간이 중복됐습니다."),
 
   // 4000-4999: 좌석/예매 관련
   SEAT_NOT_AVAILABLE(4001, "좌석이 예매할 수 있는 상태가 아닙니다."),

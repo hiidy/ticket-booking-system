@@ -5,6 +5,7 @@ import com.seatwise.core.exception.BusinessException;
 import com.seatwise.redis.RedisCache;
 import com.seatwise.redis.RedisKeyBuilder;
 import com.seatwise.redis.RedisKeys;
+import com.seatwise.redisson.BloomFilterHandler;
 import com.seatwise.show.dto.TicketAvailability;
 import com.seatwise.show.dto.request.TicketCreateRequest;
 import com.seatwise.show.dto.response.SeatAvailabilityResponse;
@@ -18,12 +19,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TicketService {
@@ -34,6 +38,7 @@ public class TicketService {
   private final TicketCacheData ticketCacheData;
   private final RedissonClient redissonClient;
   private final RedisCache redisCache;
+  private final Map<String, BloomFilterHandler> bloomFilters;
 
   public List<Long> createTickets(Long showId, TicketCreateRequest request) {
     Show show =
@@ -58,6 +63,25 @@ public class TicketService {
   }
 
   public List<TicketAvailability> getTicketAvailabilityBySection(Long showId, Long sectionId) {
+    // 블룸 필터로 showId와 sectionId 존재 여부 먼저 확인
+    BloomFilterHandler showBloomFilter = bloomFilters.get("show");
+    BloomFilterHandler sectionBloomFilter = bloomFilters.get("section");
+
+    if (showBloomFilter != null && sectionBloomFilter != null) {
+      String showKey = String.valueOf(showId);
+      String sectionKey = String.valueOf(sectionId);
+
+      if (!showBloomFilter.contains(showKey)) {
+        log.warn("존재하지 않는 showId 요청: {}", showId);
+        throw new BusinessException(BaseCode.SHOW_NOT_FOUND);
+      }
+
+      if (!sectionBloomFilter.contains(sectionKey)) {
+        log.warn("존재하지 않는 sectionId 요청 - sectionId: {}", sectionId);
+        throw new BusinessException(BaseCode.SECTION_NOT_FOUND);
+      }
+    }
+
     // 캐시에서 ticket availability 조회
     List<TicketAvailability> ticketCache = getTicketAvailabilityByCache(showId, sectionId);
     if (!ticketCache.isEmpty()) {
