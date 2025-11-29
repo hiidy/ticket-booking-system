@@ -69,22 +69,15 @@ public class TicketService {
       return ticketCache;
     }
 
-    // 2. 블룸 필터로 showId와 sectionId 존재 여부 확인
-    BloomFilterHandler showBloomFilter = bloomFilters.get("show");
-    BloomFilterHandler sectionBloomFilter = bloomFilters.get("section");
+    // 2. 블룸 필터로 showId와 sectionId 조합 존재 여부 확인
+    BloomFilterHandler showSectionBloomFilter = bloomFilters.get("show_section");
 
-    if (showBloomFilter != null && sectionBloomFilter != null) {
-      String showKey = String.valueOf(showId);
-      String sectionKey = String.valueOf(sectionId);
+    if (showSectionBloomFilter != null) {
+      String showSectionKey = showId + ":" + sectionId;
 
-      if (!showBloomFilter.contains(showKey)) {
-        log.warn("존재하지 않는 showId 요청: {}", showId);
-        throw new BusinessException(BaseCode.SHOW_NOT_FOUND);
-      }
-
-      if (!sectionBloomFilter.contains(sectionKey)) {
-        log.warn("존재하지 않는 sectionId 요청 - sectionId: {}", sectionId);
-        throw new BusinessException(BaseCode.SECTION_NOT_FOUND);
+      if (!showSectionBloomFilter.contains(showSectionKey)) {
+        log.warn("존재하지 않는 showId/sectionId 조합 요청 - showId: {}, sectionId: {}", showId, sectionId);
+        throw new BusinessException(BaseCode.SHOW_SECTION_NOT_FOUND);
       }
     }
 

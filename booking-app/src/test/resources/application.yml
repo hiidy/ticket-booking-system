@@ -14,6 +14,9 @@ bloom-filter:
     section:
       expected-insertions: 100
       false-probability: 0.1
+    show_section:
+      expected-insertions: 10000
+      false-probability: 0.01
 
 queue:
   consumer-group: 'bookingGroup'

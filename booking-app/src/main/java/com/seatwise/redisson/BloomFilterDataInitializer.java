@@ -39,6 +39,7 @@ public class BloomFilterDataInitializer {
       loadTicketData();
       loadShowData();
       loadSectionData();
+      loadShowSectionData();
 
       log.info("========== 블룸 필터 데이터 초기화 완료 ==========");
     } catch (Exception e) {
@@ -131,6 +132,42 @@ public class BloomFilterDataInitializer {
       log.info("{}개의 섹션을 블룸 필터에 로딩했습니다", added);
     } catch (Exception e) {
       log.error("섹션 데이터 로딩 실패", e);
+      throw e;
+    }
+  }
+
+  private void loadShowSectionData() {
+    log.info("공연-섹션 조합 데이터를 블룸 필터에 로딩");
+    BloomFilterHandler filter = getFilter("show_section");
+    if (filter == null) {
+      log.warn("공연-섹션 블룸 필터가 설정되지 않았습니다. 공연-섹션 데이터 로딩을 건너뜁니다");
+      return;
+    }
+
+    try {
+      List<Ticket> tickets = ticketRepository.findAll();
+      if (tickets.isEmpty()) {
+        log.info("블룸 필터에 로딩할 티켓을 찾지 못함");
+        return;
+      }
+
+      int added = 0;
+      for (Ticket ticket : tickets) {
+        if (ticket.getShow() != null && ticket.getSectionId() != null) {
+          Long showId = ticket.getShow().getId();
+          Long sectionId = ticket.getSectionId();
+          if (showId != null && sectionId != null) {
+            String showSectionKey = showId + ":" + sectionId;
+            if (filter.add(showSectionKey)) {
+              added++;
+            }
+          }
+        }
+      }
+
+      log.info("{}개의 공연-섹션 조합을 블룸 필터에 로딩했습니다", added);
+    } catch (Exception e) {
+      log.error("공연-섹션 데이터 로딩 실패", e);
       throw e;
     }
   }
