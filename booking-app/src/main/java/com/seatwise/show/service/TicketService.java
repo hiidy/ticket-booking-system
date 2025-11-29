@@ -63,7 +63,13 @@ public class TicketService {
   }
 
   public List<TicketAvailability> getTicketAvailabilityBySection(Long showId, Long sectionId) {
-    // 블룸 필터로 showId와 sectionId 존재 여부 먼저 확인
+    // 1. 캐시에서 ticket availability 조회
+    List<TicketAvailability> ticketCache = getTicketAvailabilityByCache(showId, sectionId);
+    if (!ticketCache.isEmpty()) {
+      return ticketCache;
+    }
+
+    // 2. 블룸 필터로 showId와 sectionId 존재 여부 확인
     BloomFilterHandler showBloomFilter = bloomFilters.get("show");
     BloomFilterHandler sectionBloomFilter = bloomFilters.get("section");
 
@@ -82,13 +88,17 @@ public class TicketService {
       }
     }
 
-    // 캐시에서 ticket availability 조회
-    List<TicketAvailability> ticketCache = getTicketAvailabilityByCache(showId, sectionId);
-    if (!ticketCache.isEmpty()) {
-      return ticketCache;
+    // 3. null값 캐시 검사
+    String showSectionNullKey =
+        RedisKeyBuilder.createRedisKey(RedisKeys.CACHE_SHOW_SECTION_NULL, showId, sectionId);
+    Boolean showSectionNull = redisCache.hasKey(showSectionNullKey);
+
+    if (Boolean.TRUE.equals(showSectionNull)) {
+      log.warn("존재하지 않는 showId/sectionId 요청 - showId: {}, sectionId: {}", showId, sectionId);
+      throw new BusinessException(BaseCode.SHOW_SECTION_NOT_FOUND);
     }
 
-    // 분산락으로 캐시 스탬피드 방지
+    // 4. 분산락으로 캐시 스탬피드 방지
     String lockKey = String.format("ticket_lock:%d:%d", showId, sectionId);
     RLock lock = redissonClient.getLock(lockKey);
 
@@ -100,6 +110,12 @@ public class TicketService {
           return ticketCache;
         }
         List<Ticket> tickets = ticketRepository.findTicketsByShowIdAndSectionId(showId, sectionId);
+        if (tickets.isEmpty()) {
+          redisCache.putValue(showSectionNullKey, "null", 30, TimeUnit.MINUTES);
+          log.warn("존재하지 않는 showId/sectionId 요청 - showId: {}, sectionId: {}", showId, sectionId);
+          throw new BusinessException(BaseCode.SHOW_SECTION_NOT_FOUND);
+        }
+
         List<TicketAvailability> ticketAvailabilities =
             tickets.stream()
                 .map(

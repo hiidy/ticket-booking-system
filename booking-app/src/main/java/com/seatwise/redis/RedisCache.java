@@ -15,6 +15,14 @@ public class RedisCache {
   private final StringRedisTemplate redisTemplate;
   private final ObjectMapper objectMapper;
 
+  public Boolean hasKey(String key) {
+    return redisTemplate.hasKey(key);
+  }
+
+  public void putValue(String key, String value, long timeout, TimeUnit timeUnit) {
+    redisTemplate.opsForValue().set(key, value, timeout, timeUnit);
+  }
+
   public void putHash(String key, String field, Object value, long timeout, TimeUnit timeUnit) {
     String serializedValue = serializeValue(value);
     redisTemplate.opsForHash().put(key, field, serializedValue);
