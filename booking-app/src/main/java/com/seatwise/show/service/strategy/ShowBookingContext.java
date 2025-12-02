@@ -7,22 +7,22 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BookingContext {
+public class ShowBookingContext {
 
-  private final Map<String, BookingStrategy> strategies;
+  private final Map<String, ShowBookingStrategy> strategies;
 
-  public BookingContext(List<BookingStrategy> allStrategies) {
+  public ShowBookingContext(List<ShowBookingStrategy> allStrategies) {
     this.strategies =
         allStrategies.stream()
             .collect(
                 Collectors.toMap(
                     strategy ->
-                        strategy.getClass().getAnnotation(BookingStrategyVersion.class).value(),
+                        strategy.getClass().getAnnotation(ShowBookingStrategyVersion.class).value(),
                     Function.identity()));
   }
 
-  public BookingStrategy get(String version) {
-    BookingStrategy strategy = strategies.get(version);
+  public ShowBookingStrategy get(String version) {
+    ShowBookingStrategy strategy = strategies.get(version);
     if (strategy == null) {
       throw new IllegalArgumentException("지원하지 않는 버전입니다: " + version);
     }

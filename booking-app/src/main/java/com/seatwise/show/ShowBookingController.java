@@ -1,8 +1,8 @@
 package com.seatwise.show;
 
-import com.seatwise.booking.dto.request.BookingRequest;
-import com.seatwise.show.service.strategy.BookingContext;
-import com.seatwise.show.service.strategy.BookingVersion;
+import com.seatwise.show.dto.request.ShowBookingRequest;
+import com.seatwise.show.service.strategy.ShowBookingContext;
+import com.seatwise.show.service.strategy.ShowBookingVersion;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,37 +21,37 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ShowBookingController {
 
-  private final BookingContext bookingContext;
+  private final ShowBookingContext showBookingContext;
 
   @Operation(summary = "예약 생성 v1", description = "DB 비관적락으로 예약 처리")
   @PostMapping("/v1")
   public String createBookingV1(
       @Parameter(description = "멱등키", required = true) @RequestHeader("Idempotency-Key") UUID key,
-      @Valid @RequestBody BookingRequest request) {
-    return bookingContext.get(BookingVersion.V1.getVersion()).createBooking(key, request);
+      @Valid @RequestBody ShowBookingRequest request) {
+    return showBookingContext.get(ShowBookingVersion.V1.getVersion()).createBooking(key, request);
   }
 
   @Operation(summary = "예약 생성 v2", description = "Normal MultiLock으로 예약 처리")
   @PostMapping("/v2")
   public String createBookingV2(
       @Parameter(description = "멱등키", required = true) @RequestHeader("Idempotency-Key") UUID key,
-      @Valid @RequestBody BookingRequest request) {
-    return bookingContext.get(BookingVersion.V2.getVersion()).createBooking(key, request);
+      @Valid @RequestBody ShowBookingRequest request) {
+    return showBookingContext.get(ShowBookingVersion.V2.getVersion()).createBooking(key, request);
   }
 
   @Operation(summary = "예약 생성 v21", description = "Redis Faster Multi lock")
   @PostMapping("/v21")
   public String createBookingV21(
       @Parameter(description = "멱등키", required = true) @RequestHeader("Idempotency-Key") UUID key,
-      @Valid @RequestBody BookingRequest request) {
-    return bookingContext.get(BookingVersion.V21.getVersion()).createBooking(key, request);
+      @Valid @RequestBody ShowBookingRequest request) {
+    return showBookingContext.get(ShowBookingVersion.V21.getVersion()).createBooking(key, request);
   }
 
   @Operation(summary = "예약 생성 v3", description = "Local Lock + Redisson Lock")
   @PostMapping("/v3")
   public String createBookingV3(
       @Parameter(description = "멱등키", required = true) @RequestHeader("Idempotency-Key") UUID key,
-      @Valid @RequestBody BookingRequest request) {
-    return bookingContext.get(BookingVersion.V3.getVersion()).createBooking(key, request);
+      @Valid @RequestBody ShowBookingRequest request) {
+    return showBookingContext.get(ShowBookingVersion.V3.getVersion()).createBooking(key, request);
   }
 }

@@ -1,9 +1,9 @@
 package com.seatwise.show.service.strategy;
 
-import com.seatwise.booking.dto.request.BookingRequest;
 import com.seatwise.booking.exception.RecoverableBookingException;
 import com.seatwise.core.BaseCode;
 import com.seatwise.show.cache.local.LocalLock;
+import com.seatwise.show.dto.request.ShowBookingRequest;
 import com.seatwise.show.service.ShowBookingService;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -15,9 +15,9 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 
 @Slf4j
-@BookingStrategyVersion("v3")
+@ShowBookingStrategyVersion("v3")
 @RequiredArgsConstructor
-public class BookingV3Strategy implements BookingStrategy {
+public class ShowBookingV3Strategy implements ShowBookingStrategy {
 
   private final ShowBookingService showBookingService;
   private final RedissonClient redissonClient;
@@ -28,7 +28,7 @@ public class BookingV3Strategy implements BookingStrategy {
   private static final TimeUnit LOCK_TIME_UNIT = TimeUnit.SECONDS;
 
   @Override
-  public String createBooking(UUID idempotencyKey, BookingRequest request) {
+  public String createBooking(UUID idempotencyKey, ShowBookingRequest request) {
     String lockKey = "section:" + request.sectionId();
     ReentrantLock sectionLocalLock = this.localLock.getLock(lockKey);
 

@@ -3,7 +3,7 @@ package com.seatwise.show.service.strategy;
 import lombok.Getter;
 
 @Getter
-public enum BookingVersion {
+public enum ShowBookingVersion {
   V1("v1", "DB Lock 방식"),
   V2("v2", "Redisson Multi Lock 방식"),
   V21("v21", "faster multi lock"),
@@ -12,7 +12,7 @@ public enum BookingVersion {
   private final String version;
   private final String description;
 
-  BookingVersion(String version, String description) {
+  ShowBookingVersion(String version, String description) {
     this.version = version;
     this.description = description;
   }

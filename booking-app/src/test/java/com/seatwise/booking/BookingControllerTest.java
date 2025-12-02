@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seatwise.booking.dto.BookingCreateCommand;
 import com.seatwise.booking.dto.request.BookingRequest;
 import com.seatwise.booking.messaging.BookingMessageProducer;
-import com.seatwise.show.service.strategy.BookingContext;
+import com.seatwise.show.service.strategy.ShowBookingContext;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ class BookingControllerTest {
   @MockBean private BookingMessageProducer bookingMessageProducer;
   @MockBean private BookingService bookingService;
   @MockBean private AsyncBookingService asyncBookingService;
-  @MockBean private BookingContext bookingContext;
+  @MockBean private ShowBookingContext showBookingContext;
 
   @Test
   void shouldReturnAccepted_whenCreateBookingWithValidIdempotencyKey() throws Exception {

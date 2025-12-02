@@ -1,10 +1,10 @@
 package com.seatwise.show.service.strategy;
 
-import com.seatwise.booking.dto.request.BookingRequest;
 import com.seatwise.booking.exception.RecoverableBookingException;
 import com.seatwise.core.BaseCode;
+import com.seatwise.show.dto.request.ShowBookingRequest;
 import com.seatwise.show.service.ShowBookingService;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +13,9 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 
 @Slf4j
-@BookingStrategyVersion("v2")
+@ShowBookingStrategyVersion("v21")
 @RequiredArgsConstructor
-public class BookingV2Strategy implements BookingStrategy {
+public class ShowBookingV21Strategy implements ShowBookingStrategy {
 
   private final ShowBookingService showBookingService;
   private final RedissonClient redissonClient;
@@ -25,8 +25,10 @@ public class BookingV2Strategy implements BookingStrategy {
   private static final TimeUnit LOCK_TIME_UNIT = TimeUnit.SECONDS;
 
   @Override
-  public String createBooking(UUID idempotencyKey, BookingRequest request) {
-    RLock multiLock = acquireMultiLock(request.ticketIds());
+  public String createBooking(UUID idempotencyKey, ShowBookingRequest request) {
+    RLock multiLock =
+        redissonClient.getMultiLock(
+            request.sectionId().toString(), new ArrayList<>(request.ticketIds()));
 
     try {
       if (!multiLock.tryLock(LOCK_WAIT_TIME, LOCK_LEASE_TIME, LOCK_TIME_UNIT)) {
@@ -42,14 +44,6 @@ public class BookingV2Strategy implements BookingStrategy {
     } finally {
       safeUnlock(multiLock);
     }
-  }
-
-  private RLock acquireMultiLock(List<Long> ticketIds) {
-    return redissonClient.getMultiLock(
-        ticketIds.stream()
-            .sorted()
-            .map(id -> redissonClient.getLock("lock:seat:" + id))
-            .toArray(RLock[]::new));
   }
 
   private void safeUnlock(RLock lock) {

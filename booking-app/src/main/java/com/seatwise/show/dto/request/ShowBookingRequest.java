@@ -1,0 +1,8 @@
+package com.seatwise.show.dto.request;
+
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import java.util.List;
+
+public record ShowBookingRequest(
+    @NotNull Long memberId, @NotNull @NotEmpty List<Long> ticketIds, @NotNull Long sectionId) {}
