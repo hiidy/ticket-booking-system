@@ -1,7 +1,7 @@
 package com.seatwise.show.service.strategy;
 
-import com.seatwise.booking.exception.RecoverableBookingException;
 import com.seatwise.core.BaseCode;
+import com.seatwise.core.exception.BusinessException;
 import com.seatwise.show.dto.request.ShowBookingRequest;
 import com.seatwise.show.service.ShowBookingService;
 import java.util.List;
@@ -30,7 +30,7 @@ public class ShowBookingV2Strategy implements ShowBookingStrategy {
 
     try {
       if (!multiLock.tryLock(LOCK_WAIT_TIME, LOCK_LEASE_TIME, LOCK_TIME_UNIT)) {
-        throw new RecoverableBookingException(BaseCode.SEAT_NOT_AVAILABLE, idempotencyKey);
+        throw new BusinessException(BaseCode.SEAT_NOT_AVAILABLE);
       }
 
       return showBookingService.create(idempotencyKey, request.memberId(), request.ticketIds());
@@ -38,7 +38,7 @@ public class ShowBookingV2Strategy implements ShowBookingStrategy {
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       log.error("락 획득 중 인터럽트 발생: requestId={}", idempotencyKey);
-      throw new RecoverableBookingException(BaseCode.LOCK_ACQUISITION_TIMEOUT, idempotencyKey);
+      throw new BusinessException(BaseCode.LOCK_ACQUISITION_TIMEOUT);
     } finally {
       safeUnlock(multiLock);
     }

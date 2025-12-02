@@ -1,9 +1,8 @@
 package com.seatwise.show.service;
 
 import com.seatwise.booking.BookingService;
-import com.seatwise.booking.exception.FatalBookingException;
-import com.seatwise.booking.exception.RecoverableBookingException;
 import com.seatwise.core.BaseCode;
+import com.seatwise.core.exception.BusinessException;
 import com.seatwise.member.MemberRepository;
 import com.seatwise.show.entity.Ticket;
 import com.seatwise.show.repository.TicketRepository;
@@ -29,7 +28,7 @@ public class ShowBookingService {
   public String create(UUID requestId, Long memberId, List<Long> ticketIds) {
     // 1. 멤버 존재 여부 확인
     if (!memberRepository.existsById(memberId)) {
-      throw new FatalBookingException(BaseCode.MEMBER_NOT_FOUND, requestId);
+      throw new BusinessException(BaseCode.MEMBER_NOT_FOUND);
     }
 
     LocalDateTime bookingRequestTime = LocalDateTime.now();
@@ -55,14 +54,14 @@ public class ShowBookingService {
       LocalDateTime bookingRequestTime,
       UUID requestId) {
     if (tickets.size() != ticketIds.size()) {
-      throw new RecoverableBookingException(BaseCode.SEAT_NOT_AVAILABLE, requestId);
+      throw new BusinessException(BaseCode.SEAT_NOT_AVAILABLE);
     }
 
     boolean anyUnavailable =
         tickets.stream().anyMatch(ticket -> !ticket.canAssignBooking(bookingRequestTime));
 
     if (anyUnavailable) {
-      throw new RecoverableBookingException(BaseCode.SEAT_NOT_AVAILABLE, requestId);
+      throw new BusinessException(BaseCode.SEAT_NOT_AVAILABLE);
     }
   }
 
@@ -70,7 +69,7 @@ public class ShowBookingService {
   public String createWithLock(UUID requestId, Long memberId, List<Long> ticketIds) {
     // 1. 멤버 존재 여부 확인
     if (!memberRepository.existsById(memberId)) {
-      throw new FatalBookingException(BaseCode.MEMBER_NOT_FOUND, requestId);
+      throw new BusinessException(BaseCode.MEMBER_NOT_FOUND);
     }
 
     LocalDateTime bookingRequestTime = LocalDateTime.now();
@@ -80,13 +79,13 @@ public class ShowBookingService {
     try {
       tickets = ticketRepository.findAllAvailableSeatsWithLock(ticketIds, bookingRequestTime);
     } catch (org.springframework.dao.PessimisticLockingFailureException e) {
-      throw new RecoverableBookingException(BaseCode.SEAT_NOT_AVAILABLE, requestId);
+      throw new BusinessException(BaseCode.SEAT_NOT_AVAILABLE);
     }
 
     // 3. 티켓 가용성 검증
     if (tickets.size() != ticketIds.size()
         || tickets.stream().anyMatch(t -> !t.canAssignBooking(bookingRequestTime))) {
-      throw new RecoverableBookingException(BaseCode.SEAT_NOT_AVAILABLE, requestId);
+      throw new BusinessException(BaseCode.SEAT_NOT_AVAILABLE);
     }
 
     // 4. 예매 생성
@@ -103,7 +102,7 @@ public class ShowBookingService {
   @Transactional
   public void createFailedBooking(UUID requestId, Long memberId) {
     if (!memberRepository.existsById(memberId)) {
-      throw new FatalBookingException(BaseCode.MEMBER_NOT_FOUND, requestId);
+      throw new BusinessException(BaseCode.MEMBER_NOT_FOUND);
     }
 
     bookingService.createFailedBooking(requestId, memberId);

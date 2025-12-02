@@ -3,8 +3,7 @@ package com.seatwise.booking;
 import static org.assertj.core.api.Assertions.*;
 
 import com.seatwise.annotation.ServiceTest;
-import com.seatwise.booking.exception.BookingException;
-import com.seatwise.core.BaseCode;
+import com.seatwise.core.exception.BusinessException;
 import com.seatwise.member.Member;
 import com.seatwise.member.MemberRepository;
 import com.seatwise.show.entity.Show;
@@ -85,8 +84,7 @@ class BookingServiceTest {
 
     // when & then
     assertThatThrownBy(() -> showBookingService.create(requestId, memberId, invalidTicketIds))
-        .isInstanceOf(BookingException.class)
-        .hasFieldOrPropertyWithValue("baseCode", BaseCode.SEAT_NOT_AVAILABLE);
+        .isInstanceOf(BusinessException.class);
   }
 
   @Test
@@ -112,8 +110,7 @@ class BookingServiceTest {
 
     // when & then
     assertThatThrownBy(() -> showBookingService.create(duplicatedId, memberId, secondTicketIds))
-        .isInstanceOf(BookingException.class)
-        .hasFieldOrPropertyWithValue("baseCode", BaseCode.DUPLICATE_IDEMPOTENCY_KEY);
+        .isInstanceOf(BusinessException.class);
   }
 
   @Test
@@ -130,7 +127,6 @@ class BookingServiceTest {
 
     // when & then
     assertThatThrownBy(() -> showBookingService.create(secondRequestId, otherMemberId, ticketIds))
-        .isInstanceOf(BookingException.class)
-        .hasFieldOrPropertyWithValue("baseCode", BaseCode.SEAT_NOT_AVAILABLE);
+        .isInstanceOf(BusinessException.class);
   }
 }

@@ -3,8 +3,6 @@ package com.seatwise.core.advice;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seatwise.core.ApiResponse;
-import com.seatwise.core.BaseCode;
-import com.seatwise.core.exception.BaseCodeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
@@ -13,7 +11,6 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
@@ -63,18 +60,6 @@ public class ApiResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
     }
 
     return ApiResponse.ok(body);
-  }
-
-  @ExceptionHandler(Exception.class)
-  public ApiResponse<Void> handleException(Exception e) {
-    log.error("Unhandled exception: ", e);
-    return ApiResponse.error(BaseCode.SYSTEM_ERROR);
-  }
-
-  @ExceptionHandler(BaseCodeException.class)
-  public ApiResponse<Void> handleBaseCodeException(BaseCodeException e) {
-    log.warn("Handled {} : {}", e.getClass().getSimpleName(), e.getBaseCode().name(), e);
-    return ApiResponse.error(e.getBaseCode());
   }
 
   private boolean isSwaggerRequest(ServerHttpRequest request) {

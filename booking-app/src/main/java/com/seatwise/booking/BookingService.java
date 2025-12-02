@@ -4,8 +4,8 @@ import com.seatwise.booking.dto.response.BookingStatusResponse;
 import com.seatwise.booking.entity.Booking;
 import com.seatwise.booking.entity.BookingRepository;
 import com.seatwise.booking.entity.BookingStatus;
-import com.seatwise.booking.exception.FatalBookingException;
 import com.seatwise.core.BaseCode;
+import com.seatwise.core.exception.BusinessException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class BookingService {
   @Transactional(propagation = Propagation.MANDATORY)
   public Long createBooking(UUID requestId, Long memberId, int totalAmount) {
     if (bookingRepository.existsByRequestId(requestId)) {
-      throw new FatalBookingException(BaseCode.DUPLICATE_IDEMPOTENCY_KEY, requestId);
+      throw new BusinessException(BaseCode.DUPLICATE_IDEMPOTENCY_KEY);
     }
 
     Booking booking = Booking.createNew(requestId, memberId, totalAmount);
@@ -34,7 +34,7 @@ public class BookingService {
   @Transactional(propagation = Propagation.MANDATORY)
   public Long createFailedBooking(UUID requestId, Long memberId) {
     if (bookingRepository.existsByRequestId(requestId)) {
-      throw new FatalBookingException(BaseCode.DUPLICATE_IDEMPOTENCY_KEY, requestId);
+      throw new BusinessException(BaseCode.DUPLICATE_IDEMPOTENCY_KEY);
     }
 
     Booking booking = Booking.createNew(requestId, memberId, 0);
