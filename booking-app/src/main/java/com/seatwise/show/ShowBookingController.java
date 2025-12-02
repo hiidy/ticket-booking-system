@@ -47,7 +47,7 @@ public class ShowBookingController {
     return showBookingContext.get(ShowBookingVersion.V21.getVersion()).createBooking(key, request);
   }
 
-  @Operation(summary = "예약 생성 v3", description = "Local Lock + Redisson Lock")
+  @Operation(summary = "예약 생성 v3", description = "Faster Multi With Async Booking")
   @PostMapping("/v3")
   public String createBookingV3(
       @Parameter(description = "멱등키", required = true) @RequestHeader("Idempotency-Key") UUID key,

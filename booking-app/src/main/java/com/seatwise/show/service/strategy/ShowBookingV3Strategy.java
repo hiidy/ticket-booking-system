@@ -21,7 +21,6 @@ public class ShowBookingV3Strategy implements ShowBookingStrategy {
 
   private final ShowBookingService showBookingService;
   private final RedissonClient redissonClient;
-  private final LocalLock localLock = new LocalLock();
 
   private static final long LOCK_WAIT_TIME = 0;
   private static final long LOCK_LEASE_TIME = 300;
@@ -29,37 +28,23 @@ public class ShowBookingV3Strategy implements ShowBookingStrategy {
 
   @Override
   public String createBooking(UUID idempotencyKey, ShowBookingRequest request) {
-    String lockKey = "section:" + request.sectionId();
-    ReentrantLock sectionLocalLock = this.localLock.getLock(lockKey);
+    RLock multiLock =
+        redissonClient.getMultiLock(
+            request.sectionId().toString(), new ArrayList<>(request.ticketIds()));
 
     try {
-      sectionLocalLock.lock();
-
-      RLock multiLock =
-          redissonClient.getMultiLock(
-              request.sectionId().toString(), new ArrayList<>(request.ticketIds()));
-
-      try {
-        if (!multiLock.tryLock(LOCK_WAIT_TIME, LOCK_LEASE_TIME, LOCK_TIME_UNIT)) {
-          throw new RecoverableBookingException(BaseCode.SEAT_NOT_AVAILABLE, idempotencyKey);
-        }
-
-        return showBookingService.create(idempotencyKey, request.memberId(), request.ticketIds());
-
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        log.error("Redis 락 획득 중 인터럽트 발생: requestId={}", idempotencyKey);
-        throw new RecoverableBookingException(BaseCode.LOCK_ACQUISITION_TIMEOUT, idempotencyKey);
-      } finally {
-        safeUnlock(multiLock);
+      if (!multiLock.tryLock(LOCK_WAIT_TIME, LOCK_LEASE_TIME, LOCK_TIME_UNIT)) {
+        throw new RecoverableBookingException(BaseCode.SEAT_NOT_AVAILABLE, idempotencyKey);
       }
 
+      return showBookingService.create(idempotencyKey, request.memberId(), request.ticketIds());
+
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      log.error("락 획득 중 인터럽트 발생: requestId={}", idempotencyKey);
+      throw new RecoverableBookingException(BaseCode.LOCK_ACQUISITION_TIMEOUT, idempotencyKey);
     } finally {
-      try {
-        sectionLocalLock.unlock();
-      } catch (Exception e) {
-        log.error("로컬 락 해제 중 예외 발생", e);
-      }
+      safeUnlock(multiLock);
     }
   }
 
